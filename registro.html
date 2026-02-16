@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAMAKO | Registro Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+:root{ --gold:#bf953f; }
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    min-height:100vh;
+    background:#050505;
+    font-family:'Montserrat',sans-serif;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow-y:auto; /* 👈 permite scroll vertical */
+    padding:40px 20px; /* 👈 evita que toque bordes */
+}
+
+.background{
+    position:fixed;
+    inset:0;
+    z-index:-2;
+    background:
+    radial-gradient(circle at center, rgba(191,149,63,.2), transparent 60%),
+    repeating-linear-gradient(45deg,#0b0b0b 0px,#0b0b0b 2px,#050505 2px,#050505 4px);
+}
+
+.frame{
+    position:fixed;
+    inset:40px;
+    border:1.5px solid rgba(191,149,63,.4);
+    pointer-events:none;
+}
+
+@media (max-height:800px){
+    .frame{
+        display:none; /* 👈 evita que rompa en pantallas bajas */
+    }
+}
+
+.register-card{
+    max-width:500px;
+    width:100%;
+    background:linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.4));
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(191,149,63,.3);
+    border-radius:24px;
+    padding:40px;
+    text-align:center;
+    opacity:0;
+    animation:fadeUp 1s ease forwards;
+}
+
+.register-card h1{
+    font-family:'Cinzel',serif;
+    letter-spacing:6px;
+    color:var(--gold);
+    margin-bottom:10px;
+    font-size:1.4rem;
+}
+
+.register-card p{
+    font-size:.75rem;
+    color:#aaa;
+    margin-bottom:30px;
+    letter-spacing:1px;
+}
+
+form{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:18px;
+}
+
+.form-group{
+    margin:0;
+}
+
+.form-group input{
+    width:100%;
+    padding:16px 22px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(191,149,63,.35);
+    border-radius:50px;
+    color:white;
+    outline:none;
+    transition:all .3s ease;
+    font-size:.85rem;
+    letter-spacing:.5px;
+}
+
+.form-group input::placeholder{
+    color:rgba(255,255,255,.55);
+    font-weight:300;
+}
+.btn-register{
+    width:100%;
+    padding:14px;
+    border-radius:50px;
+    border:1px solid var(--gold);
+    background:transparent;
+    color:var(--gold);
+    font-weight:600;
+    letter-spacing:2px;
+    cursor:pointer;
+    transition:.4s;
+    margin-top:10px;
+}
+
+.btn-register:hover{
+    background:var(--gold);
+    color:black;
+    transform:translateY(-3px);
+    box-shadow:0 10px 20px rgba(191,149,63,.3);
+}
+
+.login-link{
+    margin-top:20px;
+    font-size:.7rem;
+    color:#777;
+}
+
+.login-link a{
+    color:var(--gold);
+    text-decoration:none;
+}
+.layout{
+    width:100%;
+    max-width:1200px;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:80px;
+    align-items:center;
+}
+
+.branding{
+    padding:40px;
+}
+
+.logo{
+    font-family:'Cinzel',serif;
+    font-size:3rem;
+    letter-spacing:8px;
+    color:var(--gold);
+    margin-bottom:20px;
+}
+
+.tagline{
+    color:#999;
+    font-size:1rem;
+    max-width:300px;
+    line-height:1.6;
+}
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.7);
+    backdrop-filter:blur(8px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    opacity:0;
+    pointer-events:none;
+    transition:.4s ease;
+}
+
+.modal.show{
+    opacity:1;
+    pointer-events:auto;
+}
+
+.modal-content{
+    background:linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.8));
+    border:1px solid rgba(191,149,63,.4);
+    border-radius:24px;
+    padding:40px;
+    text-align:center;
+    width:90%;
+    max-width:400px;
+    box-shadow:0 20px 60px rgba(0,0,0,.6);
+    animation:scaleIn .4s ease;
+}
+
+.modal-content h2{
+    font-family:'Cinzel',serif;
+    color:var(--gold);
+    margin-bottom:15px;
+    letter-spacing:2px;
+}
+
+.modal-content p{
+    color:#aaa;
+    margin-bottom:30px;
+    font-size:.9rem;
+}
+
+@keyframes scaleIn{
+    from{transform:scale(.8); opacity:0;}
+    to{transform:scale(1); opacity:1;}
+}
+@keyframes fadeUp{
+    from{
+        opacity:0;
+        transform:translateY(40px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+.input-error{
+    border-color:#ff4d4d !important;
+    box-shadow:0 0 10px rgba(255,77,77,.4);
+}
+/* ============================= */
+/* ===== RESPONSIVE TAMAKO ===== */
+/* ============================= */
+
+@media (max-width: 900px) {
+
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid rgba(191, 149, 63, 0.2);
+        padding: 20px;
+    }
+
+    .main-content {
+        padding: 25px;
+    }
+
+}
+</style>
+</head>
+<body>
+
+<div class="background"></div>
+<div class="frame"></div>
+
+<div class="layout">
+
+    <div class="branding">
+        <h1 class="logo">TAMAKO</h1>
+        <p class="tagline">Sistema inteligente para negocios premium</p>
+    </div>
+
+    <div class="register-card">
+
+    <form id="registerForm">
+        <h1 style="grid-column:span 2;">PRUEBA DEMO</h1>
+        <p style="grid-column:span 2; margin-bottom:20px;">Crea tu cuenta gratuita por 7 días</p>
+
+        <div class="form-group">
+            <input type="text" id="nombre_tienda" placeholder="Nombre del Negocio" required>
+        </div>
+
+        <div class="form-group">
+            <input type="text" id="propietario" placeholder="Propietario" required>
+        </div>
+
+        <div class="form-group">
+            <input type="tel" id="telefono" placeholder="Teléfono" required maxlength="10" pattern="[0-9]{10}">
+            <small id="phoneError" style="color:#ff4d4d; display:none; grid-column:span 2; font-size:.75rem; text-align:left;">
+                El teléfono debe tener exactamente 10 dígitos
+            </small>
+        </div>
+
+        <div class="form-group">
+            <input type="text" id="direccion" placeholder="Dirección" required>
+        </div>
+
+        <div class="form-group">
+            <input type="number" id="cantidad_puestos" placeholder="Cantidad de Puestos" required>
+        </div>
+
+        <div class="form-group">
+            <input type="email" id="email" placeholder="Correo Electrónico" required>
+        </div>
+
+        <div class="form-group">
+            <input type="password" id="password" placeholder="Contraseña" required>
+        </div>
+        
+        <div class="form-group">
+            <input type="password" id="confirmPassword" placeholder="Confirmar Contraseña" required>
+        </div>
+
+        <small id="passwordError" style="color:#ff4d4d; display:none; grid-column:span 2; font-size:.75rem; text-align:left;">
+            Las contraseñas no coinciden
+        </small>
+
+        <button type="submit" class="btn-register" style="grid-column:span 2;">
+            CREAR DEMO
+        </button>
+
+    </form>
+    <!-- 🔥 MODAL OTP -->
+    <div id="otpModal" class="modal">
+        <div class="modal-content">
+            <h2>Verifica tu correo 📩</h2>
+            <p>Te enviamos un código de 6 dígitos a tu email.</p>
+
+            <input type="text" id="otpCode" placeholder="Ingresa el código de 6 dígitos" maxlength="6"
+            style="margin-bottom:15px; width:100%; padding:14px; border-radius:50px; border:1px solid rgba(191,149,63,.4); background:rgba(255,255,255,0.05); color:white;">
+
+            <button type="button" id="verifyOtp" class="btn-register">
+                VERIFICAR CÓDIGO
+            </button>
+        </div>
+    </div>
+
+    <!-- 🔥 MODAL ÉXITO -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h2>Cuenta creada exitosamente ✨</h2>
+            <p>Tu negocio ya está listo para comenzar.</p>
+            <button id="goDashboard" class="btn-register">
+                ACCEDER AL SISTEMA
+            </button>
+        </div>
+    </div>
+    <div class="login-link">
+        ¿Ya tienes cuenta? <a href="login.html">Iniciar sesión</a>
+    </div>
+
+</div>
+
+<!-- 1️⃣ Cargar Supabase -->
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const supabaseUrl = "https://smibbddmwgdmqpwsuaqr.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtaWJiZGRtd2dkbXFwd3N1YXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzODc1NzYsImV4cCI6MjA4NTk2MzU3Nn0.S3Z4m8s_nHa_reulKMFH1RtqoUgh9Cqzj69H0WTbghk";
+
+const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+document.getElementById("registerForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+    const submitButton = e.target.querySelector("button[type='submit']");
+    submitButton.disabled = true;
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    const errorText = document.getElementById("passwordError");
+    const passwordInput = document.getElementById("password");
+    const confirmInput = document.getElementById("confirmPassword");
+
+    if(password !== confirmPassword){
+        errorText.style.display = "block";
+
+        passwordInput.classList.add("input-error");
+        confirmInput.classList.add("input-error");
+        submitButton.disabled = false;
+
+        return;
+    } else {
+        errorText.style.display = "none";
+
+        passwordInput.classList.remove("input-error");
+        confirmInput.classList.remove("input-error");
+    }
+    // VALIDAR TELÉFONO
+        const phoneInput = document.getElementById("telefono");
+        const phoneError = document.getElementById("phoneError");
+        const phoneValue = phoneInput.value.trim();
+
+        if(!/^\d{10}$/.test(phoneValue)){
+            phoneError.style.display = "block";
+            phoneInput.classList.add("input-error");
+            submitButton.disabled = false;
+            return;
+        } else {
+            phoneError.style.display = "none";
+            phoneInput.classList.remove("input-error");
+        }
+        // REGISTRAR USUARIO EN SUPABASE
+        const email = document.getElementById("email").value.trim().toLowerCase();
+        const passwordValue = document.getElementById("password").value;
+
+        const { data, error } = await supabaseClient.auth.signUp({
+            email: email,
+            password: passwordValue
+        });
+
+        if (error) {
+            alert(error.message);
+            submitButton.disabled = false;
+            return;
+        }
+        document.getElementById("registerForm").style.opacity = "0.3";
+        document.getElementById("otpModal").classList.add("show");
+        submitButton.disabled = false;
+});
+const passwordInput = document.getElementById("password");
+const confirmInput = document.getElementById("confirmPassword");
+const errorText = document.getElementById("passwordError");
+
+function validatePasswords(){
+    if(passwordInput.value === confirmInput.value){
+        errorText.style.display = "none";
+        passwordInput.classList.remove("input-error");
+        confirmInput.classList.remove("input-error");
+    }
+}
+
+passwordInput.addEventListener("input", validatePasswords);
+confirmInput.addEventListener("input", validatePasswords);
+// BLOQUEAR LETRAS EN TELÉFONO
+const phoneInput = document.getElementById("telefono");
+const phoneError = document.getElementById("phoneError");
+
+phoneInput.addEventListener("input", function(){
+    this.value = this.value.replace(/\D/g, '');
+
+    if(this.value.length === 10){
+        phoneError.style.display = "none";
+        this.classList.remove("input-error");
+    }
+});
+
+// ==========================
+// VERIFICAR CÓDIGO OTP
+// ==========================
+document.getElementById("verifyOtp").addEventListener("click", async function(){
+
+    const code = document.getElementById("otpCode").value.trim();
+    if(!/^\d{6}$/.test(code)){
+    alert("Ingresa un código válido de 6 dígitos");
+    return;
+}
+    const email = document.getElementById("email").value.trim();
+
+    if(!email){
+        alert("Primero debes registrarte con tu correo.");
+        return;
+    }
+
+    const { data, error } = await supabaseClient.auth.verifyOtp({
+    email: email,
+    token: code,
+    type: "signup"
+});
+
+    if(error){
+    alert("Código incorrecto o vencido");
+    return;
+}
+
+// 🔥 CREAR OBJETO PARA INSERTAR EN TABLA TIENDAS
+const tiendaData = {
+    nombre_tienda: document.getElementById("nombre_tienda").value.trim(),
+    propietario_telefono: document.getElementById("propietario").value.trim() + " - " + document.getElementById("telefono").value.trim(),
+    direccion: document.getElementById("direccion").value.trim(),
+    cantidad_puestos: parseInt(document.getElementById("cantidad_puestos").value),
+    email: document.getElementById("email").value.trim().toLowerCase()
+};
+
+        // 🔥 INSERTAR EN SUPABASE
+        const { error: insertError } = await supabaseClient
+            .from("tiendas")
+            .insert([tiendaData]);
+
+        if(insertError){
+            alert("Error al guardar la tienda: " + insertError.message);
+            return;
+        }
+document.getElementById("otpModal").classList.remove("show");
+document.getElementById("registerForm").style.opacity = "1";
+document.getElementById("registerForm").style.display = "none";
+
+const modal = document.getElementById("successModal");
+modal.classList.add("show");
+
+});
+
+// 👇 AQUÍ DENTRO DEL SCRIPT
+document.getElementById("goDashboard").addEventListener("click", function(){
+    window.location.href = "dashboard.html";
+});
+</script>
+</body>
+</html>

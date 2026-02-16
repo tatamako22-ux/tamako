@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAMAKO | Agenda Maestra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #bf953f; --dark-card: rgba(255, 255, 255, 0.03); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #050505; color: white; font-family: 'Montserrat', sans-serif; display: flex; min-height: 100vh; }
+
+        /* Sidebar Reutilizable */
+        .sidebar {
+            width: 260px;
+            background: rgba(10, 10, 10, 0.95);
+            border-right: 1px solid rgba(191, 149, 63, 0.2);
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+        .sidebar-logo { font-family: 'Cinzel'; color: var(--gold); letter-spacing: 4px; font-size: 1.2rem; text-align: center; margin-bottom: 20px; }
+        .nav-item { padding: 15px; color: #888; text-decoration: none; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; border-radius: 8px; display: flex; align-items: center; gap: 15px; }
+        .nav-item:hover, .nav-item.active {
+            background: var(--dark-card);
+            color: var(--gold);
+            box-shadow: inset 0 0 10px rgba(191, 149, 63, 0.1);
+        }
+        .nav-item.logout {
+            margin-top: auto; 
+            color: #ff4d4d; 
+            border: 1px solid rgba(255, 77, 77, 0.1);
+        }
+        .nav-item.logout:hover {
+            background: rgba(255, 77, 77, 0.1);
+            color: #ff4d4d;
+        }
+
+        .main-content { flex-grow: 1; padding: 40px 6%; display: flex; flex-direction: column; }
+
+        /* Controles de Fecha */
+        .agenda-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .date-selector { display: flex; align-items: center; gap: 20px; background: var(--dark-card); padding: 10px 20px; border-radius: 50px; border: 1px solid rgba(191,149,63,0.3); }
+        .date-selector span { font-family: 'Cinzel'; font-size: 0.9rem; letter-spacing: 2px; color: var(--gold); }
+
+        /* Grilla de Agenda */
+        .agenda-grid {
+            display: grid;
+            grid-template-columns: 80px repeat(2, 1fr); /* 80px para horas, 2 columnas para barberos */
+                    @media (max-width: 900px) {
+
+            .agenda-grid {
+                overflow-x: auto;
+                display: block;
+            }
+
+        }
+            background: var(--dark-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .grid-header { background: rgba(191, 149, 63, 0.1); padding: 15px; text-align: center; border-bottom: 1px solid rgba(191, 149, 63, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.05); }
+        .grid-header h3 { font-family: 'Cinzel'; font-size: 0.7rem; letter-spacing: 2px; color: var(--gold); }
+
+        .time-slot { height: 80px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #666; border-bottom: 1px solid rgba(255, 255, 255, 0.02); }
+        .appointment-slot { height: 80px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); border-left: 1px solid rgba(255, 255, 255, 0.02); padding: 5px; position: relative; }
+
+        /* Tarjeta de Cita dentro de la Agenda */
+        .event {
+            background: linear-gradient(135deg, rgba(191, 149, 63, 0.2), rgba(191, 149, 63, 0.05));
+            border-left: 3px solid var(--gold);
+            height: 100%;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .event:hover { transform: scale(0.98); background: rgba(191, 149, 63, 0.3); }
+        .event-title { font-weight: 600; margin-bottom: 3px; }
+        .event-desc { font-size: 0.6rem; color: #aaa; }
+        /* ============================= */
+/* ===== RESPONSIVE TAMAKO ===== */
+/* ============================= */
+
+@media (max-width: 900px) {
+
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid rgba(191, 149, 63, 0.2);
+        padding: 20px;
+    }
+
+    .main-content {
+        padding: 25px;
+    }
+
+}
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">TAMAKO</div>
+        <nav style="display: flex; flex-direction: column; gap: 10px; height: 100%;">
+            <a href="dashboard.html" class="nav-item">Dashboard</a>
+            <a href="agenda.html" class="nav-item">Agenda</a>
+            <a href="clientes.html" class="nav-item">Clientes</a>
+            <a href="barberos.html" class="nav-item">Barberos</a>
+            <a href="ajustes.html" class="nav-item">Ajustes</a>
+            <a href="index.html" class="nav-item logout">Cerrar Sesión</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="agenda-header">
+            <div>
+                <h1 style="font-family: 'Cinzel'; font-size: 1.5rem; letter-spacing: 3px;">AGENDA MAESTRA</h1>
+                <p style="color: #666; font-size: 0.8rem;">Sincronización de turnos en tiempo real</p>
+            </div>
+            <div class="date-selector">
+                <button style="background:none; border:none; color:var(--gold); cursor:pointer;">&lt;</button>
+                <span>Sábado, 14 Feb 2026</span>
+                <button style="background:none; border:none; color:var(--gold); cursor:pointer;">&gt;</button>
+            </div>
+        </div>
+
+        <div class="agenda-grid">
+            <div class="grid-header"></div>
+            <div class="grid-header"><h3>MATEO SILVA</h3></div>
+            <div class="grid-header"><h3>SANTIAGO PAZ</h3></div>
+
+            <div class="time-slot">09:00 AM</div>
+            <div class="appointment-slot">
+                <div class="event">
+                    <div class="event-title">Julián Rodríguez</div>
+                    <div class="event-desc">Corte + Barba</div>
+                </div>
+            </div>
+            <div class="appointment-slot"></div>
+
+            <div class="time-slot">10:00 AM</div>
+            <div class="appointment-slot"></div>
+            <div class="appointment-slot">
+                <div class="event">
+                    <div class="event-title">Carlos Mendoza</div>
+                    <div class="event-desc">Limpieza Facial</div>
+                </div>
+            </div>
+
+            <div class="time-slot">11:00 AM</div>
+            <div class="appointment-slot">
+                <div class="event" style="border-left-color: #555; background: rgba(255,255,255,0.05);">
+                    <div class="event-title" style="color:#777;">Bloqueado</div>
+                    <div class="event-desc">Almuerzo</div>
+                </div>
+            </div>
+            <div class="appointment-slot"></div>
+        </div>
+    </main>
+
+</body>
+</html>

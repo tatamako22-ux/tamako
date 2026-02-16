@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAMAKO | Directorio de Clientes VIP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #bf953f; --dark-card: rgba(255, 255, 255, 0.03); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #050505; color: white; font-family: 'Montserrat', sans-serif; display: flex; min-height: 100vh; }
+
+        /* Sidebar Reutilizable */
+        .sidebar {
+            width: 260px;
+            background: rgba(10, 10, 10, 0.95);
+            border-right: 1px solid rgba(191, 149, 63, 0.2);
+            padding: 40px 20px; /* Este 20px es el que empuja el botón hacia adentro */
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            box-sizing: border-box;
+        }
+        .sidebar-logo { font-family: 'Cinzel'; color: var(--gold); letter-spacing: 4px; font-size: 1.2rem; text-align: center; margin-bottom: 20px; }
+        .nav-item { padding: 15px; color: #888; text-decoration: none; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; border-radius: 8px; display: flex; align-items: center; gap: 15px; }
+        .nav-item:hover, .nav-item.active {
+            background: var(--dark-card);
+            color: var(--gold);
+        }
+
+        /* Botón Logout Estilo Elite 3D */
+        /* Botón Logout Estilo Elite 3D - IGUAL AL DASHBOARD */
+        .logout-container {
+            margin-top: auto;
+            padding: 20px 0; /* Más espacio arriba y abajo, igual que el Dashboard */
+            perspective: 1000px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .button-logout {
+            --gold-bright: #e6c87a;
+            --gold-dark: #bf953f;
+            --bg: #0a0a0a;
+            outline: none;
+            cursor: pointer;
+            border: 0;
+            position: relative;
+            border-radius: 100px;
+            background-color: var(--bg);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 
+                inset 0 0.3rem 0.9rem rgba(191, 149, 63, 0.1), 
+                inset 0 -0.1rem 0.3rem rgba(0, 0, 0, 0.8),
+                0 1rem 2rem rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 210px; /* Esto hace que se vea igual al Dashboard */
+            margin: 0 auto;   /* Esto lo mantiene centrado en la sidebar */
+            text-decoration: none;
+            display: block;
+            transform-style: preserve-3d;
+        }
+
+        .button-logout .wrap {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gold-dark);
+            padding: 15px;
+            border-radius: inherit;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .button-logout .wrap::after {
+            content: "";
+            position: absolute;
+            left: 6%; right: 6%; top: 10%; bottom: 45%;
+            border-radius: 20px 20px 0 0;
+            box-shadow: inset 0 8px 6px -6px rgba(191, 149, 63, 0.4);
+            background: linear-gradient(180deg, rgba(191, 149, 63, 0.2) 0%, transparent 100%);
+        }
+
+        .button-logout:hover {
+            transform: rotateX(10deg) rotateY(-5deg) translateY(-3px);
+            box-shadow: 0 1.5rem 2.5rem rgba(0, 0, 0, 0.6), 0 0 15px rgba(191, 149, 63, 0.2);
+        }
+
+        .button-logout:hover .wrap { color: var(--gold-bright); }
+
+        .button-logout:hover .wrap p span:nth-child(1) { display: none; }
+        .button-logout:hover .wrap p span:nth-child(2) { display: inline-block; color: #ff4d4d; }
+
+        .button-logout:active { transform: scale(0.96) translateY(2px); }
+        .nav-item.logout:hover {
+            background: rgba(255, 77, 77, 0.1);
+            color: #ff4d4d;
+        }
+
+        .main-content { flex-grow: 1; padding: 40px 6%; }
+
+        /* Barra de Búsqueda y Filtros */
+        .search-bar {
+            background: var(--dark-card);
+            border: 1px solid rgba(191,149,63,0.3);
+            padding: 15px 25px;
+            border-radius: 50px;
+            width: 100%;
+            max-width: 500px;
+            color: white;
+            outline: none;
+            font-family: 'Montserrat';
+            margin-bottom: 30px;
+        }
+
+        /* Tabla de Clientes */
+        .clients-table-container {
+            background: var(--dark-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 15px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: #666; border-bottom: 1px solid rgba(191, 149, 63, 0.2); }
+        td { padding: 20px 15px; font-size: 0.85rem; border-bottom: 1px solid rgba(255, 255, 255, 0.02); }
+
+        .client-name { font-weight: 600; color: #fff; display: flex; align-items: center; gap: 12px; }
+        .client-initials { width: 35px; height: 35px; background: rgba(191,149,63,0.1); color: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; border: 1px solid var(--gold); }
+        
+        .tag { padding: 4px 10px; border-radius: 4px; font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase; }
+        .tag.vip { background: var(--gold); color: black; font-weight: bold; }
+        .tag.regular { background: rgba(255,255,255,0.1); color: #ccc; }
+
+        .btn-action { color: var(--gold); text-decoration: none; font-size: 0.7rem; border: 1px solid var(--gold); padding: 5px 12px; border-radius: 4px; transition: 0.3s; }
+        .btn-action:hover { background: var(--gold); color: black; }
+        /* ============================= */
+/* ===== RESPONSIVE TAMAKO ===== */
+/* ============================= */
+
+@media (max-width: 900px) {
+
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid rgba(191, 149, 63, 0.2);
+        padding: 20px;
+    }
+
+    .main-content {
+        padding: 25px;
+    }
+
+}
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">TAMAKO</div>
+           <nav style="display: flex; flex-direction: column; gap: 10px; height: 100%;">
+            <a href="dashboard.html" class="nav-item">Dashboard</a>
+            <a href="agenda.html" class="nav-item">Agenda</a>
+            <a href="clientes.html" class="nav-item">Clientes</a>
+            <a href="barberos.html" class="nav-item">Barberos</a>
+            <a href="ajustes.html" class="nav-item">Ajustes</a>
+            
+            <div class="logout-container">
+                <a href="index.html" class="button-logout">
+                    <div class="wrap">
+                        <p>
+                            <span>Cerrar Sesión</span>
+                            <span>¿Salir ahora?</span>
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </nav>
+        </aside>
+
+    <main class="main-content">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+            <div>
+                <h1 style="font-family: 'Cinzel'; font-size: 1.5rem; letter-spacing: 3px;">CLIENTES VIP</h1>
+                <p style="color: #666; font-size: 0.8rem;">Base de datos exclusiva y fidelización</p>
+            </div>
+            <button style="background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px 25px; border-radius: 50px; font-size: 0.7rem; cursor: pointer; letter-spacing: 1px;">+ NUEVO CLIENTE</button>
+        </header>
+
+        <input type="text" class="search-bar" placeholder="Buscar por nombre o teléfono...">
+
+        <div class="clients-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Teléfono</th>
+                        <th>Última Visita</th>
+                        <th>Categoría</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="client-name">
+                                <div class="client-initials">JR</div>
+                                Julián Rodríguez
+                            </div>
+                        </td>
+                        <td style="color: #888;">+57 300 123 4567</td>
+                        <td>Hace 4 días</td>
+                        <td><span class="tag vip">VIP Elite</span></td>
+                        <td><a href="#" class="btn-action">Ver Perfil</a></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="client-name">
+                                <div class="client-initials">AM</div>
+                                Andres Mendoza
+                            </div>
+                        </td>
+                        <td style="color: #888;">+57 311 987 6543</td>
+                        <td>Hace 12 días</td>
+                        <td><span class="tag regular">Frecuente</span></td>
+                        <td><a href="#" class="btn-action">Ver Perfil</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+</body>
+</html>

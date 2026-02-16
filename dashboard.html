@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAMAKO | Panel de Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #bf953f; --dark-card: rgba(255, 255, 255, 0.03); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #050505; 
+            color: white; 
+            font-family: 'Montserrat', sans-serif; 
+            display: flex; 
+            min-height: 100vh;
+        }
+
+        /* Sidebar Lateral (Menú de Élite) */
+           .sidebar {
+            width: 260px;
+            background: rgba(10, 10, 10, 0.95);
+            border-right: 1px solid rgba(191, 149, 63, 0.2);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 10px;
+            flex-grow: 1;
+        }
+
+
+        .sidebar-logo {
+            font-family: 'Cinzel';
+            color: var(--gold);
+            letter-spacing: 4px;
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 0; /* Eliminamos el margen para que el nav suba */
+            padding: 10px 0;
+        }
+
+        .nav-item {
+            padding: 15px;
+            color: #888;
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: 0.3s;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--dark-card);
+            color: var(--gold);
+            box-shadow: inset 0 0 10px rgba(191, 149, 63, 0.1);
+        }
+        /* Estilo Uiverse Adaptado */
+        /* Botón Logout Estilo Elite 3D */
+        .logout-container {
+            margin-top: auto;
+            padding: 10px;
+            perspective: 1000px; /* Necesario para el efecto 3D */
+        }
+
+        .button-logout {
+            --gold-bright: #e6c87a;
+            --gold-dark: #bf953f;
+            --bg: #0a0a0a;
+            outline: none;
+            cursor: pointer;
+            border: 0;
+            position: relative;
+            border-radius: 100px;
+            background-color: var(--bg);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 
+                inset 0 0.3rem 0.9rem rgba(191, 149, 63, 0.1), 
+                inset 0 -0.1rem 0.3rem rgba(0, 0, 0, 0.8),
+                0 1rem 2rem rgba(0, 0, 0, 0.5);
+            width: 100%;
+            text-decoration: none;
+            display: block;
+            transform-style: preserve-3d;
+        }
+
+        .button-logout .wrap {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gold-dark);
+            padding: 15px;
+            border-radius: inherit;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Efecto de brillo superior */
+        .button-logout .wrap::after {
+            content: "";
+            position: absolute;
+            left: 6%; right: 6%; top: 10%; bottom: 45%;
+            border-radius: 20px 20px 0 0;
+            box-shadow: inset 0 8px 6px -6px rgba(191, 149, 63, 0.4);
+            background: linear-gradient(180deg, rgba(191, 149, 63, 0.2) 0%, transparent 100%);
+        }
+
+        /* Animación de rotación y color al pasar el mouse */
+        .button-logout:hover {
+            transform: rotateX(10deg) rotateY(-5deg) translateY(-3px);
+            box-shadow: 
+                0 1.5rem 2.5rem rgba(0, 0, 0, 0.6),
+                0 0 15px rgba(191, 149, 63, 0.2);
+        }
+
+        .button-logout:hover .wrap {
+            color: var(--gold-bright);
+        }
+
+        /* Cambio de texto */
+        .button-logout .wrap span:nth-child(2) { display: none; }
+        .button-logout:hover .wrap span:nth-child(1) { display: none; }
+        .button-logout:hover .wrap span:nth-child(2) { 
+            display: inline-block; 
+            color: #ff4d4d; /* Mantenemos un toque rojo solo en el aviso */
+        }
+
+        /* Efecto al presionar (se hunde) */
+        .button-logout:active {
+            transform: scale(0.96) translateY(2px);
+        }
+
+        /* Área de Contenido Principal */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px 6%;
+            overflow-y: auto;
+        }
+
+        /* Header del Dashboard */
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+
+        .welcome-text h1 { font-family: 'Cinzel'; font-size: 1.5rem; letter-spacing: 3px; }
+        .welcome-text p { color: #666; font-size: 0.8rem; margin-top: 5px; }
+
+        /* Tarjetas de Estadísticas (Kpis) */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--dark-card);
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            text-align: left;
+        }
+
+        .stat-card h3 { font-size: 0.7rem; color: #888; letter-spacing: 2px; margin-bottom: 10px; }
+.stat-card .value { font-size: 1.8rem; color: var(--gold); font-weight: 600; }
+
+        /* Estilos de la Tabla de Élite */
+        .appointments-section {
+            background: var(--dark-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 20px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .section-header h2 {
+            font-family: 'Cinzel';
+            font-size: 1rem;
+            letter-spacing: 2px;
+            color: var(--gold);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th {
+            padding: 15px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #666;
+            border-bottom: 1px solid rgba(191, 149, 63, 0.2);
+        }
+        td {
+            padding: 20px 15px;
+            font-size: 0.8rem;
+            color: #ccc;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+        tr { transition: background 0.2s; }
+            tr:hover td { 
+                background: rgba(191, 149, 63, 0.05); 
+                color: var(--gold); 
+                border-bottom: 1px solid rgba(191, 149, 63, 0.3);
+            }
+        
+        .status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status.confirmed { background: rgba(191, 149, 63, 0.1); color: var(--gold); border: 1px solid var(--gold); }
+        .status.pending { background: rgba(255, 255, 255, 0.05); color: #888; border: 1px solid #444; }
+        .barber-tag { color: var(--gold); font-weight: 600; }
+
+        /* Botón Flotante "+ Nueva Cita" */
+        .fab-button {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 65px;
+            height: 65px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            font-size: 2rem;
+            text-decoration: none;
+            box-shadow: 0 10px 25px rgba(191, 149, 63, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            cursor: pointer;
+            border: none;
+        }
+
+        .fab-button:hover {
+            transform: scale(1.1) rotate(90deg);
+            background: #e6c87a;
+            box-shadow: 0 15px 35px rgba(191, 149, 63, 0.6);
+        }
+
+        /* Tooltip sutil al pasar el mouse */
+        .fab-button::before {
+            content: "NUEVA CITA";
+            position: absolute;
+            left: -120px;
+            background: rgba(0,0,0,0.8);
+            color: var(--gold);
+            padding: 8px 15px;
+            font-size: 0.7rem;
+            border-radius: 5px;
+            letter-spacing: 2px;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            border: 1px solid var(--gold);
+        }
+
+        .fab-button:hover::before {
+            opacity: 1;
+            left: -140px;
+        }
+
+        /* Estilos del Modal de Registro */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none; /* Oculto por defecto */
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-card {
+            background: #0a0a0a;
+            border: 1px solid var(--gold);
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(191, 149, 63, 0.2);
+        }
+
+        .modal-card h2 {
+            font-family: 'Cinzel';
+            color: var(--gold);
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            letter-spacing: 3px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            font-size: 0.65rem;
+            color: #888;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+       .form-group input, .form-group select {
+            width: 100%;
+            background: rgba(255,255,255,0.08); /* Un poco más claro */
+            border: 1px solid rgba(191,149,63,0.3);
+            padding: 12px;
+            color: #fff;
+            border-radius: 8px;
+            outline: none;
+            font-family: 'Montserrat';
+            color-scheme: dark; /* Esto hace que el icono del calendario y reloj sea blanco nativamente */
+        }
+
+        .form-group input:focus { border-color: var(--gold); }
+
+        .btn-save {
+            width: 100%;
+            padding: 15px;
+            background: var(--gold);
+            border: none;
+            color: black;
+            font-weight: 700;
+            letter-spacing: 2px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-save:hover { background: #e6c87a; transform: translateY(-2px); }
+        .button-logout:hover .wrap p span:nth-child(1) { display: none; }
+        .button-logout:hover .wrap p span:nth-child(2) { display: inline-block; color: #ff4d4d; }
+        /* ============================= */
+/* ===== RESPONSIVE TAMAKO ===== */
+/* ============================= */
+
+@media (max-width: 900px) {
+
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid rgba(191, 149, 63, 0.2);
+        padding: 20px;
+    }
+
+    .main-content {
+        padding: 25px;
+    }
+
+}
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-logo">TAMAKO</div>
+
+    <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">Dashboard</a>
+        <a href="agenda.html" class="nav-item active">Agenda</a>
+        <a href="clientes.html" class="nav-item">Clientes</a>
+        <a href="barberos.html" class="nav-item">Barberos</a>
+        <a href="ajustes.html" class="nav-item">Ajustes</a>
+    </nav>
+
+    <div class="logout-container">
+        <a href="index.html" class="button-logout">
+            <div class="wrap">
+                <p>
+                    <span>Cerrar Sesión</span>
+                    <span>¿Salir ahora?</span>
+                </p>
+            </div>
+        </a>
+    </div>
+</aside>
+
+
+    <main class="main-content">
+        <header class="dash-header">
+            <div class="welcome-text">
+                <h1>BIENVENIDO, MASTER</h1>
+                <p>Resumen de hoy en tu barbería</p>
+            </div>
+            <div class="user-profile" style="display: flex; align-items: center; gap: 15px;">
+                <div style="text-align: right;">
+                    <p style="font-size: 0.7rem; font-weight: 600;">The King Barber</p>
+                    <p style="font-size: 0.6rem; color: var(--gold);">Plan Premium</p>
+                </div>
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; color: black; font-weight: bold;">TK</div>
+            </div>
+        </header>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <h3>CITAS HOY</h3>
+                <div class="value">12</div>
+            </div>
+            <div class="stat-card">
+                <h3>INGRESOS DÍA</h3>
+                <div class="value">$450.000</div>
+            </div>
+            <div class="stat-card">
+                <h3>CLIENTES NUEVOS</h3>
+                <div class="value">4</div>
+            </div>
+            <div class="stat-card">
+                <h3>PENDIENTES</h3>
+                <div class="value">2</div>
+            </div>
+        </section>
+
+        <section class="appointments-section">
+            <div class="section-header">
+                <h2>Próximas Citas</h2>
+                <a href="#" style="color: var(--gold); font-size: 0.7rem; text-decoration: none; letter-spacing: 1px;">VER TODAS →</a>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Cliente</th>
+                        <th>Servicio</th>
+                        <th>Barbero</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: 600;">09:00 AM</td>
+                        <td>Julián Rodríguez</td>
+                        <td>Corte Caballero + Barba</td>
+                        <td class="barber-tag">Mateo</td>
+                        <td><span class="status confirmed">Confirmado</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 600;">10:30 AM</td>
+                        <td>Carlos Mendoza</td>
+                        <td>Limpieza Facial Premium</td>
+                        <td class="barber-tag">Santiago</td>
+                        <td><span class="status confirmed">Confirmado</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 600;">11:15 AM</td>
+                        <td>Andrés Felipe</td>
+                        <td>Corte Clásico</td>
+                        <td class="barber-tag">Mateo</td>
+                        <td><span class="status pending">Pendiente</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <button class="fab-button" onclick="toggleModal(true)">
+        +
+    </button>
+
+    <div class="modal-overlay" id="modalCita">
+        <div class="modal-card">
+            <span onclick="toggleModal(false)" style="position:absolute; right:20px; top:20px; cursor:pointer; color:var(--gold);">✕</span>
+            <h2>Nueva Cita</h2>
+            <form id="formNuevaCita">
+                <div class="form-group">
+                    <label>Nombre del Cliente</label>
+                    <input type="text" placeholder="Ej. Juan Pérez" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Fecha</label>
+                        <input type="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hora</label>
+                        <input type="time" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Servicio</label>
+                    <select required>
+                        <option value="">Seleccione un servicio</option>
+                        <option>Corte Caballero</option>
+                        <option>Barba Premium</option>
+                        <option>Combo Tamako (Corte + Barba)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Barbero</label>
+                    <select required>
+                        <option value="">Asignar Barbero</option>
+                        <option>Mateo</option>
+                        <option>Santiago</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-save">AGENDAR CITA</button>
+            </form>
+        </div>
+    </div>
+
+<script>
+        function toggleModal(show) {
+            const modal = document.getElementById('modalCita');
+            modal.style.display = show ? 'flex' : 'none';
+        }
+
+        // Cerrar al hacer clic fuera del card
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalCita');
+            if (event.target == modal) {
+                toggleModal(false);
+            }
+        }
+
+        // Manejo del formulario
+        document.getElementById('formNuevaCita').onsubmit = function(e) {
+            e.preventDefault();
+            alert('Cita agendada con éxito. (Aquí conectaríamos con la base de datos)');
+            toggleModal(false);
+        };
+    </script>
+    <script>
+        /* --- PROTECCIÓN DE SESIÓN TAMAKO --- */
+
+        const session = localStorage.getItem("tamakoSession");
+
+        if(session !== "active"){
+            window.location.href = "login.html";
+        }
+        </script>
+</body>
+</html>

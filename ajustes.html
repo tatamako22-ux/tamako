@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAMAKO | Configuración de Negocio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #bf953f; --dark-card: rgba(255, 255, 255, 0.03); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #050505; color: white; font-family: 'Montserrat', sans-serif; display: flex; min-height: 100vh; }
+
+        /* Sidebar Reutilizable */
+        .sidebar {
+            width: 260px;
+            background: rgba(10, 10, 10, 0.95);
+            border-right: 1px solid rgba(191, 149, 63, 0.2);
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+        .sidebar-logo { font-family: 'Cinzel'; color: var(--gold); letter-spacing: 4px; font-size: 1.2rem; text-align: center; margin-bottom: 20px; }
+        .nav-item { padding: 15px; color: #888; text-decoration: none; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; border-radius: 8px; display: flex; align-items: center; gap: 15px; }
+        .nav-item:hover, .nav-item.active {
+            background: var(--dark-card);
+            color: var(--gold);
+            box-shadow: inset 0 0 10px rgba(191, 149, 63, 0.1);
+        }
+        .nav-item.logout {
+            margin-top: auto; 
+            color: #ff4d4d; 
+            border: 1px solid rgba(255, 77, 77, 0.1);
+        }
+        .nav-item.logout:hover {
+            background: rgba(255, 77, 77, 0.1);
+            color: #ff4d4d;
+        }
+
+        .main-content { flex-grow: 1; padding: 40px 6%; }
+
+        /* Contenedores de Ajustes */
+        .settings-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; }
+        .settings-card { background: var(--dark-card); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 30px; }
+        
+        .settings-card h2 { font-family: 'Cinzel'; font-size: 1rem; color: var(--gold); letter-spacing: 2px; margin-bottom: 25px; border-bottom: 1px solid rgba(191, 149, 63, 0.1); padding-bottom: 15px; }
+
+        .setting-group { margin-bottom: 20px; }
+        .setting-group label { display: block; font-size: 0.7rem; color: #888; letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; }
+        
+        .setting-group input, .setting-group select {
+            width: 100%;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px;
+            color: white;
+            border-radius: 8px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .setting-group input:focus { border-color: var(--gold); background: rgba(191,149,63,0.05); }
+
+        .btn-save-settings {
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        .btn-save-settings:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(191,149,63,0.3); }
+
+        /* Estilo para subir logo */
+        .logo-upload {
+            width: 100px;
+            height: 100px;
+            border: 2px dashed rgba(191,149,63,0.3);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 10px;
+        }
+        .logo-upload:hover { border-color: var(--gold); background: rgba(191,149,63,0.05); }
+        /* ============================= */
+/* ===== RESPONSIVE TAMAKO ===== */
+/* ============================= */
+
+@media (max-width: 900px) {
+
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid rgba(191, 149, 63, 0.2);
+        padding: 20px;
+    }
+
+    .main-content {
+        padding: 25px;
+    }
+
+}
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">TAMAKO</div>
+        <nav style="display: flex; flex-direction: column; gap: 10px; height: 100%;">
+            <a href="dashboard.html" class="nav-item">Dashboard</a>
+            <a href="agenda.html" class="nav-item">Agenda</a>
+            <a href="clientes.html" class="nav-item">Clientes</a>
+            <a href="barberos.html" class="nav-item">Barberos</a>
+            <a href="ajustes.html" class="nav-item">Ajustes</a>
+            <a href="index.html" class="nav-item logout">Cerrar Sesión</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header style="margin-bottom: 40px;">
+            <h1 style="font-family: 'Cinzel'; font-size: 1.5rem; letter-spacing: 3px;">CONFIGURACIÓN</h1>
+            <p style="color: #666; font-size: 0.8rem;">Personaliza la experiencia de tu marca</p>
+        </header>
+
+        <div class="settings-container">
+            <div class="settings-card">
+                <h2>Identidad de Marca</h2>
+                <div class="setting-group">
+                    <label>Logo de la Barbería</label>
+                    <div class="logo-upload">
+                        <span style="color: var(--gold); font-size: 1.5rem;">+</span>
+                    </div>
+                    <p style="font-size: 0.6rem; color: #555;">Recomendado: PNG transparente 512x512</p>
+                </div>
+                <div class="setting-group">
+                    <label>Nombre Comercial</label>
+                    <input type="text" value="The King Barber Shop">
+                </div>
+                <div class="setting-group">
+                    <label>Eslogan</label>
+                    <input type="text" value="Cortes de Élite para Caballeros">
+                </div>
+                <button class="btn-save-settings">GUARDAR CAMBIOS</button>
+            </div>
+
+            <div class="settings-card">
+                <h2>Reglas y Comisiones</h2>
+                <div class="setting-group">
+                    <label>Moneda</label>
+                    <select>
+                        <option>COP - Pesos Colombianos</option>
+                        <option>USD - Dólar Estadounidense</option>
+                        <option>MXN - Peso Mexicano</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>% Comisión Barberos (Base)</label>
+                    <input type="number" value="40">
+                </div>
+                <div class="setting-group">
+                    <label>Intervalo de Citas (Minutos)</label>
+                    <select>
+                        <option>30 min</option>
+                        <option selected>45 min</option>
+                        <option>60 min</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>Notificaciones WhatsApp</label>
+                    <select>
+                        <option>Activado</option>
+                        <option>Desactivado</option>
+                    </select>
+                </div>
+                <button class="btn-save-settings">ACTUALIZAR REGLAS</button>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

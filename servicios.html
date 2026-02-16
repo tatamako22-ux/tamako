@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAMAKO | Servicios y Tarifas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root{ --gold:#bf953f; --gold-soft:#e6c87a; }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{
+            min-height:100vh;
+            background:#050505;
+            font-family:'Montserrat',sans-serif;
+            color:white;
+            overflow-x:hidden;
+        }
+
+        /* Fondo y marco */
+        .background{ position:fixed; inset:0; z-index:-3; background: radial-gradient(circle at center, rgba(191,149,63,.25), transparent 60%), repeating-linear-gradient(45deg, #0b0b0b 0px, #0b0b0b 2px, #050505 2px, #050505 4px); }
+        .frame{ position:fixed; inset:40px; border:1.5px solid rgba(191,149,63,.45); pointer-events:none; z-index: 10;}
+
+        /* Navegación */
+        nav{ display:flex; justify-content:space-between; align-items:center; padding:50px 6%; position: relative; z-index: 20;}
+        .logo{ font-family:'Cinzel',serif; font-size:1.6rem; letter-spacing:6px; color:var(--gold); margin-top: 8px; }
+        .nav-links{ display:flex; align-items:center; gap:40px; }
+        .nav-links a{ padding:10px 24px; color:#e5e5e5; text-decoration:none; font-size:.8rem; letter-spacing:4px; text-transform:uppercase; transition:all .25s ease; }
+        .nav-links a:hover{ color:#fff !important; background:linear-gradient(90deg, rgba(191,149,63,.2), rgba(191,149,63,.55), rgba(191,149,63,.2)); }
+
+        /* Contenido de Servicios */
+        .services-container {
+            position: relative;
+            z-index: 15;
+            min-height: 80vh; /* Reducimos la altura mínima para que no empuje todo hacia abajo */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Alinea al inicio para poder controlar el margen superior */
+            align-items: center;
+            padding: 20px 4%; /* Reducimos drásticamente el padding superior */
+            text-align: center;
+            width: 100%;
+        }
+
+        .cinzel-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            background: linear-gradient(#f5e7b2,#bf953f,#8c6a2d);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            letter-spacing: 12px;
+            margin-bottom: 10px;
+        }
+
+        .gold-line-separator {
+            height: 2px;
+            width: 300px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin-bottom: 40px;
+        }
+
+        /* DISEÑO DE PLANES */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(260px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            justify-items: center;
+        }
+        @media (max-width: 1200px) {
+            .pricing-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .price-card {
+            flex: 1;
+            min-width: 280px;
+            max-width: 320px; /* Limitamos el ancho para que se vean más esbeltas */
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px; /* Un poco menos redondeado para ahorrar espacio */
+            padding: 30px 25px; /* Padding más compacto */
+            text-align: left;
+            transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            
+        }
+
+        .price-card .price {
+            font-size: 2.5rem; 
+            font-weight: 700;
+            color: #fff;
+            margin: 15px 0 25px 0;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+        }
+
+        .price-card:hover {
+            border-color: rgba(191, 149, 63, 0.5);
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .price-card.featured {
+            border: 1px solid var(--gold);
+            background: rgba(191, 149, 63, 0.05);
+            box-shadow: 0 0 30px rgba(191, 149, 63, 0.1);
+            transform: scale(1.05);
+            z-index: 2;
+        }
+
+        /* Premium Shimmer */
+        .premium-shimmer { overflow: hidden; position: relative; border: 1px solid var(--gold) !important; }
+        .premium-shimmer::after {
+            content: ""; position: absolute; top: -50%; left: -60%; width: 20%; height: 200%;
+            background: rgba(255, 255, 255, 0.1); transform: rotate(30deg); animation: shimmer-effect 4s infinite;
+        }
+
+        @keyframes shimmer-effect {
+            0% { left: -60%; opacity: 0; }
+            10% { opacity: 0.5; }
+            20% { left: 120%; opacity: 0; }
+            100% { left: 120%; opacity: 0; }
+        }
+
+        .price-card h2 { font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--gold); letter-spacing: 3px; margin-bottom: 15px; }
+        .price-card .price {
+            font-size: 2.8rem; /* Más grande y audaz */
+            font-weight: 700;
+            color: #fff;
+            margin: 15px 0 30px 0;
+            letter-spacing: -1px;
+        }
+        .price-card .price span { font-size: 0.8rem; color: #666; letter-spacing: 1px; }
+        .price-card ul { list-style: none; padding: 0; margin-bottom: 30px; flex-grow: 1; }
+        .price-card ul li { font-size: 0.75rem; color: #ccc; margin-bottom: 12px; padding-left: 25px; position: relative; line-height: 1.4; }
+        .price-card ul li::before { content: "✓"; position: absolute; left: 0; color: var(--gold); }
+
+        .btn-select {
+            width: 100%;
+            padding: 14px 0;
+            background: rgba(191, 149, 63, 0.05); /* Un toque de color casi invisible */
+            border: 1px solid rgba(191, 149, 63, 0.4); /* Borde sutil */
+            border-radius: 50px;
+            color: rgba(255, 255, 255, 0.9);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            backdrop-filter: blur(5px); /* Efecto cristal */
+        }
+
+        .btn-select:hover {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(191, 149, 63, 0.3);
+            letter-spacing: 4px; /* Las letras se expanden suavemente */
+        }
+
+        .btn-select:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-select:hover { background: var(--gold); color: #000; border-color: var(--gold); box-shadow: 0 5px 15px rgba(191, 149, 63, 0.3); }
+
+        .btn-volver {
+            margin-top: 40px; margin-bottom: 30px; padding: 12px 40px; background: transparent; border: 1px solid var(--gold);
+            color: var(--gold); font-family: 'Montserrat', sans-serif; text-transform: uppercase; letter-spacing: 3px;
+            font-size: 0.8rem; cursor: pointer; text-decoration: none; transition: all 0.4s ease; position: relative; z-index: 20;
+        }
+
+        .btn-volver:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(191, 149, 63, 0.4); }
+
+        /* Animaciones de revelación */
+        .reveal-section { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal-section.active { opacity: 1; transform: translateY(0); }
+        .reveal-section.active .price-card { opacity: 1; transform: translateY(0); }
+        .price-card:nth-child(1) { transition-delay: 0.3s; }
+        .price-card:nth-child(2) { transition-delay: 0.5s; }
+        .price-card:nth-child(3) { transition-delay: 0.7s; }
+        .price-card:nth-child(4) { transition-delay: 0.9s; }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
+            display: none; justify-content: center; align-items: center; z-index: 10000; opacity: 0; transition: opacity 0.4s ease;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content {
+            background: #0a0a0a; border: 1px solid var(--gold); padding: 40px; width: 90%; max-width: 450px;
+            position: relative; transform: translateY(30px); transition: transform 0.4s ease;
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .modal-content h2 { font-family: 'Cinzel', serif; color: var(--gold); margin-bottom: 20px; font-size: 1.2rem; letter-spacing: 3px; }
+        .modal-form { display: flex; flex-direction: column; gap: 15px; }
+        .modal-form input { background: rgba(255,255,255,0.05); border: 1px solid rgba(191, 149, 63, 0.3); padding: 12px; color: white; outline: none; }
+        .modal-form input:focus { border-color: var(--gold); }
+        .close-modal { position: absolute; top: 15px; right: 15px; color: var(--gold); cursor: pointer; font-size: 1.5rem; }
+
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(191, 149, 63, 0.2); border-top: 3px solid var(--gold); border-radius: 50%; margin: 20px auto; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- FOOTER --- */
+        footer {
+            height: 75px; background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(15px); border-top: 1px solid rgba(191, 149, 63, 0.3);
+            display: flex; justify-content: space-between; align-items: center; padding: 0 6%; position: relative; z-index: 20;
+        }
+        footer h3 { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 2px; color: var(--gold); }
+        footer p { font-size: 0.6rem; color: #888; }
+        .footer-social-icons { display: flex; gap: 12px; }
+        .socialContainer { width: 35px; height: 35px; border: 1px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; text-decoration: none; }
+        .socialContainer:hover { background: var(--gold); transform: scale(1.1); }
+        .socialSvg { width: 16px; fill: var(--gold); transition: 0.3s; }
+        .socialContainer:hover .socialSvg { fill: #000; }
+        /* ============================= */
+/* ===== RESPONSIVE TAMAKO ===== */
+/* ============================= */
+
+@media (max-width: 900px) {
+
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid rgba(191, 149, 63, 0.2);
+        padding: 20px;
+    }
+
+    .main-content {
+        padding: 25px;
+    }
+
+}
+    </style>
+</head>
+<body>
+
+<div class="background"></div>
+<div class="frame"></div>
+
+<nav>
+    <div class="logo">TAMAKO</div>
+    <div class="nav-links">
+    <a href="index.html">Inicio</a>
+    <a href="servicios.html">Servicios</a>
+    <a href="index.html?login=true" class="btn-login">Iniciar sesión</a>
+</div>
+</nav>
+
+<section class="services-container reveal-section">
+
+    <h1 class="cinzel-title">PLANES</h1>
+    <div class="gold-line-separator"></div>
+
+    <div class="pricing-grid">
+       
+        <div class="price-card">
+            <h2>DEMO</h2>
+            <div class="price">$0 <span>/7 días</span></div>
+            <ul>
+                <li>Acceso completo al sistema</li>
+                <li>Sin tarjeta requerida</li>
+                <li>Prueba gratuita automática</li>
+            </ul>
+           <a href="registro.html" class="btn-select">Empezar Gratis</a>
+        </div>
+         <div class="price-card">
+            <h2>INDIVIDUAL</h2>
+            <div class="price">$29.900 <span>/mes</span></div>
+            <ul>
+                <li>Agenda de turnos personal</li>
+                <li>Base de datos (100 clientes)</li>
+                <li>Soporte vía Ticket</li>
+            </ul>
+            <a href="javascript:void(0)" class="btn-select btn-open-modal" data-plan="INDIVIDUAL">Seleccionar</a>
+        </div>
+        <div class="price-card featured">
+            <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--gold); color: black; padding: 2px 15px; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; border-radius: 20px;">RECOMENDADO</div>
+            <h2>BASIC</h2>
+            <div class="price">$59.900 <span>/mes</span></div>
+            <ul>
+                <li>Gestión hasta 3 barberos</li>
+                <li>Control de puestos y agendas</li>
+                <li>Base de datos ilimitada</li>
+                <li>Estadísticas básicas</li>
+            </ul>
+            <a href="javascript:void(0)" class="btn-select btn-open-modal" data-plan="BASIC">Seleccionar</a>
+        </div>
+
+        <div class="price-card premium-shimmer">
+            <div style="position: absolute; top: 10px; right: 15px; font-size: 0.6rem; color: var(--gold); letter-spacing: 1px;">ELITE</div>
+            <h2>PREMIUM</h2>
+            <div class="price">$99.900 <span>/mes</span></div>
+            <ul>
+                <li>Control total de barberos</li>
+                <li>Estadísticas Avanzadas</li>
+                <li>Liquidación de comisiones</li>
+                <li>Soporte Prioritario</li>
+            </ul>
+            <a href="javascript:void(0)" class="btn-select btn-open-modal" data-plan="PREMIUM">Seleccionar</a>
+        </div>
+    </div>
+    
+    <div style="width: 100%; margin: 50px 0 100px 0; display: flex; justify-content: center;">
+    <a href="index.html" class="btn-volver">Volver al Inicio</a>
+</div>
+</section>
+
+<footer>
+    <div style="display: flex; gap: 40px;">
+        <div>
+            <h3>UBICACIÓN</h3>
+            <p>Calle de la Elegancia #123</p>
+        </div>
+        <div>
+            <h3>HORARIOS</h3>
+            <p>9:00 AM - 8:00 PM</p>
+        </div>
+    </div>
+    <p style="opacity: 0.4; letter-spacing: 3px;">TAMAKO &copy; 2026</p>
+    <div class="footer-social-icons">
+        <a href="#" class="socialContainer"><svg viewBox="0 0 448 512" class="socialSvg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8z"/></svg></a>
+        <a href="#" class="socialContainer"><svg viewBox="0 0 320 512" class="socialSvg"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg></a>
+    </div>
+</footer>
+
+<div class="modal-overlay" id="modalPlan">
+    <div class="modal-content">
+        <span class="close-modal" id="closeModal">&times;</span>
+        <h2 id="modalTitle">SOLICITAR PLAN</h2>
+        <form class="modal-form" id="mainForm">
+            <input type="text" placeholder="Nombre Completo" required>
+            <input type="email" placeholder="Correo Electrónico" required>
+            <input type="tel" id="userPhone" placeholder="WhatsApp (10 dígitos)" pattern="[0-9]{10}" required>
+            <button type="submit" class="btn-select">Enviar Solicitud</button>
+        </form>
+
+        <div id="loadingState" style="display: none; text-align: center; padding: 40px 0;">
+            <div class="spinner"></div>
+            <p style="font-size: 0.7rem; color: var(--gold); letter-spacing: 2px;">PROCESANDO...</p>
+        </div>
+
+        <div id="successMessage" style="display: none; text-align: center; padding: 20px 0;">
+            <div style="font-size: 3rem; color: var(--gold); margin-bottom: 15px;">✓</div>
+            <h3 style="font-family: 'Cinzel', serif; color: #fff; letter-spacing: 2px;">¡SOLICITUD RECIBIDA!</h3>
+            <p style="font-size: 0.8rem; color: #ccc;">Un asesor se pondrá en contacto contigo.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Animación de entrada
+    window.addEventListener('load', () => {
+        const section = document.querySelector('.reveal-section');
+        setTimeout(() => section.classList.add('active'), 150);
+    });
+
+    // 2. Elementos del Modal
+    const modal = document.getElementById('modalPlan');
+    const openBtns = document.querySelectorAll('.btn-open-modal');
+    const closeBtn = document.getElementById('closeModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const form = document.getElementById('mainForm');
+    const successMsg = document.getElementById('successMessage');
+    const loadingState = document.getElementById('loadingState');
+    const phoneInput = document.getElementById('userPhone');
+
+    // 3. Lógica Modal
+    function closeModalAndReset() {
+        modal.classList.remove('active');
+        setTimeout(() => {
+            form.reset();
+            form.style.display = 'flex';
+            loadingState.style.display = 'none';
+            successMsg.style.display = 'none';
+        }, 400);
+    }
+
+    openBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const planName = btn.getAttribute('data-plan');
+            modalTitle.innerText = `SOLICITAR PLAN ${planName}`;
+            modal.classList.add('active');
+        });
+    });
+
+    closeBtn.addEventListener('click', closeModalAndReset);
+    window.addEventListener('click', (e) => { if (e.target === modal) closeModalAndReset(); });
+
+    // 4. Formulario
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        form.style.display = 'none';
+        loadingState.style.display = 'block';
+        setTimeout(() => {
+            loadingState.style.display = 'none';
+            successMsg.style.display = 'block';
+            setTimeout(closeModalAndReset, 3000);
+        }, 2000);
+    });
+
+    // 5. Validación teléfono
+    phoneInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+    });
+</script>
+
+</body>
+
+</html>

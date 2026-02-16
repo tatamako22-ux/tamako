@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050505">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+
+<title>TAMAKO | Arquitectura Web de Élite</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --gold:#bf953f;
+    --gold-soft:#e6c87a;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+@keyframes pageEntrance {
+    from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+body{
+    min-height:100vh;
+    background:#050505;
+    font-family:'Montserrat',sans-serif;
+    color:white;
+    overflow-x:hidden;
+    overflow-y:auto; /* 🔥 Permite scroll natural en móvil */
+    -webkit-overflow-scrolling: touch; /* 🔥 Scroll suave tipo app en iPhone */
+    scroll-behavior: smooth;
+    animation: pageEntrance 1.5s ease-out forwards;
+}
+
+/* ===== FONDO CARBÓN + DEGRADÉ ===== */
+.background{
+    position:fixed;
+    inset:0;
+    z-index:-3;
+    background:
+        radial-gradient(circle at center, rgba(191,149,63,.25), transparent 60%),
+        repeating-linear-gradient(
+            45deg,
+            #0b0b0b 0px,
+            #0b0b0b 2px,
+            #050505 2px,
+            #050505 4px
+        );
+}
+
+@media (max-width:900px){
+    .background{
+        position:absolute;
+    }
+}
+
+/* ===== PANEL MARCO ===== */
+.frame{
+    position:fixed;
+    inset:40px;
+    border:1.5px solid rgba(191,149,63,.45);
+    box-shadow:0 0 40px rgba(191,149,63,.15);
+    pointer-events:none;
+}
+
+@media (max-width: 900px){
+    .frame{
+        display:none;
+    }
+}
+
+/* ===== LINEA DORADA 3D ===== */
+.gold-line{
+    position:absolute;
+    height:2px;
+    width:120%;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        #e6c87a,
+        #bf953f,
+        #e6c87a,
+        transparent
+    );
+    box-shadow:
+        0 0 10px rgba(191,149,63,.6),
+        0 0 25px rgba(191,149,63,.4);
+    
+    transform:scaleX(0);
+    transform-origin:center;
+    animation: lineReveal 1.2s ease-out forwards;
+}
+@keyframes lineReveal{
+    from{
+        transform:scaleX(0);
+        opacity:0;
+    }
+    to{
+        transform:scaleX(1);
+        opacity:1;
+    }
+}
+/* ===== NAV ===== */
+nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:50px 6%;
+}
+@media (max-width: 900px){
+
+    nav{
+        position: sticky;
+        top: 0;
+        background: rgba(5,5,5,0.95);
+        backdrop-filter: blur(15px);
+        border-bottom: 1px solid rgba(191,149,63,0.2);
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 20px 6%;
+        z-index: 9999;
+    }
+
+    .logo{
+        font-size: 1.2rem;
+        letter-spacing: 4px;
+    }
+
+    .nav-links{
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .nav-links a{
+        padding: 8px 14px;
+        font-size: 0.6rem;
+        letter-spacing: 2px;
+    }
+
+    .nav-links .gold-line{
+        display: none;
+    }
+}
+
+.logo{
+    font-family:'Cinzel',serif;
+    font-size:1.6rem;
+    letter-spacing:6px;
+    color:var(--gold);
+    margin-top: 8px; /* Esto lo baja para nivelarlo con los links */
+}
+
+.nav-links{
+    display:flex;
+    align-items:center;
+    gap:40px;
+    position:relative;
+}
+
+.nav-links .gold-line{
+    top:100%;
+    left:-20%;
+    margin-top:12px; /* baja la línea */
+}
+
+.nav-links a{
+    padding:10px 24px;
+    color:#e5e5e5;
+    text-decoration:none;
+    font-size:.8rem;
+    letter-spacing:4px;
+    text-transform:uppercase;
+    transition:all .25s ease;
+}
+
+.nav-links a:hover{
+    color:#fff !important; /* Letra blanca pura */
+    text-shadow: 0 0 10px rgba(255,255,255,0.5); /* Brillo sutil */
+    background:linear-gradient(
+        90deg,
+        rgba(191,149,63,.2),
+        rgba(191,149,63,.55), /* Un poco más de intensidad */
+        rgba(191,149,63,.2)
+    );
+    box-shadow:
+        inset 0 0 0 1px rgba(191,149,63,.6),
+        0 0 18px rgba(191,149,63,.35);
+}
+
+
+.btn-login{
+    padding:12px 32px;
+    border:none;
+    color:var(--gold);
+}
+
+/* ===== HERO ===== */
+.hero{
+    min-height: calc(100vh - 140px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 10%;
+    text-align: center; /* Centramos todo */
+}
+
+.hero-text{
+    position:relative;
+}
+
+.hero-text .gold-line{
+    top:45%;
+    left:-10%;
+}
+
+.hero-text h1{
+    font-family:'Cinzel',serif;
+    font-size:clamp(4rem,8vw,6.5rem);
+    letter-spacing:18px;
+    background:linear-gradient(#f5e7b2,#bf953f,#8c6a2d);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.hero-text p{
+    margin:30px 0 50px;
+    letter-spacing:5px;
+    text-transform:uppercase;
+    color:#ccc;
+    max-width:500px;
+}
+
+/* ESTILO DE BOTÓN UIVERSE ADAPTADO */
+.btn-acceder-premium {
+  width: 100%;
+  height: 50px;
+  margin-top: 15px; /* Espacio extra arriba */
+  border: none;
+  border-radius: 5px;
+  background: linear-gradient(to right,#77530a,#ffd277,#77530a,#77530a,#ffd277,#77530a);
+  background-size: 250%;
+  background-position: left;
+  color: #ffd277;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition-duration: 1s;
+  overflow: hidden;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  letter-spacing: 4px;
+}
+.btn-acceder-premium::before {
+  position: absolute;
+  content: "";
+  color: #ffd277;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 98%;
+  height: 92%;
+  border-radius: 4px;
+  transition-duration: 1s;
+  background-color: rgba(0, 0, 0, 0.85);
+  background-size: 200%;
+  left: 1%; /* Centrado manual */
+  top: 4%;
+}
+
+.btn-acceder-premium:hover {
+  background-position: right;
+  transition-duration: 1s;
+}
+
+.btn-acceder-premium:hover::before {
+  background-position: right;
+  transition-duration: 1s;
+  color: #fff; /* Que brille un poco más al pasar el mouse */
+}
+
+.btn-acceder-premium:active {
+  transform: scale(0.95);
+}
+
+.btn-cta:active {
+    /* Efecto de botón presionado */
+    box-shadow: 0 2px 0 #73531a;
+    transform: translateY(4px);
+}
+
+.btn-cta:hover {
+    filter: brightness(1.1);
+}
+
+.btn-cta:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 6px 20px rgba(191, 149, 63, 0.6);
+    transform: translateY(-2px);
+}
+
+/* ===== IMAGEN ===== */
+.hero-image{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.hero-image img{
+    max-height:480px;
+    opacity:.9;
+    filter:drop-shadow(0 25px 40px rgba(0,0,0,.9));
+}
+/* Estilos para el Modal */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9); /* Un poco más oscuro para que resalte */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: none; 
+    justify-content: center;
+    align-items: center;
+    z-index: 99999; /* Valor altísimo para que nada lo tape */
+}
+.modal-content {
+     background: white;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    max-height: 90vh; /* 🔥 */
+    overflow-y: auto;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(191, 149, 63, 0.3);
+    margin: auto;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.field {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 10px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    border: 1.5px solid #ccc;
+    box-shadow: inset 2px 5px 10px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+.field:focus-within {
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: inset 2px 5px 10px rgba(191,149,63,0.05), 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.input-icon {
+    height: 1.4em;
+    width: 1.4em;
+    fill: var(--gold);
+}
+
+.input-field {
+    background: none;
+    border: none;
+    outline: none;
+    width: 100%;
+    color: #000 !important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900 !important;
+    font-size: 1rem;
+}
+
+.input-field::placeholder {
+    color: #222 !important; 
+    font-weight: 900 !important; /* NEGRILLA EN EL PLACEHOLDER */
+    opacity: 1;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px; /* Un poco más grande para que sea fácil de tocar */
+    color: var(--gold);
+    cursor: pointer;
+    transition: 0.3s;
+    line-height: 1; /* Centra mejor la X */
+}
+
+.close-btn:hover {
+    transform: rotate(90deg);
+}
+/* Animación de sacudida para errores */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.shake {
+  animation: shake 0.4s ease-in-out;
+  border: 3px solid #ff4b2b !important; /* Rojo de alerta */
+}
+/* DISEÑO DE SECCIONES DE CONTENIDO */
+.content-section {
+    min-height: 100vh;
+    padding: 100px 10% 180px 10%; /* Aumentamos el padding inferior */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.cinzel-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--gold);
+    margin-bottom: 20px;
+    letter-spacing: 5px;
+}
+
+.gold-line-small {
+    width: 80px;
+    height: 2px;
+    background: var(--gold);
+    margin: 0 auto 30px; /* Centra la línea y da espacio abajo */
+    box-shadow: 0 0 10px rgba(191, 149, 63, 0.5);
+}
+
+.section-text {
+    line-height: 1.8;
+    color: #ccc;
+    font-size: 1.1rem;
+    max-width: 800px;
+    letter-spacing: 1px;
+}
+
+/* TABLA DE PRECIOS ÉLITE */
+.price-table {
+    width: 100%;
+    max-width: 600px;
+    border-collapse: collapse;
+    margin-top: 30px;
+}
+
+.price-table td {
+    padding: 20px;
+    border-bottom: 1.5px solid rgba(191, 149, 63, 0.3);
+    font-family: 'Montserrat', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.price-table td:last-child {
+    text-align: right;
+    color: var(--gold);
+    font-weight: 600;
+}
+/* --- BOTÓN WHATSAPP ESTILO ELISAPI (VERSIÓN ORO) --- */
+.whatsapp-floating-container {
+    position: fixed !important;
+    bottom: 85px; /* Flota sobre el footer */
+    right: 30px;
+    z-index: 9999 !important;
+}
+
+.socialContainer {
+    width: 55px;
+    height: 55px;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition-duration: 0.3s;
+    border-radius: 50%;
+    border: 1.5px solid var(--gold);
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+}
+
+.socialContainer:hover {
+    background-color: var(--gold);
+    transition-duration: 0.3s;
+    transform: scale(1.2);
+}
+
+.socialContainer:active {
+    transform: scale(0.9);
+}
+
+.socialSvg {
+    width: 24px;
+    fill: var(--gold);
+    transition: 0.3s;
+}
+
+.socialContainer:hover .socialSvg {
+    fill: #000;
+    animation: slide-in-top 0.3s both;
+}
+
+@keyframes slide-in-top {
+    0% { transform: translateY(-50px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+/* --- FOOTER ÉLITE FINAL --- */
+footer {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: auto;
+    background: rgba(5, 5, 5, 0.95);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid rgba(191, 149, 63, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 6%;
+    z-index: 9000;
+}
+
+footer h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem !important;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin: 0;
+}
+
+footer p {
+    font-size: 0.6rem !important;
+    color: #888;
+    margin: 0;
+}
+
+.footer-social-icons {
+    display: flex;
+    gap: 12px; 
+}
+.footer-social-icons .socialContainer {
+    width: 40px;
+    height: 40px;
+}
+.label-input {
+    display: block;
+    text-align: left;
+    color: #444;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+/* ============================= */
+/* ===== RESPONSIVE TAMAKO ===== */
+/* ============================= */
+@media (max-width: 900px) {
+
+    footer{
+        position: relative !important;
+        height: auto;
+        padding: 30px 6%;
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .btn-acceder-premium{
+        height: 55px;
+        border-radius: 12px;
+        letter-spacing: 3px;
+    }
+
+    .input-field{
+        font-size:16px !important;
+    }
+
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid rgba(191, 149, 63, 0.2);
+        padding: 20px;
+    }
+
+    .main-content {
+        padding: 25px;
+    }
+
+    .hero{
+        padding: 60px 6% 120px 6%;
+        min-height: auto;
+    }
+
+    .hero-text h1{
+        letter-spacing: 8px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="background"></div>
+<div class="frame"></div>
+
+<nav>
+    <div class="logo">TAMAKO</div>
+
+    <div class="nav-links">
+    <div class="gold-line"></div>
+    <a href="#nosotros">Nosotros</a>
+    <a href="servicios.html">Servicios</a>
+    <a href="javascript:void(0)" class="btn-login" onclick="abrirLogin()">Iniciar sesión</a>
+</div>
+</nav>
+<section class="hero">
+    <div class="hero-text" style="max-width: 900px;">
+        <h2 class="cinzel-title" style="font-size: 1.2rem; opacity: 0.8;">Nuestra Esencia</h2>
+        <h1 style="font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 20px;">NOSOTROS</h1>
+        <div class="gold-line-small"></div>
+        <p class="section-text" style="margin: 0 auto 60px;">
+            TAMAKO nace con el objetivo de digitalizar la exclusividad. Nuestra aplicación es una herramienta de gestión de alto rendimiento diseñada para barberías que no solo cortan el cabello, sino que venden una experiencia de lujo. Optimizamos cada cita, cada cliente y cada ingreso bajo una interfaz impecable.
+        </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; width: 100%; max-width: 1100px;">
+        
+        <div style="padding: 30px; border: 1px solid rgba(191,149,63,0.2); background: rgba(255,255,255,0.03); backdrop-filter: blur(5px);">
+            <h3 style="font-family: 'Cinzel'; color: var(--gold); margin-bottom: 15px; letter-spacing: 2px;">Gestión de Citas</h3>
+            <p style="font-size: 0.85rem; color: #aaa; line-height: 1.6;">Control total de la agenda en tiempo real, evitando tiempos muertos y solapamientos.</p>
+        </div>
+
+        <div style="padding: 30px; border: 1px solid rgba(191,149,63,0.2); background: rgba(255,255,255,0.03); backdrop-filter: blur(5px);">
+            <h3 style="font-family: 'Cinzel'; color: var(--gold); margin-bottom: 15px; letter-spacing: 2px;">Perfil VIP</h3>
+            <p style="font-size: 0.85rem; color: #aaa; line-height: 1.6;">Historial detallado de cada cliente: sus gustos, productos preferidos y frecuencia de visita.</p>
+        </div>
+
+        <div style="padding: 30px; border: 1px solid rgba(191,149,63,0.2); background: rgba(255,255,255,0.03); backdrop-filter: blur(5px);">
+            <h3 style="font-family: 'Cinzel'; color: var(--gold); margin-bottom: 15px; letter-spacing: 2px;">Análisis Financiero</h3>
+            <p style="font-size: 0.85rem; color: #aaa; line-height: 1.6;">Reportes de ingresos y rendimiento de barberos con estética profesional y clara.</p>
+        </div>
+
+    </div>
+    
+    <a href="javascript:void(0)" class="btn-acceder-premium" style="width: 280px; margin-top: 60px;" onclick="abrirLogin()">COMENZAR AHORA</a>
+</section>
+<footer>
+    <div style="display: flex; gap: 40px; text-align: left;">
+        <div>
+            <h3>UBICACIÓN</h3>
+            <p>Calle de la Elegancia #123</p>
+        </div>
+        <div>
+            <h3>HORARIOS</h3>
+            <p>9:00 AM - 8:00 PM</p>
+        </div>
+    </div>
+
+    <p style="opacity: 0.4; letter-spacing: 3px; font-weight: 300; font-size: 0.55rem;">TAMAKO &copy; 2026</p>
+
+    <div class="footer-social-icons">
+        <a href="#" class="socialContainer">
+            <svg viewBox="0 0 448 512" class="socialSvg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>
+        </a>
+        <a href="#" class="socialContainer">
+            <svg viewBox="0 0 320 512" class="socialSvg"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
+        </a>
+        <a href="https://wa.me/tu_numero" target="_blank" class="socialContainer">
+            <svg viewBox="0 0 448 512" class="socialSvg">
+                <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.1 0-65.6-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-5.5-2.8-23.2-8.5-44.2-27.1-16.4-14.6-27.4-32.7-30.6-38.1-3.2-5.5-.3-8.4 2.4-11.2 2.5-2.5 5.5-6.5 8.3-9.7 2.8-3.3 3.7-5.5 5.5-9.3 1.9-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 13.2 5.8 23.5 9.2 31.6 11.8 13.3 4.2 25.4 3.6 35 2.2 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"></path>
+            </svg>
+        </a>
+    </div>
+</footer>
+<div id="loginModal" class="modal-overlay">
+    <div class="modal-content">
+    <span class="close-btn" onclick="cerrarLogin()">&times;</span>
+    <h1 style="font-family:'Cinzel'; color:#111; margin-bottom:25px; letter-spacing: 10px; font-size: 2rem;">ENTRAR</h1>
+    
+    <label class="label-input">Usuario</label>
+    <div class="field">
+        <svg class="input-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+        </svg>
+        <input type="email" placeholder="CORREO ELECTRÓNICO" class="input-field" autocomplete="off">
+    </div>
+    
+    <label class="label-input">Contraseña</label>
+    <div class="field">
+        <svg class="input-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+        </svg>
+        <input type="password" placeholder="••••••••" class="input-field">
+    </div>
+    <button id="btnAcceder" class="btn-acceder-premium" onclick="intentarLogin()">
+    <span class="btn-text">ACCEDER</span>
+    </button>
+    </div>
+</div>
+
+<script>
+    // 1. Control de Scroll
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+
+    // NUEVO: Abre el login automáticamente si venimos de Servicios
+    window.addEventListener('load', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('login') === 'true') {
+            abrirLogin();
+            // Esto limpia la URL para que se vea bonita de nuevo
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    });
+
+    // 2. Funciones del Modal
+    function abrirLogin() {
+        document.querySelectorAll('#loginModal input').forEach(input => input.value = "");
+        document.getElementById('loginModal').style.display = 'flex';
+        setTimeout(() => {
+            document.querySelector('#loginModal input[type="email"]').focus();
+        }, 100); 
+    }
+
+    function cerrarLogin() {
+        document.getElementById('loginModal').style.display = 'none';
+    }
+
+    function intentarLogin() {
+        const boton = document.getElementById('btnAcceder');
+        const email = document.querySelector('.input-field[type="email"]').value;
+        const password = document.querySelector('.input-field[type="password"]').value;
+
+        if (email === "" || password === "") {
+            const modalContent = document.querySelector('.modal-content');
+            modalContent.classList.add('shake');
+            setTimeout(() => modalContent.classList.remove('shake'), 400);
+            alert("Por favor, completa todos los campos.");
+            return;
+        }
+
+        boton.querySelector(".btn-text").innerText = "CONECTANDO...";
+        boton.style.opacity = "0.7";
+        boton.disabled = true;
+
+        setTimeout(() => {
+            alert("El servidor de base de datos está en mantenimiento. Reintentando...");
+            boton.querySelector(".btn-text").innerText = "ACCEDER";
+            boton.style.opacity = "1";
+            boton.disabled = false;
+        }, 2000);
+    }
+
+    // 3. Eventos Globales (Clic fuera y Tecla Escape)
+    window.onclick = function(event) {
+        const modal = document.getElementById('loginModal');
+        if (event.target === modal) cerrarLogin();
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape") cerrarLogin();
+    });
+    if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js")
+      .then(() => console.log("Service Worker registrado"))
+      .catch(err => console.log("Error al registrar:", err));
+  });
+}
+</script>
+</body>
+</html>

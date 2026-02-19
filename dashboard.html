@@ -388,7 +388,12 @@
     </style>
 </head>
 <body>
-
+<script>
+const session = localStorage.getItem("tamakoSession");
+if(session !== "active"){
+    window.location.href = "index.html";
+}
+</script>
 <aside class="sidebar">
     <div class="sidebar-logo">TAMAKO</div>
 
@@ -401,15 +406,14 @@
     </nav>
 
     <div class="logout-container">
-        <a href="index.html" class="button-logout">
-            <div class="wrap">
-                <p>
-                    <span>Cerrar Sesión</span>
-                    <span>¿Salir ahora?</span>
-                </p>
-            </div>
-        </a>
+        <a href="#" onclick="cerrarSesion()" class="button-logout">
+    <div class="wrap">
+        <p>
+            <span>Cerrar Sesión</span>
+            <span>¿Salir ahora?</span>
+        </p>
     </div>
+</a>
 </aside>
 
 
@@ -584,13 +588,10 @@ if(data && data.length > 0){
         };
     </script>
     <script>
-        /* --- PROTECCIÓN DE SESIÓN TAMAKO --- */
-
-        const session = localStorage.getItem("tamakoSession");
-
-        if(session !== "active"){
-            window.location.href = "login.html";
-        }
-        </script>
+function cerrarSesion(){
+    localStorage.removeItem("tamakoSession");
+    window.location.href = "index.html";
+}
+</script>
 </body>
 </html>

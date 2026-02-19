@@ -774,13 +774,14 @@ footer p {
         boton.style.opacity = "0.7";
         boton.disabled = true;
 
-        setTimeout(() => {
-            alert("El servidor de base de datos está en mantenimiento. Reintentando...");
-            boton.querySelector(".btn-text").innerText = "ACCEDER";
-            boton.style.opacity = "1";
-            boton.disabled = false;
-        }, 2000);
-    }
+       setTimeout(() => {
+
+            localStorage.setItem("tamakoSession", "active");
+            window.location.href = "dashboard.html";
+
+        }, 1500);
+
+        }
 
     // 3. Eventos Globales (Clic fuera y Tecla Escape)
     window.onclick = function(event) {

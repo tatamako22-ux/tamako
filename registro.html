@@ -682,6 +682,9 @@ document.getElementById("resendOtp").addEventListener("click", async function(){
 
 // 👇 AQUÍ DENTRO DEL SCRIPT
 document.getElementById("goDashboard").addEventListener("click", function(){
+
+    localStorage.setItem("tamakoSession", "active");
+
     window.location.href = "dashboard.html";
 });
 // ==========================

@@ -417,7 +417,7 @@
         <header class="dash-header">
             <div class="welcome-text">
                 <h1>BIENVENIDO, MASTER</h1>
-                <p>Resumen de hoy en tu barbería</p>
+                <p id="fechaCreacion">Resumen de hoy en tu barbería</p>
             </div>
             <div class="user-profile" style="display: flex; align-items: center; gap: 15px;">
                 <div style="text-align: right;">
@@ -534,6 +534,33 @@
             </form>
         </div>
     </div>
+    <script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const supabaseUrl = "https://smibbddmwgdmqpwsuaqr.supabase.co";
+const supabaseKey = "TU_ANON_KEY_AQUI";
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Traer datos de la tienda
+const { data, error } = await supabase
+    .from("tiendas")
+    .select("*")
+    .limit(1);
+
+if(data && data.length > 0){
+
+    const tienda = data[0];
+
+    // 🔥 AQUÍ VA LA CONVERSIÓN DE FECHA
+    const fechaColombia = new Date(tienda.fecha_creacion).toLocaleString("es-CO", {
+        timeZone: "America/Bogota"
+    });
+
+    document.getElementById("fechaCreacion").innerText =
+    "Tienda creada el " + fechaColombia;
+
+}
+</script>
 
 <script>
         function toggleModal(show) {

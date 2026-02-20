@@ -468,7 +468,16 @@ const supabaseUrl = "https://smibbddmwgdmqpwsuaqr.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtaWJiZGRtd2dkbXFwd3N1YXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzODc1NzYsImV4cCI6MjA4NTk2MzU3Nn0.S3Z4m8s_nHa_reulKMFH1RtqoUgh9Cqzj69H0WTbghk";
 
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
-
+// ==========================
+// GENERAR SLUG AUTOMÁTICO
+// ==========================
+function generarSlug(nombre) {
+  return nombre
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "");
+}
 document.getElementById("registerForm").addEventListener("submit", async function(e){
     e.preventDefault();
     const submitButton = document.getElementById("createBtn");
@@ -616,28 +625,68 @@ phoneInput.addEventListener("input", function(){
     verifyBtn.style.opacity = "1";
     return;
 }
+// ==========================
+// 1️⃣ OBTENER USUARIO AUTENTICADO
+// ==========================
+const { data: userData } = await supabaseClient.auth.getUser();
+const user = userData.user;
 
-// 🔥 CREAR OBJETO PARA INSERTAR EN TABLA TIENDAS
-const tiendaData = {
-    nombre_tienda: document.getElementById("nombre_tienda").value.trim(),
-    propietario: document.getElementById("propietario").value.trim(),
-    telefono: document.getElementById("telefono").value.trim(),
-    direccion: document.getElementById("direccion").value.trim(),
-    cantidad_puestos: parseInt(document.getElementById("cantidad_puestos").value),
-    email: document.getElementById("email").value.trim().toLowerCase()
-};
+if (!user) {
+    alert("Error obteniendo usuario autenticado.");
+    verifyBtn.disabled = false;
+    verifyBtn.innerText = "VERIFICAR CÓDIGO";
+    verifyBtn.style.opacity = "1";
+    return;
+}
 
-        // 🔥 INSERTAR EN SUPABASE
-        const { error: insertError } = await supabaseClient
-            .from("tiendas")
-            .insert([tiendaData]);
+// ==========================
+// 2️⃣ GENERAR SLUG
+// ==========================
+const nombreTienda = document.getElementById("nombre_tienda").value.trim();
+const slug = generarSlug(nombreTienda);
 
-        if(insertError){
-        alert("Error al guardar la tienda: " + insertError.message);
-        verifyBtn.disabled = false;
-        verifyBtn.innerText = "VERIFICAR CÓDIGO";
-        verifyBtn.style.opacity = "1";
-        return;
+// ==========================
+// 3️⃣ CREAR TIENDA
+// ==========================
+const { data: tiendaInsertada, error: insertError } = await supabaseClient
+    .from("tiendas")
+    .insert([{
+        nombre: nombreTienda,
+        slug: slug,
+        propietario: document.getElementById("propietario").value.trim(),
+        telefono: document.getElementById("telefono").value.trim(),
+        direccion: document.getElementById("direccion").value.trim(),
+        cantidad_puestos: parseInt(document.getElementById("cantidad_puestos").value),
+        email: document.getElementById("email").value.trim().toLowerCase()
+    }])
+    .select()
+    .single();
+
+if (insertError) {
+    alert("Error al guardar la tienda: " + insertError.message);
+    verifyBtn.disabled = false;
+    verifyBtn.innerText = "VERIFICAR CÓDIGO";
+    verifyBtn.style.opacity = "1";
+    return;
+}
+
+// ==========================
+// 4️⃣ CREAR PERFIL ADMIN
+// ==========================
+const { error: perfilError } = await supabaseClient
+    .from("perfiles")
+    .insert([{
+        user_id: user.id,
+        tienda_id: tiendaInsertada.id,
+        rol: "admin"
+    }]);
+
+if (perfilError) {
+    alert("Error al crear perfil: " + perfilError.message);
+    verifyBtn.disabled = false;
+    verifyBtn.innerText = "VERIFICAR CÓDIGO";
+    verifyBtn.style.opacity = "1";
+    return;
 }
 document.getElementById("otpModal").classList.remove("show");
 document.getElementById("registerForm").style.opacity = "1";

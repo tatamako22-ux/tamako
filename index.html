@@ -1175,13 +1175,6 @@ for(let i = 0; i < 20; i++){   // puedes bajar a 15 si quieres menos
 
     starsContainer.appendChild(star);
 }
-    if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js")
-      .then(() => console.log("Service Worker registrado"))
-      .catch(err => console.log("Error al registrar:", err));
-  });
-}
 // ===== DETECTAR SECCIÓN ACTIVA =====
 const sections = document.querySelectorAll("section");
 const navLinks = document.querySelectorAll(".nav-links a");

@@ -12,26 +12,65 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
-    min-height:100vh;
-    background:#050505;
-    font-family:'Montserrat',sans-serif;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    overflow-y:auto; /* 👈 permite scroll vertical */
-    padding:40px 20px; /* 👈 evita que toque bordes */
+    margin:0;
+    font-family: 'Inter', sans-serif;
+    background:
+    radial-gradient(circle at 70% 30%, rgba(255,190,60,0.25), transparent 40%),
+    radial-gradient(circle at 30% 70%, rgba(255,190,60,0.15), transparent 40%),
+    linear-gradient(180deg, #050505 0%, #0a0a0f 100%);
+    color:#ffffff;
+    overflow-x:hidden;
 }
 
-.background{
+body::before{
+    content:"";
     position:fixed;
     inset:0;
-    z-index:-2;
     background:
-    radial-gradient(circle at center, rgba(191,149,63,.2), transparent 60%),
-    repeating-linear-gradient(45deg,#0b0b0b 0px,#0b0b0b 2px,#050505 2px,#050505 4px);
+        radial-gradient(circle at 50% 50%, rgba(191,149,63,0.12), transparent 55%);
+    z-index:-1;
 }
 
+body::after{
+    content:"";
+    position:fixed;
+    top:0;
+    left:-50%;
+    width:200%;
+    height:100%;
+    background:linear-gradient(
+        120deg,
+        transparent 40%,
+        rgba(191,149,63,0.05),
+        transparent 60%
+    );
+    animation: moveGlow 8s linear infinite;
+    pointer-events:none;
+    z-index:-1;
+}
+
+@keyframes moveGlow{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(50%); }
+}
+.background {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(191, 149, 63, 0.15), transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(191, 149, 63, 0.1), transparent 40%),
+        black;
+}
+/* Añadimos un efecto de estrellas/partículas sutil */
+.background::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(191,149,63,0.3) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.2;
+}
 .frame{
     position:fixed;
     inset:40px;
@@ -45,19 +84,24 @@ body{
     }
 }
 
-.register-card{
-    max-width:500px;
-    width:100%;
-    background:linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.4));
-    backdrop-filter:blur(20px);
-    border:1px solid rgba(191,149,63,.3);
-    border-radius:24px;
-    padding:40px;
-    text-align:center;
-    opacity:0;
-    animation:fadeUp 1s ease forwards;
+.register-card {
+    width: 480px;
+    max-height: 90vh;
+    max-width: 95%;
+    position: relative;
+    padding: 30px 40px; /* Reducimos el padding vertical */
+    height: fit-content; /* Se ajusta estrictamente al contenido */
+    margin: auto;
+    background: rgba(15, 15, 15, 0.9);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    border: 1px solid rgba(191, 149, 63, 0.3);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+    display: block; /* Asegura que no se comporte como flex hijo */
 }
-
+.register-card:hover {
+    transform: translateY(-5px) scale(1.01);
+}
 .register-card h1{
     font-family:'Cinzel',serif;
     letter-spacing:6px;
@@ -66,52 +110,87 @@ body{
     font-size:1.4rem;
 }
 
-.register-card p{
-    font-size:.75rem;
-    color:#aaa;
-    margin-bottom:30px;
-    letter-spacing:1px;
+.register-card p {
+    font-size: .8rem;
+    color: #bbb;
+    margin-bottom: 20px; /* Menos espacio aquí */
+    letter-spacing: 1px;
+}
+.form-title{
+    grid-column:span 2;
+    text-align:center;
+    font-family:'Cinzel',serif;
+    font-size:1.2rem;
+    letter-spacing:4px;
+    color:var(--gold);
+    margin-bottom:8px;
 }
 
-form{
-    display:grid;
+.form-subtitle{
+    grid-column:span 2;
+    text-align:center;
+    font-size:.8rem;
+    color:#9a9a9a;
+    margin-bottom:20px;
+}
+form {
+    display: grid;
     grid-template-columns: 1fr 1fr;
-    gap:18px;
+    gap: 12px; /* Reducimos el espacio entre campos */
+    margin-top: 10px;
 }
 
-.form-group{
-    margin:0;
+.form-group input {
+    width: 100%;
+    padding: 10px 14px; /* Inputs un poco más delgados */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(191, 149, 63, 0.2);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.85rem;
 }
 
-.form-group input{
-    width:100%;
-    padding:16px 22px;
-    background:rgba(255,255,255,0.04);
-    border:1px solid rgba(191,149,63,.35);
-    border-radius:50px;
-    color:white;
-    outline:none;
-    transition:all .3s ease;
-    font-size:.85rem;
-    letter-spacing:.5px;
+.form-group input {
+    width: 100%;
+    padding: 10px 5px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(191, 149, 63, 0.2);
+    border-radius: 15px;
+    color: #fff;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
 }
-
+.form-group input:focus {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: #fcf6ba;
+    outline: none;
+    box-shadow: 0 0 15px rgba(191, 149, 63, 0.3);
+}
 .form-group input::placeholder{
     color:rgba(255,255,255,.55);
     font-weight:300;
 }
-.btn-register{
-    width:100%;
-    padding:14px;
-    border-radius:50px;
-    border:1px solid var(--gold);
-    background:transparent;
-    color:var(--gold);
-    font-weight:600;
-    letter-spacing:2px;
-    cursor:pointer;
-    transition:.4s;
-    margin-top:10px;
+.btn-register {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #aa771c 100%);
+    border: none;
+    border-radius: 50px;
+    color: #1a1a1a;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    transition: all 0.4s ease;
+}
+.btn-register:hover{
+    background:var(--gold);
+    color:black;
+    transform:translateY(-3px);
+    box-shadow:0 10px 20px rgba(191,149,63,.3);
 }
 
 .btn-register:hover{
@@ -121,73 +200,121 @@ form{
     box-shadow:0 10px 20px rgba(191,149,63,.3);
 }
 
-.login-link{
-    margin-top:20px;
-    font-size:.7rem;
-    color:#777;
+.login-link {
+    font-size: .75rem;
+    color: #888;
 }
 
 .login-link a{
     color:var(--gold);
     text-decoration:none;
 }
-.layout{
-    width:100%;
-    max-width:1200px;
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap:80px;
-    align-items:center;
+.layout {
+    width: 100%;
+    max-width: 1100px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+}
+.branding {
+    flex: 0 1 45%;
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+    animation: fadeUp 1.2s ease forwards;
 }
 
-.branding{
-    padding:40px;
+.logo {
+    font-family: 'Cinzel', serif;
+    font-size: 4.5rem;
+    letter-spacing: 15px;
+    background: linear-gradient(to right, #bf953f 20%, #fcf6ba 40%, #fcf6ba 60%, #bf953f 80%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 4s linear infinite;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 10px rgba(191,149,63,0.3));
 }
 
-.logo{
-    font-family:'Cinzel',serif;
-    font-size:3rem;
-    letter-spacing:8px;
-    color:var(--gold);
-    margin-bottom:20px;
+@keyframes shine {
+    to { background-position: 200% center; }
 }
 
 .tagline{
-    color:#999;
-    font-size:1rem;
-    max-width:300px;
-    line-height:1.6;
-}
-.modal{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.7);
-    backdrop-filter:blur(8px);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    opacity:0;
-    pointer-events:none;
-    transition:.4s ease;
+    color:#aaa;
+    font-size:1.05rem;
+    max-width:360px;
+    line-height:1.8;
+    letter-spacing:1px;
 }
 
+.modal{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: .4s ease;
+}
+.modal::before{
+    content:"";
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    width:600px;
+    height:600px;
+    background:radial-gradient(circle, rgba(191,149,63,.18), transparent 70%);
+    z-index:-1;
+}
 .modal.show{
     opacity:1;
     pointer-events:auto;
 }
 
 .modal-content{
-    background:linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.8));
-    border:1px solid rgba(191,149,63,.4);
-    border-radius:24px;
-    padding:40px;
+    background:linear-gradient(145deg, rgba(255,255,255,0.06), rgba(0,0,0,0.4));
+    backdrop-filter:blur(25px);
+    border:1px solid rgba(191,149,63,.35);
+    border-radius:28px;
+    padding:45px 35px;
     text-align:center;
     width:90%;
-    max-width:400px;
-    box-shadow:0 20px 60px rgba(0,0,0,.6);
-    animation:scaleIn .4s ease;
+    max-width:420px;
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.7),
+        0 0 40px rgba(191,149,63,.15);
+    animation:scaleIn .35s ease;
+    position:relative;
+}
+#otpCode{
+    width:100%;
+    padding:16px 20px;
+    margin-bottom:20px;
+    border-radius:50px;
+    border:1px solid rgba(191,149,63,.35);
+    background:rgba(255,255,255,0.05);
+    color:white;
+    font-size:1rem;
+    text-align:center;
+    letter-spacing:4px;
+    outline:none;
+    transition:.3s;
 }
 
+#otpCode:focus{
+    border-color:var(--gold);
+    box-shadow:0 0 15px rgba(191,149,63,.3);
+}
 .modal-content h2{
     font-family:'Cinzel',serif;
     color:var(--gold);
@@ -243,6 +370,27 @@ form{
     }
 
 }
+.tamako-toast{
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    background: linear-gradient(135deg,#1a1a1a,#000);
+    border: 1px solid #bf953f;
+    color: #fff;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-size: .85rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all .4s ease;
+    z-index: 9999;
+    box-shadow: 0 0 20px rgba(191,149,63,.4);
+}
+
+.tamako-toast.show{
+    opacity: 1;
+    transform: translateY(0);
+}
 </style>
 </head>
 <body>
@@ -260,7 +408,7 @@ form{
     <div class="register-card">
 
     <form id="registerForm">
-        <h1 style="grid-column:span 2;">PRUEBA DEMO</h1>
+        <h1 class="form-title">PRUEBA DEMO</h1>
         <p style="grid-column:span 2; margin-bottom:20px;">Crea tu cuenta gratuita por 7 días</p>
 
         <div class="form-group">
@@ -302,22 +450,32 @@ form{
             Las contraseñas no coinciden
         </small>
 
-        <button type="submit" class="btn-register" style="grid-column:span 2;">
-            CREAR DEMO
+        <button type="submit" class="btn-register" id="createBtn" style="grid-column:span 2;">
+            <span id="btnText">CREAR DEMO</span>
         </button>
+        <div class="login-link" style="grid-column: span 2; text-align:center; margin-top:15px;">
+    ¿Ya tienes cuenta? <a href="login.html">Iniciar sesión</a>
+</div>
 
     </form>
     <!-- 🔥 MODAL OTP -->
     <div id="otpModal" class="modal">
         <div class="modal-content">
             <h2>Verifica tu correo 📩</h2>
-            <p>Te enviamos un código de 6 dígitos a tu email.</p>
+            <p>Te enviamos un código de 8 dígitos a tu email.</p>
 
-            <input type="text" id="otpCode" placeholder="Ingresa el código de 6 dígitos" maxlength="6"
-            style="margin-bottom:15px; width:100%; padding:14px; border-radius:50px; border:1px solid rgba(191,149,63,.4); background:rgba(255,255,255,0.05); color:white;">
-
+            <input type="text" id="otpCode" placeholder="Ingresa el código de 8 dígitos" maxlength="8">
             <button type="button" id="verifyOtp" class="btn-register">
                 VERIFICAR CÓDIGO
+            </button>
+
+            <p style="margin-top:15px; font-size:.8rem; color:#aaa;">
+                ¿No recibiste el código?
+            </p>
+
+            <button type="button" id="resendOtp" 
+                style="background:none;border:none;color:#bf953f;cursor:pointer;font-size:.85rem;margin-top:5px;">
+                Reenviar código
             </button>
         </div>
     </div>
@@ -332,10 +490,6 @@ form{
             </button>
         </div>
     </div>
-    <div class="login-link">
-        ¿Ya tienes cuenta? <a href="login.html">Iniciar sesión</a>
-    </div>
-
 </div>
 
 <!-- 1️⃣ Cargar Supabase -->
@@ -346,11 +500,24 @@ const supabaseUrl = "https://smibbddmwgdmqpwsuaqr.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtaWJiZGRtd2dkbXFwd3N1YXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzODc1NzYsImV4cCI6MjA4NTk2MzU3Nn0.S3Z4m8s_nHa_reulKMFH1RtqoUgh9Cqzj69H0WTbghk";
 
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
-
+// ==========================
+// GENERAR SLUG AUTOMÁTICO
+// ==========================
+function generarSlug(nombre) {
+  return nombre
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "");
+}
 document.getElementById("registerForm").addEventListener("submit", async function(e){
     e.preventDefault();
-    const submitButton = e.target.querySelector("button[type='submit']");
+    const submitButton = document.getElementById("createBtn");
+    const btnText = document.getElementById("btnText");
     submitButton.disabled = true;
+    btnText.innerText = "CREANDO...";
+    submitButton.style.opacity = "0.7";
+    submitButton.style.cursor = "not-allowed";
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
 
@@ -364,6 +531,9 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         passwordInput.classList.add("input-error");
         confirmInput.classList.add("input-error");
         submitButton.disabled = false;
+        btnText.innerText = "CREAR DEMO";
+        submitButton.style.opacity = "1";
+        submitButton.style.cursor = "pointer";
 
         return;
     } else {
@@ -378,10 +548,13 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         const phoneValue = phoneInput.value.trim();
 
         if(!/^\d{10}$/.test(phoneValue)){
-            phoneError.style.display = "block";
-            phoneInput.classList.add("input-error");
-            submitButton.disabled = false;
-            return;
+        phoneError.style.display = "block";
+        phoneInput.classList.add("input-error");
+        submitButton.disabled = false;
+        btnText.innerText = "CREAR DEMO";
+        submitButton.style.opacity = "1";
+        submitButton.style.cursor = "pointer";
+        return;
         } else {
             phoneError.style.display = "none";
             phoneInput.classList.remove("input-error");
@@ -390,19 +563,32 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         const email = document.getElementById("email").value.trim().toLowerCase();
         const passwordValue = document.getElementById("password").value;
 
-        const { data, error } = await supabaseClient.auth.signUp({
+        const { error } = await supabaseClient.auth.signInWithOtp({
             email: email,
-            password: passwordValue
+            options: {
+                shouldCreateUser: true,
+                emailOtpType: "numeric"   // 👈 ESTA LÍNEA ES LA CLAVE
+            }
         });
 
         if (error) {
             alert(error.message);
             submitButton.disabled = false;
+            btnText.innerText = "CREAR DEMO";
+            submitButton.style.opacity = "1";
+            submitButton.style.cursor = "pointer";
             return;
         }
-        document.getElementById("registerForm").style.opacity = "0.3";
+        document.getElementById("registerForm").style.display = "none";
         document.getElementById("otpModal").classList.add("show");
+
+        setTimeout(() => {
+            document.getElementById("otpCode").focus();
+        }, 300);
         submitButton.disabled = false;
+        btnText.innerText = "CREAR DEMO";
+        submitButton.style.opacity = "1";
+        submitButton.style.cursor = "pointer";
 });
 const passwordInput = document.getElementById("password");
 const confirmInput = document.getElementById("confirmPassword");
@@ -431,52 +617,109 @@ phoneInput.addEventListener("input", function(){
     }
 });
 
-// ==========================
-// VERIFICAR CÓDIGO OTP
-// ==========================
-document.getElementById("verifyOtp").addEventListener("click", async function(){
+    // ==========================
+    // VERIFICAR CÓDIGO OTP
+    // ==========================
+    document.getElementById("verifyOtp").addEventListener("click", async function(){
+    const verifyBtn = document.getElementById("verifyOtp");
+    verifyBtn.disabled = true;
+    verifyBtn.innerText = "VERIFICANDO...";
+    verifyBtn.style.opacity = "0.7";
 
     const code = document.getElementById("otpCode").value.trim();
-    if(!/^\d{6}$/.test(code)){
-    alert("Ingresa un código válido de 6 dígitos");
+    if(!/^\d{8}$/.test(code)){
+    alert("Ingresa un código válido de 8 dígitos");
+    verifyBtn.disabled = false;
+    verifyBtn.innerText = "VERIFICAR CÓDIGO";
+    verifyBtn.style.opacity = "1";
     return;
 }
     const email = document.getElementById("email").value.trim();
 
     if(!email){
-        alert("Primero debes registrarte con tu correo.");
-        return;
-    }
+    alert("Primero debes registrarte con tu correo.");
+    verifyBtn.disabled = false;
+    verifyBtn.innerText = "VERIFICAR CÓDIGO";
+    verifyBtn.style.opacity = "1";
+    return;
+}
 
     const { data, error } = await supabaseClient.auth.verifyOtp({
     email: email,
     token: code,
-    type: "signup"
+    type: 'email'
 });
 
     if(error){
     alert("Código incorrecto o vencido");
+    verifyBtn.disabled = false;
+    verifyBtn.innerText = "VERIFICAR CÓDIGO";
+    verifyBtn.style.opacity = "1";
+    return;
+}
+// ==========================
+// 1️⃣ OBTENER USUARIO AUTENTICADO
+// ==========================
+const { data: userData } = await supabaseClient.auth.getUser();
+const user = userData.user;
+
+if (!user) {
+    alert("Error obteniendo usuario autenticado.");
+    verifyBtn.disabled = false;
+    verifyBtn.innerText = "VERIFICAR CÓDIGO";
+    verifyBtn.style.opacity = "1";
     return;
 }
 
-// 🔥 CREAR OBJETO PARA INSERTAR EN TABLA TIENDAS
-const tiendaData = {
-    nombre_tienda: document.getElementById("nombre_tienda").value.trim(),
-    propietario_telefono: document.getElementById("propietario").value.trim() + " - " + document.getElementById("telefono").value.trim(),
-    direccion: document.getElementById("direccion").value.trim(),
-    cantidad_puestos: parseInt(document.getElementById("cantidad_puestos").value),
-    email: document.getElementById("email").value.trim().toLowerCase()
-};
+// ==========================
+// 2️⃣ GENERAR SLUG
+// ==========================
+const nombreTienda = document.getElementById("nombre_tienda").value.trim();
+const slug = generarSlug(nombreTienda);
 
-        // 🔥 INSERTAR EN SUPABASE
-        const { error: insertError } = await supabaseClient
-            .from("tiendas")
-            .insert([tiendaData]);
+// ==========================
+// 3️⃣ CREAR TIENDA
+// ==========================
+const { data: tiendaInsertada, error: insertError } = await supabaseClient
+    .from("tiendas")
+    .insert([{
+        nombre: nombreTienda,
+        slug: slug,
+        propietario: document.getElementById("propietario").value.trim(),
+        telefono: document.getElementById("telefono").value.trim(),
+        direccion: document.getElementById("direccion").value.trim(),
+        cantidad_puestos: parseInt(document.getElementById("cantidad_puestos").value),
+        email: document.getElementById("email").value.trim().toLowerCase()
+    }])
+    .select()
+    .single();
 
-        if(insertError){
-            alert("Error al guardar la tienda: " + insertError.message);
-            return;
-        }
+if (insertError) {
+    alert("Error al guardar la tienda: " + insertError.message);
+    verifyBtn.disabled = false;
+    verifyBtn.innerText = "VERIFICAR CÓDIGO";
+    verifyBtn.style.opacity = "1";
+    return;
+}
+
+// ==========================
+// 4️⃣ CREAR PERFIL ADMIN
+// ==========================
+const { error: perfilError } = await supabaseClient
+    .from("perfiles")
+    .insert([{
+        user_id: user.id,
+        tienda_id: tiendaInsertada.id,
+        rol: "admin"
+    }]);
+
+if (perfilError) {
+    alert("Error al crear perfil: " + perfilError.message);
+    verifyBtn.disabled = false;
+    verifyBtn.innerText = "VERIFICAR CÓDIGO";
+    verifyBtn.style.opacity = "1";
+    return;
+}
 document.getElementById("otpModal").classList.remove("show");
 document.getElementById("registerForm").style.opacity = "1";
 document.getElementById("registerForm").style.display = "none";
@@ -485,11 +728,66 @@ const modal = document.getElementById("successModal");
 modal.classList.add("show");
 
 });
+// ==========================
+// REENVIAR CÓDIGO OTP
+// ==========================
+document.getElementById("resendOtp").addEventListener("click", async function(){
+
+    const resendBtn = document.getElementById("resendOtp");
+    resendBtn.innerText = "Enviando...";
+    resendBtn.disabled = true;
+
+    const email = document.getElementById("email").value.trim().toLowerCase();
+
+    const { error } = await supabaseClient.auth.signInWithOtp({
+        email: email,
+        options: {
+            shouldCreateUser: true,
+            emailOtpType: "numeric"
+        }
+    });
+
+    if(error){
+
+    showToast("Por seguridad debes esperar 45 segundos antes de reenviar el código ⏳");
+
+    resendBtn.innerText = "Reenviar código";
+    resendBtn.disabled = false;
+    return;
+}
+
+    alert("Nuevo código enviado 📩");
+    resendBtn.innerText = "Reenviar código";
+    resendBtn.disabled = false;
+});
 
 // 👇 AQUÍ DENTRO DEL SCRIPT
 document.getElementById("goDashboard").addEventListener("click", function(){
+
+    localStorage.setItem("tamakoSession", "active");
+
     window.location.href = "dashboard.html";
 });
+// ==========================
+// TOAST FLOTANTE TAMAKO
+// ==========================
+function showToast(message){
+
+    const toast = document.createElement("div");
+    toast.className = "tamako-toast";
+    toast.innerText = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add("show");
+    }, 100);
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 400);
+    }, 4000);
+}
 </script>
 </body>
 </html>

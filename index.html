@@ -8,13 +8,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
 
-<title>TAMAKO | Arquitectura Web de Élite</title>
+<title>TAMAKU | Plataforma Premium para Negocios de Belleza</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
 :root{
-    --gold:#bf953f;
+    --gold:#ffd277;
     --gold-soft:#e6c87a;
 }
 
@@ -26,33 +26,49 @@
 }
 
 body{
-    min-height:100vh;
-    background:#050505;
-    font-family:'Montserrat',sans-serif;
-    color:white;
+    margin:0;
+    font-family: 'Inter', sans-serif;
+    background:
+    radial-gradient(circle at 70% 30%, rgba(191,149,63,0.14), transparent 50%),
+    radial-gradient(circle at 30% 70%, rgba(191,149,63,0.08), transparent 50%),
+    linear-gradient(180deg, #050505 0%, #0a0a0f 100%);
+    color:#ffffff;
     overflow-x:hidden;
-    overflow-y:auto; /* 🔥 Permite scroll natural en móvil */
-    -webkit-overflow-scrolling: touch; /* 🔥 Scroll suave tipo app en iPhone */
-    scroll-behavior: smooth;
-    animation: pageEntrance 1.5s ease-out forwards;
 }
 
-/* ===== FONDO CARBÓN + DEGRADÉ ===== */
-.background{
+/* Glow central profundo */
+body::before{
+    content:"";
     position:fixed;
     inset:0;
-    z-index:-3;
     background:
-        radial-gradient(circle at center, rgba(191,149,63,.25), transparent 60%),
-        repeating-linear-gradient(
-            45deg,
-            #0b0b0b 0px,
-            #0b0b0b 2px,
-            #050505 2px,
-            #050505 4px
-        );
+    radial-gradient(circle at 50% 50%, rgba(191,149,63,0.06), transparent 60%);
+    z-index:-1;
 }
 
+/* Línea dorada sutil animada */
+body::after{
+    content:"";
+    position:fixed;
+    top:0;
+    left:-50%;
+    width:200%;
+    height:100%;
+    background:linear-gradient(
+        120deg,
+        transparent 40%,
+        rgba(191,149,63,0.05),
+        transparent 60%
+    );
+    animation: moveGlow 8s linear infinite;
+    pointer-events:none;
+    z-index:-1;
+}
+
+@keyframes moveGlow{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(50%); }
+}
 @media (max-width:900px){
     .background{
         position:absolute;
@@ -60,14 +76,6 @@ body{
 }
 
 /* ===== PANEL MARCO ===== */
-.frame{
-    position:fixed;
-    inset:40px;
-    border:1.5px solid rgba(191,149,63,.45);
-    box-shadow:0 0 40px rgba(191,149,63,.15);
-    pointer-events:none;
-}
-
 @media (max-width: 900px){
     .frame{
         display:none;
@@ -107,10 +115,33 @@ body{
 }
 /* ===== NAV ===== */
 nav{
+    position:sticky;
+    top:0;
     display:flex;
     justify-content:space-between;
     align-items:center;
-    padding:50px 6%;
+    padding:16px 6%;
+
+    background:rgba(0,0,0,0.65);
+    backdrop-filter:blur(30px);
+
+    border-bottom:1px solid rgba(191,149,63,0.15);
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,0.6),
+        0 0 60px rgba(191,149,63,0.1);
+
+    transition:all .4s ease;
+    z-index:9999;
+}
+
+/* NAV ACTIVO AL SCROLL */
+nav.scrolled{
+    background:rgba(5,5,5,0.95);
+    border-bottom:1px solid rgba(255,210,120,0.35);
+    box-shadow:
+        0 15px 60px rgba(0,0,0,0.9),
+        0 0 80px rgba(191,149,63,0.25);
 }
 @media (max-width: 900px){
 
@@ -127,8 +158,10 @@ nav{
     }
 
     .logo{
-        font-size: 1.2rem;
-        letter-spacing: 4px;
+    font-family:'Cinzel', serif;
+    font-size:1.4rem;
+    letter-spacing:4px;
+    color:#e6c87a;
     }
 
     .nav-links{
@@ -137,10 +170,22 @@ nav{
     }
 
     .nav-links a{
-        padding: 8px 14px;
-        font-size: 0.6rem;
-        letter-spacing: 2px;
-    }
+    padding:8px 16px;
+    color:#cfcfcf;
+    text-decoration:none;
+    font-size:.8rem;
+    letter-spacing:1px;
+    transition:all .25s ease;
+}
+.nav-links a.active{
+    color:var(--gold) !important;
+    text-shadow:
+        0 0 10px rgba(255,210,120,0.8),
+        0 0 20px rgba(191,149,63,0.6);
+}
+.nav-links a:hover{
+    color:#fff;
+}
 
     .nav-links .gold-line{
         display: none;
@@ -148,17 +193,33 @@ nav{
 }
 
 .logo{
-    font-family:'Cinzel',serif;
-    font-size:1.6rem;
+    font-family:'Cinzel', serif;
+    font-size:1.8rem;
     letter-spacing:6px;
-    color:var(--gold);
-    margin-top: 8px; /* Esto lo baja para nivelarlo con los links */
+    font-weight:600;
+    position:relative;
+
+    background: linear-gradient(
+        90deg,
+        #bf953f,
+        #ffd277,
+        #fff3c4,
+        #ffd277,
+        #bf953f
+    );
+    background-size:300%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    text-shadow:
+        0 0 10px rgba(255,210,120,0.6),
+        0 0 25px rgba(191,149,63,0.5),
+        0 0 45px rgba(191,149,63,0.3);
 }
 
 .nav-links{
     display:flex;
     align-items:center;
-    gap:40px;
+    gap:28px;
     position:relative;
 }
 
@@ -169,13 +230,13 @@ nav{
 }
 
 .nav-links a{
-    padding:10px 24px;
-    color:#e5e5e5;
+    padding:10px 18px;
+    color:#cfcfcf;
     text-decoration:none;
-    font-size:.8rem;
-    letter-spacing:4px;
+    font-size:.95rem;
+    letter-spacing:3px;
     text-transform:uppercase;
-    transition:all .25s ease;
+    transition:all .3s ease;
 }
 
 .nav-links a:hover{
@@ -194,46 +255,163 @@ nav{
 
 
 .btn-login{
-    padding:12px 32px;
-    border:none;
-    color:var(--gold);
+    padding:8px 20px;
+    background:transparent;
+    border:1px solid rgba(191,149,63,0.35);
+    border-radius:6px;
+    color:#fff !important;
+    transition:all .3s ease;
 }
 
-/* ===== HERO ===== */
+.btn-login:hover{
+    background:linear-gradient(
+        90deg,
+        rgba(191,149,63,.2),
+        rgba(191,149,63,.5),
+        rgba(191,149,63,.2)
+    );
+    box-shadow:0 0 18px rgba(191,149,63,.4);
+}
+
+/* ===== HERO NUEVO ESTILO SaaS ===== */
 .hero{
-    min-height: calc(100vh - 140px);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 80px 10%;
-    text-align: center; /* Centramos todo */
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px 8% 140px 8%;
 }
 
-.hero-text{
+.hero-container{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    width:100%;
+    max-width:1300px;
+    margin:0 auto;
+}
+
+@media (max-width: 900px){
+    .hero-container{
+        flex-direction:column;
+        text-align:center;
+        gap:40px;
+    }
+
+    .hero-left,
+    .hero-right{
+        width:100%;
+    }
+
+    .hero-right{
+        justify-content:center;
+    }
+
+    .hero-right img{
+        width:95%;
+    }
+}
+
+.hero-left{
+    width:40%;
+    max-width:520px;
+}
+
+.hero-right{
+    width:60%;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    margin-bottom:-80px;
+}
+.hero-right{
     position:relative;
+    perspective:1200px;
+}
+.hero-right::after{
+    content:"";
+    position:absolute;
+    bottom:-60px;
+    left:50%;
+    transform:translateX(-50%);
+    width:70%;
+    height:140px;
+
+    background:radial-gradient(
+        ellipse at center,
+        rgba(0,0,0,0.8) 0%,
+        rgba(0,0,0,0.5) 40%,
+        rgba(0,0,0,0.2) 60%,
+        rgba(0,0,0,0) 80%
+    );
+
+    filter:blur(40px);
+    z-index:-1;
 }
 
-.hero-text .gold-line{
-    top:45%;
-    left:-10%;
+.hero-right img{
+    width:115%;
+    max-width:950px;
+
+    transform:
+        rotateY(-8deg)
+        rotateX(4deg);
+
+    filter:
+        brightness(0.95)
+        contrast(1.05)
+        saturate(0.95)
+        drop-shadow(0 40px 80px rgba(0,0,0,0.85))
+        drop-shadow(0 10px 40px rgba(0,0,0,0.6));
+
+    transition:none;
 }
 
-.hero-text h1{
-    font-family:'Cinzel',serif;
-    font-size:clamp(4rem,8vw,6.5rem);
-    letter-spacing:18px;
-    background:linear-gradient(#f5e7b2,#bf953f,#8c6a2d);
+.hero-left h1{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-size:clamp(2.5rem,4.5vw,3.8rem);
+    line-height:1.1;
+}
+.hero-left h1 span{
+    background: linear-gradient(90deg, #ffffff 0%, #d6b25e 100%);
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
 }
 
-.hero-text p{
-    margin:30px 0 50px;
-    letter-spacing:5px;
-    text-transform:uppercase;
-    color:#ccc;
+.hero-left p{
+    margin:25px 0 40px;
+    color:#cfcfcf;
     max-width:500px;
+    font-size:1.1rem;
+}
+
+.hero-buttons{
+    display:flex;
+    gap:20px;
+}
+
+.btn-primary{
+    padding:16px 32px;
+    background:linear-gradient(90deg,#bf953f,#ffd277,#bf953f);
+    background-size:200%;
+    border-radius:12px;
+    font-weight:600;
+    box-shadow:0 0 25px rgba(255,190,60,0.4);
+    transition:.4s;
+}
+.btn-primary:hover{
+    background-position:right;
+    transform:translateY(-3px);
+    box-shadow:0 0 35px rgba(255,190,60,0.7);
+}
+
+.btn-secondary{
+    padding:14px 28px;
+    border:1px solid #d6b25e;
+    color:#d6b25e;
+    border-radius:8px;
+    text-decoration:none;
 }
 
 /* ESTILO DE BOTÓN UIVERSE ADAPTADO */
@@ -326,7 +504,7 @@ nav{
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.9); /* Un poco más oscuro para que resalte */
+    background: rgba(15, 15, 20, 0.75);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     display: none; 
@@ -449,7 +627,7 @@ nav{
 
 .section-text {
     line-height: 1.8;
-    color: #ccc;
+    color: #cfcfcf;
     font-size: 1.1rem;
     max-width: 800px;
     letter-spacing: 1px;
@@ -575,7 +753,7 @@ footer p {
     text-transform: uppercase;
 }
 /* ============================= */
-/* ===== RESPONSIVE TAMAKO ===== */
+/* ===== RESPONSIVE TAMAKU ===== */
 /* ============================= */
 @media (max-width: 900px) {
 
@@ -599,7 +777,12 @@ footer p {
     }
 
     body {
-        flex-direction: column;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at 50% 40%, rgba(191,149,63,0.08) 0%, rgba(10,10,15,1) 55%),
+            linear-gradient(180deg, #0b0c10 0%, #07080c 100%);
+    color: #fff;
+    overflow-x: hidden;
     }
 
     .sidebar {
@@ -624,83 +807,259 @@ footer p {
         letter-spacing: 8px;
     }
 }
+.content-section > div > div{
+    transition: all .3s ease;
+}
+
+.content-section > div > div:hover{
+    transform: translateY(-8px);
+    border-color: var(--gold);
+}
+/* ===== ESTRELLAS PREMIUM SUTILES ===== */
+
+.stars{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+}
+
+.star{
+    position:absolute;
+    width:3px;
+    height:3px;
+    background:#fff;
+    border-radius:50%;
+    opacity:1;
+    box-shadow:0 0 5px rgba(255,255,255,.5);
+    animation: twinkle ease-in-out infinite;
+}
+
+@keyframes twinkle{
+    0%{opacity:0;}
+    50%{opacity:1;}
+    100%{opacity:0;}
+}
+/* ===== BENEFITS GRID PREMIUM ===== */
+
+.benefits-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:25px;
+    margin-top:60px;
+    max-width:1100px;
+    width:100%;
+}
+
+.benefit-card{
+    padding:35px;
+    border-radius:22px;
+    background:linear-gradient(180deg, #0c0c12, #08080c);
+    border:1.5px solid rgba(191,149,63,0.5);
+    position:relative;
+    overflow:hidden;
+    transition:all .4s ease;
+    box-shadow:
+        inset 0 0 0 1px rgba(255,210,120,0.05),
+        0 0 40px rgba(191,149,63,0.08);
+}
+
+.benefit-card::before{
+    content:"";
+    position:absolute;
+    top:-50%;
+    left:-50%;
+    width:200%;
+    height:200%;
+    background:linear-gradient(
+        120deg,
+        transparent 40%,
+        rgba(255,210,120,0.15),
+        transparent 60%
+    );
+    transform:rotate(25deg);
+    animation:shine 6s linear infinite;
+    opacity:.4;
+}
+
+@keyframes shine{
+    0%{ transform:translateX(-100%) rotate(25deg); }
+    100%{ transform:translateX(100%) rotate(25deg); }
+}
+
+.benefit-card:hover{
+    transform:translateY(-8px);
+    border-color:#ffd277;
+    box-shadow:
+        0 0 25px rgba(255,210,120,0.4),
+        0 0 60px rgba(191,149,63,0.25);
+}
+
+.benefit-card:hover::before{
+    opacity:0.9;
+}
+
+.benefit-icon{
+    width:60px;
+    height:60px;
+    margin:0 auto 20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    border:1.5px solid rgba(191,149,63,0.6);
+    color:#ffd277;
+    box-shadow:
+        0 0 20px rgba(191,149,63,0.2);
+}
+
+.benefit-icon svg{
+    width:28px;
+    height:28px;
+}
+
+.benefit-card h3{
+    font-size:1.1rem;
+    margin-bottom:8px;
+    font-weight:600;
+}
+
+.benefit-card p{
+    font-size:.9rem;
+    color:#aaa;
+}
+html{
+    scroll-behavior:smooth;
+}
 </style>
 </head>
 
 <body>
-
+<div class="stars"></div>    
 <div class="background"></div>
-<div class="frame"></div>
 
 <nav>
-    <div class="logo">TAMAKO</div>
+    <div class="logo">
+    ✦ TAMAKU
+</div>
 
     <div class="nav-links">
     <div class="gold-line"></div>
-    <a href="#nosotros">Nosotros</a>
+    <a href="#beneficios">Beneficios</a>
+    <a href="#quienes">Nosotros</a>
     <a href="servicios.html">Servicios</a>
     <a href="javascript:void(0)" class="btn-login" onclick="abrirLogin()">Iniciar sesión</a>
 </div>
 </nav>
 <section class="hero">
-    <div class="hero-text" style="max-width: 900px;">
-        <h2 class="cinzel-title" style="font-size: 1.2rem; opacity: 0.8;">Nuestra Esencia</h2>
-        <h1 style="font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 20px;">NOSOTROS</h1>
-        <div class="gold-line-small"></div>
-        <p class="section-text" style="margin: 0 auto 60px;">
-            TAMAKO nace con el objetivo de digitalizar la exclusividad. Nuestra aplicación es una herramienta de gestión de alto rendimiento diseñada para barberías que no solo cortan el cabello, sino que venden una experiencia de lujo. Optimizamos cada cita, cada cliente y cada ingreso bajo una interfaz impecable.
+    <div class="hero-container">
+
+        <div class="hero-left">
+            <h1>
+                Transforma tu negocio<br>
+                de belleza en una <span>empresa digital</span>
+            </h1>
+
+            <p>
+                Gestiona clientes, agenda, ventas y control operativo 
+                desde una sola plataforma.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="#" class="btn-primary">Prueba Gratuita 7 Días</a>
+                <a href="#" class="btn-secondary">Ver Demo</a>
+                    
+            </div>
+        </div>
+        <div class="hero-right">
+            <img src="./images/dashboard-tamaku.png" alt="Dashboard TAMAKU">
+        </div>
+
+    </div>
+</section>
+
+<section id="beneficios" class="content-section">
+    <h2 class="cinzel-title">Una plataforma diseñada para escalar tu negocio</h2>
+    <div class="gold-line-small"></div>
+    <p class="section-text">
+     Centraliza tu operación, controla tu flujo de ingresos y toma decisiones basadas en datos reales.
+    </p>
+    <div class="benefits-grid">
+
+    <div class="benefit-card">
+        <div class="benefit-icon">👥</div>
+        <h3>Gestión de Clientes</h3>
+        <p>Base de datos completa con historial</p>
+    </div>
+
+    <div class="benefit-card">
+        <div class="benefit-icon">📅</div>
+        <h3>Agenda Inteligente</h3>
+        <p>Citas, recordatorios y sincronización</p>
+    </div>
+
+    <div class="benefit-card">
+        <div class="benefit-icon">🌿</div>
+        <h3>Control de Servicios</h3>
+        <p>Catálogo, precios y comisiones</p>
+    </div>
+
+    <div class="benefit-card">
+        <div class="benefit-icon">📊</div>
+        <h3>Analytics & Reportes</h3>
+        <p>Decisiones basadas en datos</p>
+    </div>
+
+    <div class="benefit-card">
+        <div class="benefit-icon">💳</div>
+        <h3>Pagos & Facturación</h3>
+        <p>Integración con múltiples métodos</p>
+    </div>
+
+    <div class="benefit-card">
+        <div class="benefit-icon">👤</div>
+        <h3>Equipo & Roles</h3>
+        <p>Control de personal y permisos</p>
+    </div>
+
+</div>
+</section>
+<section id="quienes" class="content-section">
+    <h2 class="cinzel-title">¿Quiénes Somos?</h2>
+    <div class="gold-line-small"></div>
+
+    <p class="section-text">
+        En <strong>Tamaku</strong> somos una empresa TechMade especializada en desarrollo tecnológico y soluciones digitales a la medida. 
+        Nacimos como una empresa familiar con una visión clara: transformar ideas en herramientas digitales que optimicen procesos, impulsen negocios y mejoren la vida de emprendedores y empresas.
+    </p>
+
+    <p class="section-text" style="margin-top:25px;">
+        Desarrollamos aplicaciones móviles, software empresarial y plataformas digitales innovadoras que automatizan tareas, aumentan la productividad y reducen costos operativos. 
+        Nuestro enfoque está centrado en la eficiencia, la escalabilidad y la experiencia del usuario.
+    </p>
+
+    <p class="section-text" style="margin-top:25px;">
+        Trabajamos con un equipo interdisciplinario de desarrolladores, diseñadores y estrategas digitales que colaboran de manera integral para crear soluciones personalizadas, adaptadas a cada cliente y sector.
+    </p>
+
+    <div style="margin-top:40px; max-width:800px;">
+        <p class="section-text" style="color:var(--gold); font-weight:600; letter-spacing:2px;">
+            Nuestras especialidades:
+        </p>
+        <p class="section-text" style="margin-top:15px;">
+            • Desarrollo de aplicaciones móviles (iOS y Android)<br>
+            • Desarrollo de software a la medida<br>
+            • Automatización de procesos empresariales<br>
+            • Transformación digital<br>
+            • Consultoría tecnológica<br>
+            • Implementación de soluciones digitales innovadoras
         </p>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; width: 100%; max-width: 1100px;">
-        
-        <div style="padding: 30px; border: 1px solid rgba(191,149,63,0.2); background: rgba(255,255,255,0.03); backdrop-filter: blur(5px);">
-            <h3 style="font-family: 'Cinzel'; color: var(--gold); margin-bottom: 15px; letter-spacing: 2px;">Gestión de Citas</h3>
-            <p style="font-size: 0.85rem; color: #aaa; line-height: 1.6;">Control total de la agenda en tiempo real, evitando tiempos muertos y solapamientos.</p>
-        </div>
-
-        <div style="padding: 30px; border: 1px solid rgba(191,149,63,0.2); background: rgba(255,255,255,0.03); backdrop-filter: blur(5px);">
-            <h3 style="font-family: 'Cinzel'; color: var(--gold); margin-bottom: 15px; letter-spacing: 2px;">Perfil VIP</h3>
-            <p style="font-size: 0.85rem; color: #aaa; line-height: 1.6;">Historial detallado de cada cliente: sus gustos, productos preferidos y frecuencia de visita.</p>
-        </div>
-
-        <div style="padding: 30px; border: 1px solid rgba(191,149,63,0.2); background: rgba(255,255,255,0.03); backdrop-filter: blur(5px);">
-            <h3 style="font-family: 'Cinzel'; color: var(--gold); margin-bottom: 15px; letter-spacing: 2px;">Análisis Financiero</h3>
-            <p style="font-size: 0.85rem; color: #aaa; line-height: 1.6;">Reportes de ingresos y rendimiento de barberos con estética profesional y clara.</p>
-        </div>
-
-    </div>
-    
-    <a href="javascript:void(0)" class="btn-acceder-premium" style="width: 280px; margin-top: 60px;" onclick="abrirLogin()">COMENZAR AHORA</a>
+    <p class="section-text" style="margin-top:40px; font-weight:500;">
+        En Tamaku no solo desarrollamos tecnología. Creamos soluciones que impulsan el crecimiento y fortalecen la competitividad empresarial.
+    </p>
 </section>
-<footer>
-    <div style="display: flex; gap: 40px; text-align: left;">
-        <div>
-            <h3>UBICACIÓN</h3>
-            <p>Calle de la Elegancia #123</p>
-        </div>
-        <div>
-            <h3>HORARIOS</h3>
-            <p>9:00 AM - 8:00 PM</p>
-        </div>
-    </div>
-
-    <p style="opacity: 0.4; letter-spacing: 3px; font-weight: 300; font-size: 0.55rem;">TAMAKO &copy; 2026</p>
-
-    <div class="footer-social-icons">
-        <a href="#" class="socialContainer">
-            <svg viewBox="0 0 448 512" class="socialSvg"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>
-        </a>
-        <a href="#" class="socialContainer">
-            <svg viewBox="0 0 320 512" class="socialSvg"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
-        </a>
-        <a href="https://wa.me/tu_numero" target="_blank" class="socialContainer">
-            <svg viewBox="0 0 448 512" class="socialSvg">
-                <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.1 0-65.6-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-5.5-2.8-23.2-8.5-44.2-27.1-16.4-14.6-27.4-32.7-30.6-38.1-3.2-5.5-.3-8.4 2.4-11.2 2.5-2.5 5.5-6.5 8.3-9.7 2.8-3.3 3.7-5.5 5.5-9.3 1.9-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 13.2 5.8 23.5 9.2 31.6 11.8 13.3 4.2 25.4 3.6 35 2.2 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"></path>
-            </svg>
-        </a>
-    </div>
-</footer>
 <div id="loginModal" class="modal-overlay">
     <div class="modal-content">
     <span class="close-btn" onclick="cerrarLogin()">&times;</span>
@@ -774,13 +1133,14 @@ footer p {
         boton.style.opacity = "0.7";
         boton.disabled = true;
 
-        setTimeout(() => {
-            alert("El servidor de base de datos está en mantenimiento. Reintentando...");
-            boton.querySelector(".btn-text").innerText = "ACCEDER";
-            boton.style.opacity = "1";
-            boton.disabled = false;
-        }, 2000);
-    }
+       setTimeout(() => {
+
+            localStorage.setItem("tamakuSession", "active");
+            window.location.href = "dashboard.html";
+
+        }, 1500);
+
+        }
 
     // 3. Eventos Globales (Clic fuera y Tecla Escape)
     window.onclick = function(event) {
@@ -791,6 +1151,30 @@ footer p {
     document.addEventListener('keydown', function(event) {
         if (event.key === "Escape") cerrarLogin();
     });
+    // ===== EFECTO NAV SCROLL =====
+window.addEventListener("scroll", function(){
+    const nav = document.querySelector("nav");
+    if(window.scrollY > 50){
+        nav.classList.add("scrolled");
+    } else {
+        nav.classList.remove("scrolled");
+    }
+});
+    // ===== GENERADOR DE ESTRELLAS TAMAKU =====
+
+const starsContainer = document.querySelector('.stars');
+
+for(let i = 0; i < 20; i++){   // puedes bajar a 15 si quieres menos
+    const star = document.createElement('div');
+    star.classList.add('star');
+
+    star.style.top = Math.random() * 100 + "%";
+    star.style.left = Math.random() * 100 + "%";
+    star.style.animationDelay = Math.random() * 5 + "s";
+    star.style.animationDuration = (3 + Math.random() * 4) + "s";
+
+    starsContainer.appendChild(star);
+}
     if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js")
@@ -798,6 +1182,27 @@ footer p {
       .catch(err => console.log("Error al registrar:", err));
   });
 }
+// ===== DETECTAR SECCIÓN ACTIVA =====
+const sections = document.querySelectorAll("section");
+const navLinks = document.querySelectorAll(".nav-links a");
+
+window.addEventListener("scroll", () => {
+    let current = "";
+
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop - 120;
+        if(pageYOffset >= sectionTop){
+            current = section.getAttribute("id");
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove("active");
+        if(link.getAttribute("href") === "#" + current){
+            link.classList.add("active");
+        }
+    });
+});
 </script>
 </body>
 </html>

@@ -1436,8 +1436,10 @@ html{
             return;
         }
 
-        localStorage.setItem("tamakuSession", "active");
-        localStorage.setItem("tienda", JSON.stringify(tienda));
+        localStorage.setItem(
+            "tamaku_tienda",
+            JSON.stringify(tienda)
+        );
         window.location.href = "pages/dashboard.html";
 
     } catch (err) {

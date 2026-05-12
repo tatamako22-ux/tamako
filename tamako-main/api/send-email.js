@@ -1,28 +1,37 @@
 // api/send-email.js
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Método no permitido' });
-    }
-    
-    const { email, nombre, tiendaNombre, servicio, profesional, fecha, hora, valor } = req.body;
-    
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        auth: {
-            user: process.env.GMAIL_USER,
-            pass: process.env.GMAIL_APP_PASS
-        }
-    });
-    
-    const mailOptions = {
-        from: `${tiendaNombre} <${process.env.GMAIL_USER}>`,
-        to: email,
-        subject: `✨ ${tiendaNombre} - Tu reserva ha sido confirmada ✨`,
-        html: `
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Método no permitido" });
+  }
+
+  const {
+    email,
+    nombre,
+    tiendaNombre,
+    servicio,
+    profesional,
+    fecha,
+    hora,
+    valor,
+  } = req.body;
+
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: `"TAMAKU" <${process.env.GMAIL_USER}>`,
+    to: email,
+    subject: `✨ ${tiendaNombre} - Tu reserva ha sido confirmada ✨`,
+    html: `
             <!DOCTYPE html>
             <html>
             <head><meta charset="UTF-8"></head>
@@ -54,14 +63,14 @@ export default async function handler(req, res) {
                 </div>
             </body>
             </html>
-        `
-    };
-    
-    try {
-        await transporter.sendMail(mailOptions);
-        return res.status(200).json({ success: true });
-    } catch (error) {
-        console.error('Error:', error);
-        return res.status(500).json({ error: error.message });
-    }
+        `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ error: error.message });
+  }
 }

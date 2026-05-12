@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TAMAKU | Panel de Control</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../assets/css/menu.css">
+
+    <!-- QR Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar">
+    <div class="sidebar-logo">✦ TAMAKU</div>
+
+    <nav class="nav-menu">
+        <a href="dashboard.html" class="nav-item active"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="agenda.html" class="nav-item"><i class="fa-solid fa-calendar-alt"></i> Agenda</a>
+        <a href="clientes.html" class="nav-item"><i class="fa-solid fa-users"></i> Clientes</a>
+        <a href="profesionales.html" class="nav-item"><i class="fa-solid fa-user-tie"></i> Profesionales</a>
+        <a href="ajustes.html" class="nav-item"><i class="fa-solid fa-gear"></i> Ajustes</a>
+    </nav>
+
+    <div class="logout-btn" onclick="toggleLogout(true)">
+        Cerrar Sesión
+    </div>
+</aside>
+
+<!-- ================= MOBILE NAV ================= -->
+<nav class="mobile-tab-bar">
+    <a href="dashboard.html" class="tab-item active"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
+    <a href="agenda.html" class="tab-item"><i class="fa-solid fa-calendar"></i><span>Agenda</span></a>
+    <a href="profesionales.html" class="tab-item"><i class="fa-solid fa-user-tie"></i><span>Staff</span></a>
+    <a href="clientes.html" class="tab-item"><i class="fa-solid fa-users"></i><span>VIP</span></a>
+    <a href="ajustes.html" class="tab-item"><i class="fa-solid fa-gear"></i><span>Ajustes</span></a>
+</nav>
+
+<!-- ================= MODAL CITA ================= -->
+<div id="modalCita" class="modal-overlay">
+    <div class="modal-card">
+        <h2>Agendar Cita</h2>
+
+        <div class="form-group">
+            <label>Cliente</label>
+            <input type="text" id="clienteCita">
+        </div>
+
+        <div class="form-group">
+            <label>Fecha</label>
+            <input type="date" id="fechaCita">
+        </div>
+
+        <div class="form-group">
+            <label>Hora</label>
+            <input type="time" id="horaCita">
+        </div>
+
+        <div class="form-group">
+            <label>Profesional</label>
+            <select id="barberoCita">
+                <option value="">Seleccionar...</option>
+            </select>
+        </div>
+
+        <button onclick="crearCita()">CONFIRMAR</button>
+        <button onclick="toggleModal('modalCita', false)">Cancelar</button>
+    </div>
+</div>
+
+<!-- ================= MODAL QR ================= -->
+<div id="modalQR" class="modal-overlay" onclick="toggleModal('modalQR', false)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <h2>Link para Clientes</h2>
+
+        <div id="qrcode" style="background:white;padding:15px;border-radius:10px;"></div>
+
+        <button onclick="descargarQR()">Descargar QR</button>
+        <button onclick="copiarAlPortapapeles()">Copiar enlace</button>
+    </div>
+</div>
+
+<!-- ================= MODAL LOGOUT ================= -->
+<div id="modalLogout" class="modal-overlay">
+    <div class="modal-card">
+        <h2>¿Cerrar Sesión?</h2>
+        <button onclick="cerrarSesion()">SALIR</button>
+        <button onclick="toggleModal('modalLogout', false)">Cancelar</button>
+    </div>
+</div>
+
+<!-- ================= HEADER ================= -->
+<main class="main-content">
+
+    <header class="header-dash">
+        <div>
+            <h1>HOLA, <span id="nombreBienvenida">MASTER</span></h1>
+            <p>Resumen del día</p>
+        </div>
+
+        <button class="btn-link-clientes" onclick="generarYMostrarQR()">
+            <i class="fa-solid fa-qrcode"></i> Link Clientes
+        </button>
+
+        <div id="avatarInicial" onclick="toggleModal('modalLogout', true)">
+            T
+        </div>
+    </header>
+
+    <!-- ================= STATS ================= -->
+    <section class="stats-grid">
+        <div class="stat-card"><h3>Citas Hoy</h3><div id="valCitas">0</div></div>
+        <div class="stat-card"><h3>Ingresos</h3><div id="valIngresos">$0</div></div>
+        <div class="stat-card"><h3>Nuevos</h3><div id="valNuevos">0</div></div>
+        <div class="stat-card"><h3>Espera</h3><div id="valEspera">0</div></div>
+    </section>
+
+    <!-- ================= TABLE ================= -->
+    <section class="table-container">
+        <h2>Próximas Citas</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Hora</th>
+                    <th>Cliente</th>
+                    <th>Profesional</th>
+                    <th>Estado</th>
+                    <th>Contacto</th>
+                </tr>
+            </thead>
+
+            <tbody id="listaCitas"></tbody>
+        </table>
+    </section>
+
+</main>
+
+<!-- ================= FAB ================= -->
+<button class="fab-button" onclick="toggleModal('modalCita', true)">+</button>
+
+<!-- ================= MENU SCRIPT ================= -->
+<script src="../assets/js/core/menu.js"></script>
+
+<!-- ================= APP ENTRY ================= -->
+<script type="module">
+
+import { getTiendaInfo } from "../assets/js/core/session.js";
+import { initDashboard } from "../assets/js/dashboard/dashboard.init.js";
+
+const tiendaInfo = getTiendaInfo();
+
+if (!tiendaInfo) {
+    window.location.href = "../index.html";
+} else {
+    initDashboard(tiendaInfo);
+}
+
+</script>
+
+</body>
+</html>

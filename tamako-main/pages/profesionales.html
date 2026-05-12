@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TAMAKU | Staff de Élite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/menu.css">
+    <style>
+        
+        /* --- CONTENIDO --- */
+        .main-content { flex-grow: 1; padding: 40px 5% 150px; height: 100vh; overflow-y: auto; }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
+        .header-flex h1 { font-family: 'Cinzel'; font-size: 1.8rem; letter-spacing: 3px; }
+        .sede-info { color: var(--gold); font-family: 'Cinzel'; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 30px; opacity: 0.8; }
+        .btn-add { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; border-radius: 50px; font-size: 0.7rem; font-weight: 700; cursor: pointer; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; }
+        .btn-add:hover { background: var(--gold); color: black; }
+
+        /* --- TARJETAS --- */
+        .barbers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .barber-card { position: relative; background: #0d0d0d; border: 1px solid rgba(191, 149, 63, 0.1); border-radius: 28px; padding: 30px 20px; text-align: center; transition: 0.4s; }
+        .card-actions { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .action-icon { color: var(--gold); opacity: 0.5; cursor: pointer; transition: 0.3s; font-size: 1.1rem; }
+        .action-icon:hover { opacity: 1; color: var(--gold-light); }
+
+        .barber-avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #bf953f, #fcfabb); padding: 2px; margin: 0 auto 15px; }
+        .barber-avatar div { width: 100%; height: 100%; border-radius: 50%; background: #111; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .barber-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .barber-name { font-family: 'Cinzel'; font-size: 1.2rem; color: #fff; margin-bottom: 5px; }
+        .puesto-tag { font-size: 0.6rem; color: var(--gold-light); font-weight: 800; letter-spacing: 2px; background: rgba(191,149,63,0.1); padding: 5px 15px; border-radius: 50px; display: inline-block; margin-bottom: 20px; }
+
+        .contact-quick-actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
+        .quick-btn { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); transition: 0.3s; }
+        .btn-phone { color: var(--gold); border-color: rgba(191,149,63,0.2); }
+        .btn-sos { color: var(--danger); border-color: rgba(255,77,77,0.2); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .stat-box { text-align: center; padding: 10px; border-radius: 12px; background: rgba(255,255,255,0.02); }
+        .stat-box span { display: block; font-size: 0.5rem; color: #444; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-box b { font-size: 0.9rem; color: #fff; }
+        .disponibilidad-box {
+            font-size: 0.65rem;
+            color: #ccc;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .disponible {
+            color: #00ff9c;
+            font-weight: 700;
+        }
+
+        .no-disponible {
+            color: #ff4d4d;
+            font-weight: 700;
+        }
+
+        .horario-line {
+            font-size: 0.6rem;
+            color: #888;
+        }
+        .stat-wide { grid-column: span 2; background: rgba(191,149,63,0.05); margin-bottom: 5px; }
+
+        /* --- MODALES --- */
+        .modal-overlay { 
+            display: none; position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.85); z-index: 2000; 
+            justify-content: center; align-items: center; 
+            backdrop-filter: blur(15px); padding: 20px;
+        }
+        .modal-card { 
+            background: #0a0a0a; border: 1px solid rgba(191, 149, 63, 0.3); 
+            padding: 30px; border-radius: 30px; width: 100%; 
+            max-width: 480px; max-height: 90vh; overflow-y: auto; 
+            text-align: center; position: relative;
+            animation: modalPop 0.3s ease-out; 
+        }
+        @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; font-size: 0.6rem; color: #888; margin-bottom: 8px; text-transform: uppercase; font-weight: 700; }
+        .modal-card input, .modal-card select { width: 100%; padding: 15px; background: #151515; border: 1px solid #222; color: white; border-radius: 12px; outline: none; font-family: 'Montserrat'; font-size: 0.85rem; }
+        .modal-card input::placeholder { color: #555 !important; opacity: 1; font-style: italic; }
+
+        .btn-gold { width: 100%; padding: 18px; background: var(--gold); border: none; color: #000; font-weight: 800; border-radius: 50px; cursor: pointer; letter-spacing: 2px; text-transform: uppercase; margin-top: 10px; }
+
+        .confirm-box { background: #0d0d0d; border: 1px solid #333; padding: 35px; border-radius: 25px; width: 100%; max-width: 320px; text-align: center; }
+        #toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 12px 30px; border-radius: 50px; font-weight: 800; font-size: 0.7rem; z-index: 5000; transition: 0.5s; }
+        #toast.show { bottom: 110px; }
+
+        .serv-item-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px; background: #111; border-radius: 15px; 
+            margin-bottom: 10px; border: 1px solid #222; text-align: left;
+        }
+
+        @media (max-width: 900px) {
+            body { flex-direction: column; overflow: auto; }
+            .sidebar { display: none; }
+            .mobile-tab-bar { display: flex; }
+            .main-content { padding: 90px 20px 120px; height: auto; }
+            .header-flex { position: fixed; top: 0; left: 0; right: 0; background: rgba(5,5,5,0.85); backdrop-filter: var(--ios-blur); padding: 15px 20px; z-index: 1100; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        }
+        /* Optimizaciones para Móvil */
+@media (max-width: 600px) {
+    .modal-card {
+        width: 95%;
+        padding: 25px 20px;
+        border-radius: 25px;
+    }
+
+    .modal-card input {
+        font-size: 16px !important; /* Evita que iOS haga zoom automático al enfocar */
+        padding: 12px;
+    }
+
+    .serv-item-row i.fa-pen-to-square {
+        background: rgba(191,149,63,0.1);
+        padding: 8px;
+        border-radius: 8px;
+    }
+}
+
+/* Animación sutil al presionar en el celular */
+.serv-item-row:active {
+    transform: scale(0.98);
+    background: rgba(191,149,63,0.05);
+}
+    </style>
+</head>
+<body>
+
+    <div id="toast">✦ OPERACIÓN EXITOSA</div>
+    <div id="errorModal" class="modal-overlay" style="z-index: 9999;">
+    <div class="confirm-box" style="border-color: var(--danger);">
+        <i class="fa-solid fa-circle-exclamation" style="font-size: 2.5rem; color: var(--danger); margin-bottom: 20px;"></i>
+        <h3 style="font-family:'Cinzel'; margin-bottom: 10px;">Error</h3>
+        <p id="errorMensaje" style="color:#aaa; font-size: 0.8rem; margin-bottom: 25px;"></p>
+        <button onclick="cerrarModales()" 
+            style="width:100%; padding:15px; border-radius:12px; background:var(--danger); color:#fff; border:none; font-weight:800; cursor:pointer;">
+            ENTENDIDO
+        </button>
+    </div>
+</div>
+
+    <div id="confirmModal" class="modal-overlay">
+        <div class="confirm-box">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: #ff4d4d; margin-bottom: 20px;"></i>
+            <h3 style="font-family:'Cinzel'; margin-bottom: 10px;">¿Remover Staff?</h3>
+            <p style="color:#666; font-size: 0.8rem; margin-bottom: 30px;">Esta acción borrará permanentemente al profesional.</p>
+            <div style="display:flex; gap:10px;">
+                <button onclick="cerrarModales()" style="flex:1; padding:15px; border-radius:12px; background:#222; color:#fff; border:none; cursor:pointer;">VOLVER</button>
+                <button id="btnEliminarFinal" style="flex:1; padding:15px; border-radius:12px; background:#ff4d4d; color:#fff; border:none; font-weight:800; cursor:pointer;">ELIMINAR</button>
+            </div>
+        </div>
+    </div>
+    <div id="callModal" class="modal-overlay">
+    <div class="confirm-box" style="border-color: var(--gold);">
+        <i id="callIcon" class="fa-solid fa-phone-volume" style="font-size: 2.5rem; color: var(--gold); margin-bottom: 20px;"></i>
+        <h3 id="callTitle" style="font-family:'Cinzel'; margin-bottom: 10px;">¿Llamar?</h3>
+        <p id="callSubtitle" style="color:#888; font-size: 0.8rem; margin-bottom: 30px; white-space: pre-line;"></p>
+        <div style="display:flex; gap:10px;">
+            <button onclick="cerrarModales()" style="flex:1; padding:15px; border-radius:12px; background:#222; color:#fff; border:none; cursor:pointer;">CANCELAR</button>
+            <a id="btnCallAction" href="#" style="flex:1; padding:15px; border-radius:12px; background:var(--gold); color:#000; border:none; font-weight:800; cursor:pointer; text-decoration:none; display: flex; align-items: center; justify-content: center;">LLAMAR</a>
+        </div>
+    </div>
+</div>
+    <div id="configModal" class="modal-overlay">
+        <div class="modal-card">
+            <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom: 25px;">Jornada de <span id="nombreStaffConfig"></span></h2>
+            <div class="input-group">
+                <label>Horario Laboral</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="time" id="configInicio">
+                    <input type="time" id="configFin">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Hora Almuerzo</label>
+                <select id="configAlmuerzo" onchange="toggleAlmuerzo()">
+                <option value="0">Sin almuerzo</option>
+                <option value="30">30 Minutos</option>
+                <option value="60" selected>1 Hora</option>
+                <option value="90">1.5 Horas</option>
+            </select>
+
+            <div class="input-group" id="horaAlmuerzoContainer">
+                <label>Inicio Almuerzo</label>
+                <input type="time" id="horaAlmuerzoInicio" value="13:00">
+            </div>
+            <div class="input-group">
+                <label>Modo de Agenda</label>
+                <select id="modoAgenda" onchange="toggleModoAgenda()">
+                    <option value="auto" selected>Automática (por duración real)</option>
+                    <option value="intervalo">Modo Intervalo fijo</option>
+                </select>
+            </div>
+
+            <div class="input-group" id="intervaloContainer" style="display:none;">
+                <label>Duración de Intervalo (min)</label>
+                <input type="number" id="intervaloTurno" placeholder="Ej. 30">
+            </div>
+            <div class="input-group">
+                <label>Break (Descanso corto)</label>
+            <div style="display:flex; gap:10px;">
+                <input type="time" id="breakInicio" value="10:30">
+                <select id="breakDuracion">
+                    <option value="0">Sin break</option>
+                    <option value="10">10 Min</option>
+                    <option value="15">15 Min</option>
+                    <option value="20">20 Min</option>
+                </select>
+            </div>
+        </div>
+            </div>
+            <div class="input-group">
+                <label>Descanso Semanal</label>
+                <select id="configDescanso"><option value="Ninguno">Ninguno</option><option value="Lunes">Lunes</option><option value="Martes">Martes</option><option value="Miércoles">Miércoles</option><option value="Jueves">Jueves</option><option value="Viernes">Viernes</option><option value="Sábado">Sábado</option><option value="Domingo">Domingo</option></select>
+            </div>
+            <div class="input-group">
+                <label>Vacaciones / Licencias</label>
+                <div style="display:flex; gap:10px;"><input type="date" id="vacStart"><input type="date" id="vacEnd"></div>
+            </div>
+            <button class="btn-gold" onclick="guardarConfig()">Guardar Ajustes</button>
+            <button onclick="cerrarModales()" style="background:transparent; border:none; color:#555; margin-top:15px; cursor:pointer; font-weight:700;">CANCELAR</button>
+        </div>
+    </div>
+
+    <div id="modalServicios" class="modal-overlay">
+        <div class="modal-card">
+            <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom: 10px;">Servicios de <span id="nombreBarberoServicio"></span></h2>
+            <div id="listaServiciosContent" style="margin: 20px 0; max-height: 350px; overflow-y: auto;"></div>
+            <button class="btn-gold" onclick="document.getElementById('modalFormServicio').style.display='flex'">+ Agregar Nuevo Servicio</button>
+            <button onclick="cerrarModales()" style="background:transparent; border:none; color:#555; margin-top:15px; cursor:pointer; font-weight:700;">CERRAR</button>
+        </div>
+    </div>
+
+    <div id="modalFormServicio" class="modal-overlay" style="z-index: 3000; background: rgba(0,0,0,0.9);">
+        <div class="modal-card" style="max-width: 400px; border-color: var(--gold-light);">
+            <h3 style="font-family:'Cinzel'; color:var(--gold); margin-bottom: 25px;">Configurar Servicio</h3>
+            <div class="input-group"><label>Nombre del Servicio</label><input type="text" id="servNombre" placeholder="Ej. Manicura Pro"></div>
+            <div class="input-group"><label>Precio (COP)</label><input type="number" id="servPrecio" placeholder="0"></div>
+            <div class="input-group"><label>Duración (Minutos)</label><input type="number" id="servDuracion" placeholder="45" oninput="actualizarLeyenda(this.value, 'leyendaCrear')">
+<small id="leyendaCrear" style="color: var(--gold); font-size: 0.6rem; display: block; margin-top: 5px; opacity: 0.8;"></small></div>
+            <button class="btn-gold" onclick="guardarServicio()">GUARDAR</button>
+            <button onclick="document.getElementById('modalFormServicio').style.display='none'" style="background:transparent; border:none; color:#555; margin-top:15px; cursor:pointer;">CANCELAR</button>
+        </div>
+    </div>
+    <div id="modalEditarServicio" class="modal-overlay" style="z-index: 3500;">
+        <div class="modal-card" style="max-width: 400px; border-color: var(--gold);">
+            <h3 style="font-family:'Cinzel'; color:var(--gold); margin-bottom: 25px;">Editar Servicio</h3>
+            <input type="hidden" id="editServId">
+            <div class="input-group">
+                <label>Nombre del Servicio</label>
+                <input type="text" id="editServNombre">
+            </div>
+            <div class="input-group">
+                <label>Precio (COP)</label>
+                <input type="number" id="editServPrecio">
+            </div>
+            <div class="input-group">
+                <label>Duración (Minutos)</label>
+                <input type="number" id="editServDuracion" oninput="actualizarLeyenda(this.value, 'leyendaEdit')">
+                <small id="leyendaEdit" style="color: var(--gold); font-size: 0.6rem; display: block; margin-top: 5px; opacity: 0.8;"></small>
+            </div>
+            <button class="btn-gold" onclick="actualizarServicio()">GUARDAR CAMBIOS</button>
+            <button onclick="document.getElementById('modalEditarServicio').style.display='none'" style="background:transparent; border:none; color:#555; margin-top:15px; cursor:pointer; font-weight:700;">CANCELAR</button>
+        </div>
+    </div>
+    
+    <div id="modalConfirmBloques" class="modal-overlay" style="z-index: 4000;">
+        <div class="confirm-box" style="border-color: var(--gold); max-width: 380px;">
+            <i class="fa-solid fa-layer-group" style="font-size: 2.5rem; color: var(--gold); margin-bottom: 20px;"></i>
+            <h3 style="font-family:'Cinzel'; margin-bottom: 10px; color: var(--gold);">Ajuste de Agenda</h3>
+            <p id="msgConfirmBloques" style="color:#aaa; font-size: 0.8rem; margin-bottom: 25px; line-height: 1.5;"></p>
+            <div style="display:flex; gap:10px;">
+                <button onclick="document.getElementById('modalConfirmBloques').style.display='none'" style="flex:1; padding:15px; border-radius:12px; background:#222; color:#fff; border:none; cursor:pointer; font-weight: 700;">CANCELAR</button>
+                <button id="btnAceptarBloques" style="flex:1; padding:15px; border-radius:12px; background:var(--gold); color:#000; border:none; font-weight:800; cursor:pointer;">ACEPTAR</button>
+            </div>
+        </div>
+    </div>
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">✦ TAMAKU</div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="agenda.html" class="nav-item"><i class="fa-solid fa-calendar-alt"></i> Agenda</a>
+            <a href="clientes.html" class="nav-item"><i class="fa-solid fa-users"></i> Clientes</a>
+            <a href="profesionales.html" class="nav-item active"><i class="fa-solid fa-user-tie"></i> Profesionales</a>
+            <a href="ajustes.html" class="nav-item"><i class="fa-solid fa-gear"></i> Ajustes</a>
+        </nav>
+        <a href="#" onclick="cerrarSesion()" class="logout-btn">Cerrar Sesión</a>
+    </aside>
+
+    <nav class="mobile-tab-bar">
+        <a href="dashboard.html" class="tab-item"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
+        <a href="agenda.html" class="tab-item"><i class="fa-solid fa-calendar"></i><span>Agenda</span></a>
+        <a href="profesionales.html" class="tab-item active"><i class="fa-solid fa-user-tie"></i><span>Staff</span></a>
+        <a href="clientes.html" class="tab-item"><i class="fa-solid fa-users"></i><span>VIP</span></a>
+        <a href="ajustes.html" class="tab-item"><i class="fa-solid fa-gear"></i><span>Ajustes</span></a>
+    </nav>
+
+    <main class="main-content">
+        <div class="header-flex"><h1>Staff de Élite</h1><button class="btn-add" onclick="abrirModal()">+ Agregar Staff</button></div>
+        <div id="sedeNombre" class="sede-info">Cargando Sede...</div>
+        <div id="profesionales-grid" class="barbers-grid"></div>
+    </main>
+
+    <div id="modalProf" class="modal-overlay">
+        <div class="modal-card">
+            <h2 id="modalTitle" style="font-family:'Cinzel'; color:var(--gold); margin-bottom:25px;">Registrar Profesional</h2>
+            <input type="hidden" id="editID"> 
+            <div class="input-group"><label>Nombre Artístico</label><input type="text" id="nombreProf" placeholder="Ej. Mateo Silva"></div>
+            <div class="input-group"><label>Celular</label><input type="text" id="telProf" maxlength="10" placeholder="Ej. 3101234567"></div>
+            <div class="input-group"><label>Dirección</label><input type="text" id="dirProf" placeholder="Ej. Calle 10 #20-30"></div>
+            <div class="input-group"><label>Urgencia: Llamar a</label><input type="text" id="urgProf" placeholder="Ej. Esposa: 3001234567"></div>
+            <div class="input-group"><label>Puesto #</label><input type="number" id="puestoProf" value="1"></div>
+            <div class="input-group"><label>Foto Profesional</label><input type="file" id="fotoProf" accept="image/*"></div>
+            <button class="btn-gold" id="btnGuardar" onclick="guardar()">Vincular Staff</button>
+            <button onclick="cerrarModales()" style="background:transparent; border:none; color:#444; margin-top:15px; cursor:pointer; font-weight:700;">CANCELAR</button>
+        </div>
+    </div>
+
+    <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+    const supabaseUrl = "https://smibbddmwgdmqpwsuaqr.supabase.co";
+    const supabaseKey = "sb_publishable_kQQ7ldmjql3V5Jbn9jvxYw_IAoSz1Uj";
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const tiendaInfo = JSON.parse(localStorage.getItem("tienda"));
+    let horarioTienda = {};
+    let staffLocal = []; 
+    let barberoActivoID = null;
+
+    // ========== FUNCIONES AUXILIARES ==========
+    function horaToMin(h) {
+        if (!h) return 0;
+        const [hh, mm] = h.split(":").map(Number);
+        return hh * 60 + mm;
+    }
+
+    function actualizarDisponibilidadUI() {
+        document.querySelectorAll('.barber-card').forEach((card) => {
+            const id = card.getAttribute("data-id");
+            const p = staffLocal.find(x => x.id_barbero == id);
+            if (!p) return;
+
+            const box = card.querySelector('.disponibilidad-box');
+            if (box) {
+                box.innerHTML = generarDisponibilidad(p);
+            }
+        });
+    }
+
+    function minToHora(minutosTotales) {
+        const horas = Math.floor(minutosTotales / 60);
+        const mins = minutosTotales % 60;
+        return `${horas.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+    }
+    
+    function calcularFinCita(inicioMin, duracion, modo, bloquesOcupados = [], intervalo = 30) {
+    // AUTO = duración real del servicio
+    if (modo === "auto") {
+        return inicioMin + duracion;
+    }
+
+    // INTERVALO = bloques fijos
+    if (modo === "intervalo") {
+        return inicioMin + intervalo;
+    }
+
+    return inicioMin + duracion;
+}
+    function showToast(msj) { 
+        const t = document.getElementById("toast"); 
+        t.innerText = msj; 
+        t.classList.add("show"); 
+        setTimeout(() => t.classList.remove("show"), 3000); 
+    }
+
+    function showError(msj) {
+        const modal = document.getElementById("errorModal");
+        const errorMsg = document.getElementById("errorMensaje");
+        if (errorMsg) errorMsg.innerText = msj;
+        if (modal) modal.style.display = "flex";
+    }
+
+    window.cerrarModales = () => { 
+        document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = "none"); 
+    };
+
+    window.toggleAlmuerzo = () => {
+        const val = document.getElementById("configAlmuerzo").value;
+        const cont = document.getElementById("horaAlmuerzoContainer");
+        if (cont) {
+            cont.style.display = (val === "0") ? "none" : "flex";
+        }
+    };
+    window.toggleModoAgenda = () => {
+        const modo = document.getElementById("modoAgenda").value;
+        const cont = document.getElementById("intervaloContainer");
+
+        if (cont) {
+            cont.style.display = (modo === "intervalo") ? "block" : "none";
+        }
+    };
+
+    // Función para bloquear horas fuera del rango de la tienda
+    function bloquearHorasFueraRango() {
+        const hoy = new Date();
+        const dias = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+        const dia = dias[hoy.getDay()];
+        
+        let horarioTiendaHoy = horarioTienda[dia];
+        if (!horarioTiendaHoy || !horarioTiendaHoy.inicio || !horarioTiendaHoy.fin) {
+            const diasDisponibles = Object.keys(horarioTienda).filter(d => horarioTienda[d]?.inicio && horarioTienda[d]?.fin);
+            if (diasDisponibles.length > 0) {
+                horarioTiendaHoy = horarioTienda[diasDisponibles[0]];
+            } else {
+                return;
+            }
+        }
+
+        const inputInicio = document.getElementById("configInicio");
+        const inputFin = document.getElementById("configFin");
+
+        if (inputInicio) {
+            inputInicio.min = horarioTiendaHoy.inicio;
+            inputInicio.max = horarioTiendaHoy.fin;
+        }
+        if (inputFin) {
+            inputFin.min = horarioTiendaHoy.inicio;
+            inputFin.max = horarioTiendaHoy.fin;
+        }
+    }
+
+    // ========== FUNCIONES PRINCIPALES ==========
+    async function cargarHorarioTienda() {
+        const { data } = await supabase
+            .from("tiendas")
+            .select("horario_general")
+            .eq("id", tiendaInfo.id)
+            .single();
+        if (data) {
+            horarioTienda = data.horario_general || {};
+        }
+    }
+
+    function generarDisponibilidad(p) {
+        const modo = p.modo_agenda || "auto";
+        // 🔥 TEST DE LÓGICA (temporal)
+        const ahora = new Date();
+        const horaActual = ahora.getHours() * 60 + ahora.getMinutes();
+        const inicio = horaToMin(p.horario_inicio);
+        const fin = horaToMin(p.horario_fin);
+
+        const dias = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+        const hoyNombre = dias[ahora.getDay()];
+
+        if (hoyNombre === p.dia_descanso) {
+            return `<span class="no-disponible">Descanso hoy</span>`;
+        }
+
+        if (p.vacaciones_inicio && p.vacaciones_fin) {
+            const hoy = new Date().toISOString().split("T")[0];
+            if (hoy >= p.vacaciones_inicio && hoy <= p.vacaciones_fin) {
+                return `<span class="no-disponible">En vacaciones</span>`;
+            }
+        }
+
+        if (horaActual < inicio || horaActual > fin) {
+            return `<span class="no-disponible">Fuera de turno</span>
+                    <div class="horario-line">${p.horario_inicio} - ${p.horario_fin}</div>`;
+        }
+
+        if (p.almuerzo_inicio && p.almuerzo_minutos > 0) {
+            const almInicio = horaToMin(p.almuerzo_inicio);
+            const almFin = almInicio + p.almuerzo_minutos;
+            if (horaActual >= almInicio && horaActual < almFin) {
+                return `<span class="no-disponible">En almuerzo</span>
+                        <div class="horario-line">${p.almuerzo_inicio} - ${minToHora(almFin)}</div>`;
+            }
+        }
+
+        if (p.break_inicio && p.break_minutos > 0) {
+            const breakInicio = horaToMin(p.break_inicio);
+            const breakFin = breakInicio + p.break_minutos;
+            if (horaActual >= breakInicio && horaActual < breakFin) {
+                return `<span class="no-disponible">En descanso</span>
+                        <div class="horario-line">${p.break_inicio} - ${minToHora(breakFin)}</div>`;
+            }
+        }
+
+        return `<span class="disponible">Disponible ahora</span>
+        <div class="horario-line">${p.horario_inicio} - ${p.horario_fin}</div>`;
+    }
+
+    // --- Mejora en la carga de profesionales (más eficiente) ---
+async function cargarProfesionales() {
+    const { data, error } = await supabase
+        .from("profesionales")
+        .select("*")
+        .eq("id_tienda", tiendaInfo.id)
+        .order('puesto_asignado', { ascending: true });
+
+    if (error) {
+        showToast("Error cargando datos");
+        return;
+    }
+
+    staffLocal = data;
+    const grid = document.getElementById("profesionales-grid");
+    
+    if (data.length === 0) {
+        grid.innerHTML = `<div style="text-align:center; padding:50px; opacity:0.5; font-family:'Cinzel';">✦ TIENDA SIN STAFF</div>`;
+        return;
+    }
+
+    // Usamos un array y join para evitar múltiples reflows del DOM
+    const cardsHTML = data.map(p => {
+        const disponibilidadHTML = generarDisponibilidad(p);
+        
+        // Determinamos el color según el texto de disponibilidad
+        let colorBorde = "#ff4d4d"; // Rojo por defecto
+
+        if (disponibilidadHTML.includes("Disponible")) {
+            colorBorde = "#00ff9c"; // Verde si está libre
+        } else if (disponibilidadHTML.includes("almuerzo") || disponibilidadHTML.includes("descanso")) {
+            colorBorde = "#ffaa00"; // Naranja si es break
+        }
+
+        return `
+            <div class="barber-card" data-id="${p.id_barbero}" style="border: 1px solid ${colorBorde}">
+                <div class="card-actions">
+                    <i class="fa-solid fa-gear action-icon gear-btn" data-id="${p.id_barbero}" data-nombre="${p.nombre_empleado}"></i>
+                    <div style="display:flex; gap:12px;">
+                        <i class="fa-solid fa-list-check action-icon services-btn" data-id="${p.id_barbero}" data-nombre="${p.nombre_empleado}"></i>
+                        <i class="fa-solid fa-pen-to-square action-icon edit-btn" data-id="${p.id_barbero}"></i>
+                        <i class="fa-solid fa-trash-can action-icon delete-btn" data-id="${p.id_barbero}"></i>
+                    </div>
+                </div>
+                <div class="barber-avatar"><div>
+                    ${p.foto_url ? `<img src="${p.foto_url}">` : `<i class="fa-solid fa-user" style="font-size:3rem; color:#222;"></i>`}
+                </div></div>
+                <h3 class="barber-name">${p.nombre_empleado}</h3>
+                <div class="puesto-tag">PUESTO ${p.puesto_asignado}</div>
+                <div style="display:flex; justify-content:center; gap:5px; margin-bottom:15px;">
+                    <div class="puesto-tag" style="background: rgba(0,150,255,0.1); color:#00cfff; border:1px solid rgba(0,207,255,0.2);">
+                        ✦ ${p.modo_agenda?.toUpperCase() || 'AUTO'}
+                    </div>
+                    <div class="puesto-tag" style="background: rgba(255,255,255,0.05); color:#fff; opacity:0.6;">
+                        ⏱ ${p.intervalo_citas || 40}m
+                    </div>
+                </div>
+                <div class="disponibilidad-box">${disponibilidadHTML}</div>
+            </div>`;
+    }).join('');
+
+    grid.innerHTML = cardsHTML;
+}
+
+window.guardarConfig = async () => { 
+    const modo = document.getElementById("modoAgenda").value;
+    const intervaloRaw = parseInt(document.getElementById("intervaloTurno").value);
+    
+    const payload = {
+        horario_inicio: document.getElementById("configInicio").value,
+        horario_fin: document.getElementById("configFin").value,
+        almuerzo_minutos: parseInt(document.getElementById("configAlmuerzo").value) || 0,
+        almuerzo_inicio: document.getElementById("configAlmuerzo").value !== "0" ? document.getElementById("horaAlmuerzoInicio").value : null,
+        break_inicio: document.getElementById("breakInicio").value || null,
+        break_minutos: parseInt(document.getElementById("breakDuracion").value) || 0,
+        dia_descanso: document.getElementById("configDescanso").value,
+        modo_agenda: modo,
+        intervalo_citas: modo === "intervalo"
+        ? Math.max(15, intervaloRaw || 30)
+        : null,
+        vacaciones_inicio: document.getElementById("vacStart").value || null,
+        vacaciones_fin: document.getElementById("vacEnd").value || null
+    };
+
+    if (!payload.horario_inicio || !payload.horario_fin) {
+        showError("⚠️ Define la jornada laboral completa.");
+        return;
+    }
+    
+    if (horaToMin(payload.horario_inicio) >= horaToMin(payload.horario_fin)) {
+        showError("❌ El horario de inicio debe ser menor al de cierre.");
+        return;
+    }
+
+    const { error } = await supabase
+        .from("profesionales")
+        .update(payload)
+        .eq("id_barbero", barberoActivoID);
+
+    if (error) {
+        showError("Error en Supabase: " + error.message);
+    } else {
+        showToast("✦ ESTRATEGIA DE AGENDA ACTUALIZADA");
+        cerrarModales();
+        await cargarProfesionales();
+    }
+};
+
+    // ========== EVENTOS Y OTROS ==========
+    window.guardarServicio = async () => {
+    const nombre = document.getElementById("servNombre").value.trim();
+    const precio = document.getElementById("servPrecio").value;
+    const duracionManual = parseInt(document.getElementById("servDuracion").value);
+    
+    if(!nombre || !precio || !duracionManual) return alert("⚠️ Completa todos los campos");
+
+    const p = staffLocal.find(x => x.id_barbero == barberoActivoID);
+    let duracionFinal = duracionManual;
+
+    if (p && p.modo_agenda === "intervalo") {
+        const intervalo = p.intervalo_citas || 30;
+        const bloquesNecesarios = Math.ceil(duracionManual / intervalo);
+        duracionFinal = bloquesNecesarios * intervalo;
+
+        if (duracionManual > intervalo) {
+            // EN LUGAR DE CONFIRM(), USAMOS EL NUEVO MODAL
+            const msg = `El servicio dura ${duracionManual} min, pero tu intervalo es de ${intervalo} min.<br><br>Se ocuparán <b>${bloquesNecesarios} espacios</b> seguidos en la agenda (Total: ${duracionFinal} min).`;
+            document.getElementById("msgConfirmBloques").innerHTML = msg;
+            document.getElementById("modalConfirmBloques").style.display = "flex";
+
+            // Programamos el botón del modal para que guarde al hacer clic
+            document.getElementById("btnAceptarBloques").onclick = () => {
+                ejecutarGuardadoReal(nombre, precio, duracionFinal);
+                document.getElementById("modalConfirmBloques").style.display = "none";
+            };
+            return; 
+        }
+    }
+    
+    // Si no es modo intervalo o no supera el tiempo, guarda directo
+    ejecutarGuardadoReal(nombre, precio, duracionFinal);
+};
+
+// Nueva función auxiliar para procesar el envío a Supabase
+async function ejecutarGuardadoReal(nombre, precio, duracion) {
+    const { error } = await supabase.from("servicios").insert([{ 
+        id_tienda: tiendaInfo.id, 
+        id_barbero: barberoActivoID, 
+        nombre_servicio: nombre.toUpperCase(), 
+        precio: parseFloat(precio), 
+        duracion_minutos: duracion 
+    }]);
+
+    if(!error) { 
+        document.getElementById("servNombre").value = ""; 
+        document.getElementById("servPrecio").value = ""; 
+        document.getElementById("servDuracion").value = ""; 
+        // Cerramos tanto el form como los modales de confirmación
+        document.getElementById('modalFormServicio').style.display = 'none';
+        cerrarModales(); 
+        await abrirModalServicios(); 
+        showToast(`✦ SERVICIO VINCULADO (${duracion} MIN)`); 
+    } else {
+        alert("Error: " + error.message);
+    }
+}
+    window.eliminarServicio = async (id) => { 
+        if(!confirm("¿Eliminar este servicio?")) return; 
+        await supabase.from("servicios").delete().eq("id_servicio", id); 
+        await abrirModalServicios(); 
+    };
+    window.abrirModalServicios = async () => {
+        if (!barberoActivoID) return;
+
+        const { data, error } = await supabase
+            .from("servicios")
+            .select("*")
+            .eq("id_barbero", barberoActivoID);
+
+        if (error) {
+            alert("Error cargando servicios: " + error.message);
+            return;
+        }
+
+        const lista = document.getElementById("listaServiciosContent");
+        lista.innerHTML = "";
+
+        if (data.length === 0) {
+            lista.innerHTML = `
+                <div style="text-align:center; padding:20px; opacity:0.5;">
+                    <i class="fa-solid fa- de-folder-open" style="display:block; margin-bottom:10px;"></i>
+                    <p style="font-size:0.7rem;">Sin servicios configurados</p>
+                </div>`;
+        } else {
+            data.forEach(s => {
+    // Calculamos cuántos bloques ocupa según el intervalo del profesional
+    const p = staffLocal.find(x => x.id_barbero == barberoActivoID);
+    const intervalo = p.intervalo_citas || 30;
+    const numBloques = Math.ceil(s.duracion_minutos / intervalo);
+    
+    // Etiqueta visual para los bloques
+    const badgeBloques = p.modo_agenda === 'intervalo' 
+        ? `<span style="background:rgba(255,210,119,0.1); color:#ffd277; padding:2px 6px; border-radius:4px; font-size:0.55rem; border:1px solid rgba(255,210,119,0.2); margin-left:10px; font-family:'Montserrat';">${numBloques} ${numBloques > 1 ? 'BLOQUES' : 'BLOQUE'}</span>` 
+        : '';
+
+    lista.innerHTML += `
+        <div class="serv-item-row" style="display:flex; justify-content:space-between; align-items:center; padding:18px; background:rgba(255,255,255,0.03); border-radius:18px; margin-bottom:12px; border:1px solid rgba(191,149,63,0.15); text-align:left;">
+            <div style="flex-grow: 1; cursor:pointer;" onclick="prepararEdicionServicio('${s.id_servicio}', '${s.nombre_servicio}', ${s.precio}, ${s.duracion_minutos})">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <i class="fa-solid fa-pen-to-square" style="color:var(--gold); font-size: 0.9rem; opacity:0.8;"></i>
+                    <span style="color:var(--gold); font-weight:700; font-size:0.85rem; text-transform:uppercase;">${s.nombre_servicio}</span>
+                    ${badgeBloques}
+                </div>
+                <div style="color:#888; font-size:0.75rem; margin-top:6px; margin-left:26px;">
+                    ${s.duracion_minutos} MIN • <span style="color:#fff;">$${s.precio.toLocaleString()}</span>
+                </div>
+            </div>
+            
+            <div onclick="eliminarServicio(${s.id_servicio})" style="padding: 12px; cursor:pointer; margin-left:10px;">
+                <i class="fa-solid fa-trash-can" style="color:#ff4d4d; opacity:0.7; font-size:1.1rem;"></i>
+            </div>
+        </div>`;
+});
+        }
+        document.getElementById("modalServicios").style.display = "flex";
+    };
+
+    window.guardar = async () => {
+        const editID = document.getElementById("editID").value;
+        const nombre = document.getElementById("nombreProf").value.trim();
+        const tel = document.getElementById("telProf").value.trim();
+        const dir = document.getElementById("dirProf").value.trim();
+        const urg = document.getElementById("urgProf").value.trim();
+        const puesto = document.getElementById("puestoProf").value;
+        const archivo = document.getElementById("fotoProf").files[0];
+
+        if (!nombre || !/^\d{7,10}$/.test(tel)) return alert("⚠️ Nombre y Celular requeridos");
+        
+        const btn = document.getElementById("btnGuardar");
+        btn.innerText = "PROCESANDO..."; btn.disabled = true;
+
+        try {
+            let urlFoto = "";
+            if (archivo) {
+                const path = `${tiendaInfo.id}/${Date.now()}_${archivo.name}`;
+                const { error: uploadError } = await supabase.storage.from('fotos-profesionales').upload(path, archivo);
+                if (uploadError) throw uploadError;
+                urlFoto = supabase.storage.from('fotos-profesionales').getPublicUrl(path).data.publicUrl;
+            }
+
+            const payload = { 
+                nombre_empleado: nombre.toUpperCase(), 
+                telefono_empleado: tel, 
+                direccion_empleado: dir, 
+                contacto_urgencia: urg, 
+                puesto_asignado: parseInt(puesto) || 1,
+                id_tienda: tiendaInfo.id,
+                modo_agenda: "auto"
+            };
+            if(urlFoto) payload.foto_url = urlFoto;
+
+            let res;
+            if (editID) {
+                res = await supabase.from("profesionales").update(payload).eq("id_barbero", editID);
+            } else {
+                res = await supabase.from("profesionales").insert([payload]);
+            }
+            
+            if (res.error) throw res.error;
+
+            showToast("✦ STAFF ACTUALIZADO");
+            cerrarModales();
+            setTimeout(() => cargarProfesionales(), 500);
+            
+        } catch (e) { 
+            alert("Error: " + e.message); 
+        } finally { 
+            btn.disabled = false; 
+            btn.innerText = "Vincular Staff"; 
+        }
+    };
+
+    window.prepararEdicion = (id) => {
+        const p = staffLocal.find(item => item.id_barbero === id);
+        if(!p) return;
+        document.getElementById("editID").value = p.id_barbero;
+        document.getElementById("nombreProf").value = p.nombre_empleado;
+        document.getElementById("telProf").value = p.telefono_empleado;
+        document.getElementById("dirProf").value = p.direccion_empleado || "";
+        document.getElementById("urgProf").value = p.contacto_urgencia || "";
+        document.getElementById("puestoProf").value = p.puesto_asignado;
+        document.getElementById("modalTitle").innerText = "Editar Profesional";
+        document.getElementById("modalProf").style.display = "flex";
+    };
+
+    window.abrirModal = () => {
+        document.getElementById("editID").value = "";
+        document.getElementById("modalTitle").innerText = "Registrar Profesional";
+        document.getElementById("nombreProf").value = ""; 
+        document.getElementById("telProf").value = ""; 
+        document.getElementById("dirProf").value = ""; 
+        document.getElementById("urgProf").value = "";
+        document.getElementById("puestoProf").value = staffLocal.length + 1;
+        document.getElementById("modalProf").style.display = "flex";
+    };
+
+    
+
+    document.getElementById("btnEliminarFinal").onclick = async () => {
+        if (!window.idParaBorrar) return;
+        const { error } = await supabase.from("profesionales").delete().eq("id_barbero", window.idParaBorrar);
+        if (!error) { showToast("✦ STAFF REMOVIDO"); cerrarModales(); await cargarProfesionales(); }
+    };
+
+    // ========== EVENTO CLICK PRINCIPAL ==========
+    document.addEventListener('click', async (e) => {
+        const btnDelete = e.target.closest('.delete-btn');
+        const btnEdit = e.target.closest('.edit-btn');
+        const btnGear = e.target.closest('.gear-btn');
+        const btnServices = e.target.closest('.services-btn');
+        const btnPhone = e.target.closest('.btn-phone');
+        const btnSos = e.target.closest('.btn-sos');
+
+        if (btnDelete) { window.idParaBorrar = btnDelete.getAttribute('data-id'); document.getElementById("confirmModal").style.display = "flex"; }
+        if (btnPhone) { const tel = btnPhone.getAttribute('data-tel'); document.getElementById("callSubtitle").innerText = `Llamar a ${btnPhone.getAttribute('data-nombre')}\nTel: ${tel}`; document.getElementById("btnCallAction").href = `tel:${tel}`; document.getElementById("callModal").style.display = "flex"; }
+        if (btnSos) { const urg = btnSos.getAttribute('data-urg'); document.getElementById("callSubtitle").innerText = `EMERGENCIA: ${btnSos.getAttribute('data-nombre')}\nLlamar a: ${urg || 'N/A'}`; document.getElementById("btnCallAction").href = urg ? `tel:${urg}` : "#"; document.getElementById("callIcon").style.color = "var(--danger)"; document.getElementById("callModal").style.display = "flex"; }
+        if (btnEdit) prepararEdicion(btnEdit.getAttribute('data-id'));
+        
+        if (btnGear) { 
+            barberoActivoID = btnGear.getAttribute('data-id'); 
+            const nombre = btnGear.getAttribute('data-nombre');
+
+            document.getElementById("nombreStaffConfig").innerText = nombre.toUpperCase(); 
+
+            const p = staffLocal.find(item => item.id_barbero == barberoActivoID);
+
+            if (p) {
+                document.getElementById("configInicio").value = p.horario_inicio || "08:00";
+                document.getElementById("configFin").value = p.horario_fin || "18:00";
+                document.getElementById("configAlmuerzo").value = p.almuerzo_minutos || 0;
+                document.getElementById("horaAlmuerzoInicio").value = p.almuerzo_inicio || "13:00";
+                document.getElementById("breakInicio").value = p.break_inicio || "10:30";
+                document.getElementById("breakDuracion").value = p.break_minutos || 0;
+                document.getElementById("configDescanso").value = p.dia_descanso || "Ninguno";
+                document.getElementById("modoAgenda").value = p.modo_agenda || "auto";
+                toggleModoAgenda();
+                document.getElementById("vacStart").value = p.vacaciones_inicio || "";
+                document.getElementById("vacEnd").value = p.vacaciones_fin || "";
+                document.getElementById("intervaloTurno").value = p.intervalo_citas || 40;
+            }
+
+            // ✅ AQUÍ SÍ
+            bloquearHorasFueraRango();
+
+            toggleAlmuerzo();
+            document.getElementById("configModal").style.display = "flex"; 
+        }
+
+                // 🔥 EVENTOS ONCHANGE PARA ACTUALIZAR MIN/MAX DE ALMUERZO Y BREAK
+                const inpInicio = document.getElementById("configInicio");
+                const inpFin = document.getElementById("configFin");
+                const almInp = document.getElementById("horaAlmuerzoInicio");
+                const brkInp = document.getElementById("breakInicio");
+
+                inpInicio.onchange = () => {
+                    if (almInp) almInp.min = inpInicio.value;
+                    if (brkInp) brkInp.min = inpInicio.value;
+                    if (inpFin) inpFin.min = inpInicio.value;
+                };
+
+                inpFin.onchange = () => {
+                    if (almInp) almInp.max = inpFin.value;
+                    if (brkInp) brkInp.max = inpFin.value;
+                    if (inpInicio) inpInicio.max = inpFin.value;
+                };
+        if (btnServices) { 
+            barberoActivoID = btnServices.getAttribute('data-id'); 
+            document.getElementById("nombreBarberoServicio").innerText = btnServices.getAttribute('data-nombre').toUpperCase(); 
+            abrirModalServicios(); 
+        }
+    });
+    
+    // ========== INIT ==========
+    async function init() {
+        if (!tiendaInfo) return window.location.href = "../index.html";
+        
+        const sedeElem = document.getElementById("sedeNombre");
+        if(sedeElem && tiendaInfo.nombre) {
+            sedeElem.innerText = `SEDE: ${tiendaInfo.nombre.toUpperCase()}`;
+        }
+        await cargarHorarioTienda();
+        await cargarProfesionales();
+        
+        supabase.channel('staff').on('postgres_changes', { event: '*', schema: 'public', table: 'profesionales', filter: `id_tienda=eq.${tiendaInfo.id}` }, async () => {
+            await cargarProfesionales();
+        }).subscribe();
+    }
+
+    init();
+    setInterval(() => {
+    actualizarDisponibilidadUI();
+    }, 60000);
+    // Función para convertir minutos a Horas y Minutos (Ej: 240 min -> 4h)
+window.actualizarLeyenda = (minutos, elementId) => {
+    const el = document.getElementById(elementId);
+    if (!minutos || minutos < 1) { el.innerText = ""; return; }
+    
+    const hrs = Math.floor(minutos / 60);
+    const mins = minutos % 60;
+    
+    let texto = "⏱ Traducido: ";
+    if (hrs > 0) texto += `${hrs}h `;
+    if (mins > 0 || hrs === 0) texto += `${mins}min`;
+    
+    el.innerText = texto;
+};
+
+// Carga los datos del servicio en el modal de edición
+window.prepararEdicionServicio = (id, nombre, precio, duracion) => {
+    document.getElementById("editServId").value = id;
+    document.getElementById("editServNombre").value = nombre;
+    document.getElementById("editServPrecio").value = precio;
+    document.getElementById("editServDuracion").value = duracion;
+    
+    window.actualizarLeyenda(duracion, 'leyendaEdit');
+    document.getElementById("modalEditarServicio").style.display = "flex";
+};
+
+// Guarda los cambios editados en Supabase
+window.actualizarServicio = async () => {
+    const id = document.getElementById("editServId").value;
+    const nombre = document.getElementById("editServNombre").value.toUpperCase();
+    const precio = document.getElementById("editServPrecio").value;
+    const duracion = document.getElementById("editServDuracion").value;
+
+    const { error } = await supabase
+        .from("servicios")
+        .update({ 
+            nombre_servicio: nombre, 
+            precio: parseFloat(precio), 
+            duracion_minutos: parseInt(duracion) 
+        })
+        .eq("id_servicio", id);
+
+    if (!error) {
+        showToast("✦ SERVICIO ACTUALIZADO");
+        document.getElementById("modalEditarServicio").style.display = "none";
+        await abrirModalServicios(); 
+    } else {
+        alert("Error: " + error.message);
+    }
+};
+</script>
+</body>
+</html>

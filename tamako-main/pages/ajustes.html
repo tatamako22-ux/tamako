@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TAMAKU | Configuración</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/menu.css">
+    <style>
+        body { 
+            display: block !important; 
+            overflow-y: auto !important; 
+            height: auto !important; 
+        }
+        
+        .sidebar { float: left; position: sticky; top: 0; }
+        /* --- CONTENIDO (Original) --- */
+                .main-content { 
+            flex-grow: 1; 
+            padding: 40px 5% 200px; 
+            height: auto; 
+            overflow-y: visible; 
+        }
+
+        .agenda-header { margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 25px; }
+        .agenda-header h1 { font-family: 'Cinzel'; font-size: 1.8rem; letter-spacing: 3px; margin-bottom: 20px; }
+
+        /* --- CARDS Y FORMULARIOS --- */
+        .settings-card {
+            background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px; padding: 25px; margin-bottom: 25px;
+        }
+        .settings-card h2 { font-family: 'Cinzel'; font-size: 0.9rem; color: var(--gold); margin-bottom: 20px; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.65rem; color: #777; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; font-weight: 600; }
+        
+        input, select {
+            width: 100%; background: #0f0f0f; border: 1px solid rgba(191,149,63,0.1);
+            padding: 14px; color: white; border-radius: 15px; outline: none; font-family: 'Montserrat'; font-size: 0.85rem;
+        }
+
+        .btn-action {
+            background: var(--gold); color: black; border: none; padding: 16px; 
+            border-radius: 50px; font-weight: 700; font-size: 0.7rem; letter-spacing: 2px; 
+            cursor: pointer; width: 100%; text-transform: uppercase; margin-top: 10px;
+        }
+
+        /* --- CUADRÍCULA DE HORARIOS --- */
+        .horarios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px; margin-bottom: 20px;
+        }
+        .dia-card {
+            background: #0f0f0f; border: 1px solid rgba(191,149,63,0.1);
+            border-radius: 20px; padding: 20px;
+        }
+        .dia-nombre { font-size: 0.8rem; font-weight: 700; color: var(--gold); text-transform: uppercase; margin-bottom: 12px; display: block; }
+        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .input-cell { display: flex; flex-direction: column; gap: 5px; }
+        .input-cell label { font-size: 0.55rem; color: #555; text-transform: uppercase; }
+        .editable-input { text-align: center; padding: 10px; font-size: 0.9rem; color: var(--gold-light); }
+
+        /* --- LOGO PREVIEW --- */
+        .logo-preview-box {
+            width: 100px; height: 100px; border: 1px dashed var(--gold);
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; background: #000; overflow: hidden; margin-bottom: 10px;
+        }
+        .logo-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* --- DINÁMICOS (ESPECIALES / CIERRES) --- */
+        .dinamic-row {
+            background: linear-gradient(145deg, #0f0f0f, #050505); 
+            padding: 20px; border-radius: 20px; 
+            margin-bottom: 15px; border: 1px solid rgba(191, 149, 63, 0.1);
+            transition: 0.3s;
+        }
+        .dinamic-row:hover {
+            border-color: rgba(191, 149, 63, 0.3);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .flex-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+        .flex-col { flex: 1; min-width: 120px; }
+
+        /* --- RESPONSIVE ADAPTIVE (Mismo que tus otros módulos) --- */
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .mobile-tab-bar { display: flex; }
+            
+            .main-content { 
+            padding-top: 120px !important; 
+            padding-bottom: 180px !important; 
+            height: auto !important; 
+        } 
+            
+            .agenda-header { 
+                position: fixed; top: 0; left: 0; right: 0; 
+                background: rgba(5,5,5,0.9); backdrop-filter: var(--ios-blur); 
+                padding: 20px; z-index: 1500; border-bottom: 1px solid rgba(255,255,255,0.08); 
+                margin-bottom: 0;
+            }
+            .agenda-header h1 { font-size: 1rem; text-align: center; margin-bottom: 0; }
+            
+            .horarios-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">✦ TAMAKU</div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="agenda.html" class="nav-item"><i class="fa-solid fa-calendar-alt"></i> Agenda</a>
+            <a href="clientes.html" class="nav-item"><i class="fa-solid fa-star"></i> Clientes</a>
+            <a href="profesionales.html" class="nav-item"><i class="fa-solid fa-user-tie"></i> Profesionales</a>
+            <a href="ajustes.html" class="nav-item active"><i class="fa-solid fa-gear"></i> Ajustes</a>
+        </nav>
+        <a href="#" id="btnLogoutPC" style="text-decoration:none; color:var(--red); text-align:center; padding:15px; border:1px solid rgba(255,77,77,0.1); border-radius:50px; margin-top:auto; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase;">CERRAR SESIÓN</a>
+    </aside>
+
+    <nav class="mobile-tab-bar">
+        <a href="dashboard.html" class="tab-item"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
+        <a href="agenda.html" class="tab-item"><i class="fa-solid fa-calendar-alt"></i><span>Agenda</span></a>
+        <a href="profesionales.html" class="tab-item"><i class="fa-solid fa-user-tie"></i><span>Staff</span></a>
+        <a href="clientes.html" class="tab-item"><i class="fa-solid fa-users"></i><span>VIP</span></a>
+        <a href="ajustes.html" class="tab-item active"><i class="fa-solid fa-gear"></i><span>Ajustes</span></a>
+    </nav>
+
+    <main class="main-content">
+        <header class="agenda-header">
+            <h1>Configuración</h1>
+        </header>
+
+        <div class="settings-wrapper">
+            <div class="settings-card">
+                <h2>Identidad de Marca</h2>
+                <div class="form-group">
+                    <label>Logo de la Sede</label>
+                    <div class="logo-preview-box" id="logoTrigger">
+                        <div id="plusIcon" style="color:var(--gold);">+</div>
+                        <img id="imgPreview" style="display:none;">
+                    </div>
+                    <input type="file" id="logoInput" style="display:none;" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>Nombre Comercial</label>
+                    <input type="text" id="shopName">
+                </div>
+                <div class="form-group">
+                    <label>Dirección</label>
+                    <input type="text" id="shopAddress">
+                </div>
+                <button class="btn-action" id="saveId">Guardar Identidad</button>
+            </div>
+
+            <div class="settings-card">
+                <h2>Horario Semanal (AM/PM)</h2>
+                <div class="horarios-grid" id="gridSemanal"></div>
+                <button class="btn-action" id="saveWeekly" style="background:none; border:1px solid var(--gold); color:var(--gold);">Actualizar Cuadrícula</button>
+            </div>
+
+            <div class="settings-card">
+                <h2>Horarios Especiales</h2>
+                <div id="listaEspeciales"></div>
+                <button class="btn-action" id="addSpecial" style="background:rgba(255,255,255,0.05); border:1px dashed var(--gold); color:var(--gold); margin-bottom:10px;">+ Agregar Fecha Especial</button>
+                <button class="btn-action" id="saveSpecials">Guardar Especiales</button>
+            </div>
+
+            <div class="settings-card">
+                <h2>Cierres Temporales</h2>
+                <div id="listaCierres"></div>
+                <button class="btn-action" id="addClose" style="background:rgba(255,77,77,0.05); border:1px dashed var(--red); color:var(--red); margin-bottom:10px;">+ Agregar Rango de Cierre</button>
+                <button class="btn-action" id="saveCloses" style="background:var(--red); color:white;">Actualizar Cierres</button>
+            </div>
+
+            <div class="settings-card">
+                <h2>Reglas Administrativas</h2>
+                <div class="form-group">
+                    <label>Modo de Agenda</label>
+                    <select id="modo_agenda">
+                        <option value="intervalo">Manual (Intervalos Fijos)</option>
+                        <option value="auto">Automático (Según duración del Servicio)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="group-intervalo">
+                <label>Intervalo de Agenda (Minutos)</label>
+                <select id="intervalo">
+                    <option value="15">15 min</option>
+                    <option value="30">30 min</option>
+                    <option value="40">40 min</option>
+                    <option value="60">60 min</option>
+                </select>
+            </div>
+                <div class="form-group">
+                    <label>Duración Citas por Defecto (Min)</label>
+                    <input type="number" id="duracion_defecto">
+                </div>
+                <div class="form-group">
+                    <label>Comisión Staff (%)</label>
+                    <input type="number" id="commission">
+                </div>
+                <div class="form-group">
+                    <label>Moneda</label>
+                    <select id="currency">
+                        <option value="COP">Pesos Colombianos (COP)</option>
+                        <option value="USD">Dólares (USD)</option>
+                    </select>
+                </div>
+                <button class="btn-action" id="saveRules">Guardar Reglas</button>
+            </div>
+        </div>
+    </main>
+    <script src="../assets/js/menu.js"></script>
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+        const supabaseUrl = "https://smibbddmwgdmqpwsuaqr.supabase.co";
+        const supabaseKey = "sb_publishable_kQQ7ldmjql3V5Jbn9jvxYw_IAoSz1Uj";
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        let tiendaInfo = JSON.parse(localStorage.getItem("tienda"));
+        const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+        function horaToMin(hora) {
+            const [h, m] = hora.split(":").map(Number);
+            return h * 60 + m;
+        }
+
+        function estaDentroHorario(dia, horaInicio, horaFin, horarioGeneral) {
+            if (!horarioGeneral[dia]) return false;
+
+            const tiendaInicio = horaToMin(horarioGeneral[dia].inicio);
+            const tiendaFin = horaToMin(horarioGeneral[dia].fin);
+
+            const userInicio = horaToMin(horaInicio);
+            const userFin = horaToMin(horaFin);
+
+            return userInicio >= tiendaInicio && userFin <= tiendaFin;
+        }
+
+        async function init() {
+            if(!tiendaInfo) { window.location.href="../index.html"; return; }
+            
+            const { data } = await supabase.from("tiendas").select("*").eq("id", tiendaInfo.id).single();
+            if(data) {
+                // 🔥 SINCRONIZAR SIEMPRE LOCALSTORAGE CON BASE DE DATOS
+                localStorage.setItem("tienda", JSON.stringify(data));
+                tiendaInfo = data; // 🔥 ESTA ES LA CLAVE QUE TE FALTA
+                document.getElementById('shopName').value = data.nombre || "";
+                document.getElementById('shopAddress').value = data.direccion || "";
+                document.getElementById('currency').value = data.moneda || "COP";
+                document.getElementById('commission').value = data.comision || 0;
+                // Aquí usamos 'intervalo_minutos' que es como está en tu Supabase
+                document.getElementById('modo_agenda').value = data.modo_agenda || "intervalo";
+                document.getElementById('intervalo').value = data.intervalo_minutos || "30";
+                // Activamos la carga de duración por defecto
+                document.getElementById('duracion_defecto').value = data.duracion_citas || 40;
+
+                if(data.logo_url) {
+                    document.getElementById('imgPreview').src = data.logo_url;
+                    document.getElementById('imgPreview').style.display = 'block';
+                    document.getElementById('plusIcon').style.display = 'none';
+                }
+
+                const hData = data.horario_general || {};
+                window.horarioTienda = hData;
+                document.getElementById('gridSemanal').innerHTML = dias.map(d => {
+                    const conf = hData[d] || { inicio: "08:00", fin: "20:00" };
+                    return `
+                        <div class="dia-card">
+                            <span class="dia-nombre">${d}</span>
+                            <div class="grid-inputs">
+                                <div class="input-cell"><label>Abre</label><input type="time" class="editable-input" id="ini-${d}" value="${conf.inicio}"></div>
+                                <div class="input-cell"><label>Cierra</label><input type="time" class="editable-input" id="fin-${d}" value="${conf.fin}"></div>
+                            </div>
+                        </div>`;
+                }).join('');
+                document.getElementById('listaEspeciales').innerHTML = "";
+                (data.horarios_especiales || []).forEach(addSpecialUI);
+                document.getElementById('listaCierres').innerHTML = "";
+                (data.cierres_temporales || []).forEach(addCloseUI);
+            }
+            // --- CONTROL DE VISIBILIDAD MODO AUTO ---
+        const modoAgendaSelect = document.getElementById('modo_agenda');
+        const intervaloGroup = document.getElementById('group-intervalo');
+
+        const actualizarVisibilidad = () => {
+            intervaloGroup.style.display = modoAgendaSelect.value === 'auto' ? 'none' : 'block';
+        };
+
+        modoAgendaSelect.addEventListener('change', actualizarVisibilidad);
+        actualizarVisibilidad();
+
+        // --- FORZAR RE-RENDER DE CUADRÍCULA SI ESTÁ VACÍA ---
+        }
+
+        function addSpecialUI(item = {fecha:'', inicio:'08:00', fin:'18:00'}) {
+            const div = document.createElement('div');
+            div.className = 'dinamic-row';
+            div.innerHTML = `<div class="flex-row">
+                <div class="flex-col"><label>Fecha</label><input type="date" class="sp-fecha" value="${item.fecha}"></div>
+                <div class="flex-col"><label>Desde</label><input type="time" class="editable-input sp-ini" value="${item.inicio}"></div>
+                <div class="flex-col"><label>Hasta</label><input type="time" class="editable-input sp-fin" value="${item.fin}"></div>
+                <button style="background:none; border:none; color:var(--red);" onclick="this.parentElement.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+            </div>`;
+            document.getElementById('listaEspeciales').appendChild(div);
+        }
+
+        function addCloseUI(item = {desde:'', hasta:'', motivo:''}) {
+            const div = document.createElement('div');
+            div.className = 'dinamic-row';
+            div.innerHTML = `<div class="flex-row">
+                <div class="flex-col"><label>Desde</label><input type="date" class="cl-desde" value="${item.desde}"></div>
+                <div class="flex-col"><label>Hasta</label><input type="date" class="cl-hasta" value="${item.hasta}"></div>
+                <div class="flex-col" style="flex:2;"><label>Motivo</label><input type="text" class="cl-motivo" value="${item.motivo}"></div>
+                <button style="background:none; border:none; color:var(--red);" onclick="this.parentElement.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+            </div>`;
+            document.getElementById('listaCierres').appendChild(div);
+        }
+
+        document.getElementById('addSpecial').onclick = () => addSpecialUI();
+        document.getElementById('addClose').onclick = () => addCloseUI();
+        document.getElementById('saveSpecials').onclick = async () => {
+        const filas = document.querySelectorAll('#listaEspeciales .dinamic-row');
+        const data = [];
+
+        for (let f of filas) {
+            const fecha = f.querySelector('.sp-fecha').value;
+            const ini = f.querySelector('.sp-ini').value;
+            const fin = f.querySelector('.sp-fin').value;
+
+            // VALIDACIÓN VACÍOS
+            if (!fecha || !ini || !fin) {
+                alert("Completa todos los campos en horarios especiales");
+                return;
+            }
+
+            // 🔥 SACAR DÍA REAL
+            const fechaObj = new Date(fecha);
+            let diaIndex = fechaObj.getDay(); // 0 = domingo
+            diaIndex = diaIndex === 0 ? 6 : diaIndex - 1;
+            const dia = dias[diaIndex];
+
+            // Se quita la validación para que el horario especial pueda ser cualquier hora (Excepción)
+
+            // VALIDAR ORDEN
+            if (horaToMin(ini) >= horaToMin(fin)) {
+                alert(`Error en ${fecha}: hora inicio mayor que fin`);
+                return;
+            }
+
+            data.push({
+                fecha: fecha,
+                inicio: ini,
+                fin: fin
+            });
+        }
+
+        const { error } = await supabase
+            .from("tiendas")
+            .update({ horarios_especiales: data })
+            .eq("id", tiendaInfo.id);
+
+        if (error) {
+            alert("Error guardando horarios especiales");
+        } else {
+            alert("Horarios especiales guardados correctamente");
+            await init();
+        }
+    };
+
+        document.getElementById('saveWeekly').onclick = async () => {
+    const obj = {};
+    let error = false;
+
+    dias.forEach(d => {
+        const ini = document.getElementById(`ini-${d}`).value;
+        const fin = document.getElementById(`fin-${d}`).value;
+
+        // VALIDACIÓN
+        if (!ini || !fin) {
+            alert(`Completa el horario de ${d}`);
+            error = true;
+            return;
+        }
+
+        if (horaToMin(ini) >= horaToMin(fin)) {
+            alert(`Error en ${d}: la hora de inicio debe ser menor que la de cierre`);
+            error = true;
+            return;
+        }
+
+                obj[d] = { inicio: ini, fin: fin };
+            });
+
+            if (error) return;
+
+            const { error: dbError } = await supabase
+                .from("tiendas")
+                .update({ horario_general: obj })
+                .eq("id", tiendaInfo.id);
+
+            if (dbError) {
+                alert("Error al guardar horario");
+            } else {
+                window.horarioTienda = obj; 
+                // ACTUALIZAR LOCALSTORAGE
+                tiendaInfo.horario_general = obj;
+                localStorage.setItem("tienda", JSON.stringify(tiendaInfo));
+                alert("Horario guardado correctamente");
+                await init();
+            }
+        }; // <--- ESTA LLAVE TE FALTABA PARA CERRAR EL BOTÓN
+
+        document.getElementById('saveId').onclick = async () => {
+            const nombre = document.getElementById('shopName').value;
+            const direccion = document.getElementById('shopAddress').value;
+            const logo = document.getElementById('imgPreview').src;
+
+            const { error } = await supabase.from("tiendas").update({
+                nombre: nombre,
+                direccion: direccion,
+                logo_url: logo
+            }).eq("id", tiendaInfo.id);
+
+            if (error) {
+                alert("Error: " + error.message);
+            } else {
+                // ACTUALIZAMOS EL OBJETO GLOBAL PARA QUE NO SE REVIERTA
+                tiendaInfo.nombre = nombre;
+                tiendaInfo.direccion = direccion;
+                tiendaInfo.logo_url = logo;
+                
+                localStorage.setItem("tienda", JSON.stringify(tiendaInfo));
+                
+                alert("Identidad guardada y sincronizada");
+                await init();
+                // Forzamos una pequeña recarga interna de los campos
+                document.getElementById('shopName').value = nombre;
+                document.getElementById('shopAddress').value = direccion;
+            }
+        };
+        document.getElementById('saveCloses').onclick = async () => {
+            const filas = document.querySelectorAll('#listaCierres .dinamic-row');
+            const data = [];
+
+            for (let f of filas) {
+                const desde = f.querySelector('.cl-desde').value;
+                const hasta = f.querySelector('.cl-hasta').value;
+                const motivo = f.querySelector('.cl-motivo').value;
+
+                // VALIDACIÓN VACÍOS
+                if (!desde || !hasta) {
+                    alert("Completa las fechas en cierres");
+                    return;
+                }
+
+                // VALIDAR ORDEN DE FECHAS
+                if (new Date(desde) > new Date(hasta)) {
+                    alert("La fecha 'desde' no puede ser mayor que 'hasta'");
+                    return;
+                }
+
+                data.push({
+                    desde: desde,
+                    hasta: hasta,
+                    motivo: motivo || ""
+                });
+            }
+
+            const { error } = await supabase
+                .from("tiendas")
+                .update({ cierres_temporales: data })
+                .eq("id", tiendaInfo.id);
+
+            if (error) {
+                alert("Error guardando cierres");
+            } else {
+                // ACTUALIZAR LOCALSTORAGE
+                tiendaInfo.cierres_temporales = data;
+                localStorage.setItem("tienda", JSON.stringify(tiendaInfo));
+                alert("Cierres guardados correctamente");
+                await init();
+            }
+        };
+        document.getElementById('saveRules').onclick = async () => {
+            const modo = document.getElementById('modo_agenda').value;
+
+            const datos = {
+                modo_agenda: modo,
+                intervalo_minutos: modo === "intervalo" 
+                    ? parseInt(document.getElementById('intervalo').value) 
+                    : null,
+                duracion_citas: parseInt(document.getElementById('duracion_defecto').value),
+                comision: parseInt(document.getElementById('commission').value),
+                moneda: document.getElementById('currency').value
+            };
+
+            const { error } = await supabase.from("tiendas").update(datos).eq("id", tiendaInfo.id);
+
+            if (error) {
+            alert("Error al guardar: " + error.message);
+            } else {
+                const tiendaActualizada = { ...tiendaInfo, ...datos };
+                localStorage.setItem("tienda", JSON.stringify(tiendaActualizada));
+                alert("¡Configuración guardada con éxito!");
+
+                await init(); // 🔥 RECARGA REAL DESDE SUPABASE
+            }
+        };
+
+        document.getElementById('logoTrigger').onclick = () => document.getElementById('logoInput').click();
+        document.getElementById('logoInput').onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    // --- REDIMENSIONAR AUTOMÁTICAMENTE ---
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800; // Tamaño optimizado para web
+                    const scaleSize = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scaleSize;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // Convertir a formato ligero (WebP o JPEG)
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7); // 0.7 es la calidad (70%)
+
+                    // Mostrar preview
+                    const preview = document.getElementById('imgPreview');
+                    preview.src = dataUrl;
+                    preview.style.display = 'block';
+                    document.getElementById('plusIcon').style.display = 'none';
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        init();
+    </script>
+</body>
+</html>

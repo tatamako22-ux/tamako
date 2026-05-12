@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <title>TAMAKU | Agenda Maestra</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    >
+
+    <link rel="stylesheet" href="../assets/css/menu.css">
+    <link rel="stylesheet" href="../assets/css/agenda.css">
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+            ✦ TAMAKU
+        </div>
+
+        <nav class="nav-menu">
+
+            <a href="dashboard.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="agenda.html" class="nav-item active">
+                <i class="fa-solid fa-calendar-alt"></i>
+                Agenda
+            </a>
+
+            <a href="clientes.html" class="nav-item">
+                <i class="fa-solid fa-star"></i>
+                Clientes
+            </a>
+
+            <a href="profesionales.html" class="nav-item">
+                <i class="fa-solid fa-user-tie"></i>
+                Profesionales
+            </a>
+
+            <a href="ajustes.html" class="nav-item">
+                <i class="fa-solid fa-gear"></i>
+                Ajustes
+            </a>
+
+        </nav>
+
+        <a
+            href="#"
+            onclick="cerrarSesion()"
+            style="
+                text-decoration:none;
+                color:#ff4d4d;
+                text-align:center;
+                padding:15px;
+                border:1px solid rgba(255,77,77,0.1);
+                border-radius:50px;
+                margin-top:auto;
+                font-size:0.7rem;
+                letter-spacing:2px;
+                text-transform:uppercase;
+            "
+        >
+            CERRAR SESIÓN
+        </a>
+
+    </aside>
+
+    <!-- MOBILE NAV -->
+    <nav class="mobile-tab-bar">
+
+        <a href="dashboard.html" class="tab-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Inicio</span>
+        </a>
+
+        <a href="agenda.html" class="tab-item active">
+            <i class="fa-solid fa-calendar"></i>
+            <span>Agenda</span>
+        </a>
+
+        <a href="profesionales.html" class="tab-item">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Staff</span>
+        </a>
+
+        <a href="clientes.html" class="tab-item">
+            <i class="fa-solid fa-users"></i>
+            <span>VIP</span>
+        </a>
+
+        <a href="ajustes.html" class="tab-item">
+            <i class="fa-solid fa-gear"></i>
+            <span>Ajustes</span>
+        </a>
+
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <header class="agenda-header">
+
+            <h1>Agenda Maestra</h1>
+
+            <div class="controls-row">
+
+                <div class="date-selector">
+
+                    <button class="date-btn" id="prevDay">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+
+                    <span id="fechaActual">
+                        Cargando...
+                    </span>
+
+                    <button class="date-btn" id="nextDay">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                </div>
+
+                <div style="width:100%; position:relative;">
+
+                    <select id="mobileBarberSelector"></select>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <div class="agenda-wrapper">
+
+            <div
+                id="agendaGrid"
+                class="agenda-grid"
+            ></div>
+
+        </div>
+
+    </main>
+
+    <!-- MODAL NUEVA RESERVA -->
+    <div id="reservaModal" class="modal">
+
+        <div class="modal-content">
+
+            <span
+                class="close-modal"
+                id="closeReserva"
+            >
+                &times;
+            </span>
+
+            <h2>
+                ✦ Nueva Reserva ✦
+            </h2>
+
+            <div id="infoReserva"></div>
+
+            <input
+                type="text"
+                id="res_nombre"
+                placeholder="Nombre del Cliente"
+                autocomplete="off"
+            >
+
+            <input
+                type="tel"
+                id="res_tel"
+                placeholder="Teléfono (Ej: 3001234567)"
+                autocomplete="off"
+            >
+
+            <button
+                class="btn-gold"
+                id="btnConfirmarReserva"
+            >
+                Confirmar Cita
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- MODAL CANCELAR -->
+    <div id="confirmCancelModal" class="modal">
+
+        <div
+            class="modal-content"
+            style="
+                max-width:300px;
+                text-align:center;
+            "
+        >
+
+            <h2 style="font-size:1rem;">
+                ¿Cancelar cita?
+            </h2>
+
+            <p
+                style="
+                    color:#aaa;
+                    margin:20px 0;
+                    font-size:0.8rem;
+                "
+            >
+                Esta acción eliminará la cita permanentemente.
+            </p>
+
+            <div style="display:flex; gap:10px;">
+
+                <button
+                    id="btnCancelarNo"
+                    style="
+                        flex:1;
+                        padding:12px;
+                        background:#222;
+                        border:none;
+                        color:#fff;
+                        border-radius:50px;
+                        cursor:pointer;
+                    "
+                >
+                    VOLVER
+                </button>
+
+                <button
+                    id="btnCancelarSi"
+                    style="
+                        flex:1;
+                        padding:12px;
+                        background:var(--danger);
+                        border:none;
+                        color:#fff;
+                        border-radius:50px;
+                        cursor:pointer;
+                        font-weight:800;
+                    "
+                >
+                    ELIMINAR
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- MENU -->
+    <script src="../assets/js/core/menu.js"></script>
+
+    <!-- AGENDA -->
+    <script type="module">
+
+import {
+    initAgenda
+} from "../assets/js/agenda/index.js";
+
+initAgenda();
+
+</script>
+
+</body>
+</html>

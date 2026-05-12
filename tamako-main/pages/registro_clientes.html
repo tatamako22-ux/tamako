@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAMAKU | Crear Tienda</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+:root { --gold:#bf953f; --gold-light:#fcf6ba; }
+
+body{
+    font-family:'Montserrat';
+    background: radial-gradient(circle at 70% 30%, rgba(191,149,63,0.1), transparent),
+                linear-gradient(180deg,#050505,#0a0a0f);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:100vh;
+}
+
+.card{
+    width:420px;
+    background:rgba(15,15,15,0.95);
+    border-radius:30px;
+    padding:40px;
+    border:1px solid rgba(191,149,63,0.3);
+}
+
+.logo{
+    font-family:'Cinzel';
+    text-align:center;
+    color:var(--gold);
+    letter-spacing:6px;
+    margin-bottom:20px;
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    border:1px solid rgba(191,149,63,0.2);
+    background:rgba(255,255,255,0.03);
+    color:white;
+}
+
+button{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:50px;
+    margin-top:20px;
+    font-weight:700;
+    background:linear-gradient(135deg,#bf953f,#fcf6ba);
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2 class="logo">✦ TAMAKU</h2>
+
+    <div class="form-group">
+        <input id="nombre" placeholder="Nombre de la tienda">
+    </div>
+
+    <div class="form-group">
+        <input id="propietario" placeholder="Nombre del propietario">
+    </div>
+
+    <div class="form-group">
+        <input id="telefono" placeholder="Teléfono / WhatsApp">
+    </div>
+
+    <div class="form-group">
+        <input id="direccion" placeholder="Dirección">
+    </div>
+
+    <div class="form-group">
+        <input id="email" placeholder="Correo">
+    </div>
+
+    <div class="form-group">
+        <input type="password" id="password" placeholder="Contraseña">
+    </div>
+
+    <button id="btnCrear">CREAR MI NEGOCIO</button>
+</div>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const supabase = createClient(
+    "https://smibbddmwgdmqpwsuaqr.supabase.co",
+    "sb_publishable_kQQ7ldmjql3V5Jbn9jvxYw_IAoSz1Uj"
+);
+
+function generarSlug(nombre){
+    return nombre.toLowerCase()
+        .replace(/ /g,"-")
+        .replace(/[^\w-]+/g,"");
+}
+
+document.getElementById("btnCrear").onclick = async () => {
+
+    const nombre = document.getElementById("nombre").value.trim();
+    const propietario = document.getElementById("propietario").value.trim();
+    const telefono = document.getElementById("telefono").value.trim();
+    const direccion = document.getElementById("direccion").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if(!nombre || !email || !password){
+        alert("Completa los campos obligatorios");
+        return;
+    }
+
+    // 1. CREAR USUARIO AUTH
+    const { data, error } = await supabase.auth.signUp({
+        email,
+        password
+    });
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+
+    const user = data.user;
+
+    // 2. CREAR TIENDA
+    const slug = generarSlug(nombre);
+
+    const { data: tienda, error: errTienda } = await supabase
+    .from("tiendas")
+    .insert([{
+        nombre,
+        propietario,
+        telefono,
+        direccion,
+        email,
+        slug,
+        user_id: user.id
+    }])
+    .select()
+    .single();
+
+    if(errTienda){
+        console.error(errTienda);
+        alert("Error creando tienda");
+        return;
+    }
+
+    // 3. GUARDAR SESIÓN LOCAL
+    localStorage.setItem("tienda", JSON.stringify(tienda));
+
+    // 4. REDIRECCIÓN
+    window.location.href = "dashboard.html";
+};
+</script>
+
+</body>
+</html>

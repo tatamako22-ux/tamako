@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TAMAKU | Clientes VIP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/menu.css">
+    <style>
+
+        /* --- CONTENIDO --- */
+        .main-content { flex-grow: 1; padding: 50px 5%; height: 100vh; overflow-y: auto; }
+        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 30px; }
+        .header-section h1 { font-family: 'Cinzel'; font-size: 1.8rem; letter-spacing: 3px; }
+
+        .btn-new-client { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; border-radius: 50px; font-size: 0.7rem; font-weight: 700; cursor: pointer; letter-spacing: 2px; transition: 0.3s; text-transform: uppercase; }
+        .btn-new-client:hover { background: var(--gold); color: black; box-shadow: 0 0 20px rgba(191,149,63,0.3); }
+
+        .search-bar { background: var(--card-bg); border: 1px solid rgba(191,149,63,0.2); padding: 18px 30px; border-radius: 50px; width: 100%; max-width: 600px; color: white; outline: none; margin-bottom: 30px; font-family: 'Montserrat'; font-size: 0.9rem; }
+
+        /* --- TABLA ESCRITORIO / LISTA MÓVIL --- */
+        .table-container { background: var(--card-bg); border-radius: 24px; padding: 35px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 18px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: #444; border-bottom: 1px solid rgba(191, 149, 63, 0.1); }
+        td { padding: 22px 18px; font-size: 0.85rem; color: #ccc; border-bottom: 1px solid rgba(255, 255, 255, 0.02); }
+
+        .client-info { display: flex; align-items: center; gap: 15px; }
+        .client-avatar { width: 42px; height: 42px; background: rgba(191,149,63,0.1); color: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; border: 1px solid rgba(191,149,63,0.3); }
+        
+        .tag { padding: 6px 14px; border-radius: 50px; font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
+        .tag.vip { background: var(--gold); color: black; box-shadow: 0 0 10px rgba(191,149,63,0.4); }
+        .tag.frecuente { background: rgba(255,255,255,0.05); color: #888; border: 1px solid #333; }
+
+        /* --- MODAL iPHONE STYLE --- */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: flex-end; backdrop-filter: blur(10px); }
+        .modal-card { background: #0a0a0a; border: 1px solid var(--gold); border-bottom: none; padding: 40px; border-radius: 30px 30px 0 0; width: 100%; max-width: 500px; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        .modal-card h2 { font-family: 'Cinzel'; color: var(--gold); margin-bottom: 25px; text-align: center; letter-spacing: 2px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.65rem; color: #888; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .form-group input { width: 100%; padding: 16px; background: #111; border: 1px solid #222; color: white; border-radius: 15px; outline: none; font-size: 0.9rem; }
+        .btn-save { width: 100%; padding: 18px; background: var(--gold); border: none; color: black; font-weight: 700; border-radius: 50px; cursor: pointer; letter-spacing: 2px; font-size: 0.9rem; }
+
+        /* TOAST */
+        .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #0a0a0a; border: 1px solid var(--gold); color: var(--gold); padding: 15px 35px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; z-index: 3000; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .toast.show { bottom: 100px; }
+
+        /* --- RESPONSIVE ADAPTIVE --- */
+        @media (max-width: 900px) {
+            body { flex-direction: column; overflow: auto; }
+            .sidebar { display: none; }
+            .mobile-tab-bar { display: flex; }
+            .main-content { padding: 100px 20px 180px; height: auto; }
+            
+            .header-section { position: fixed; top: 0; left: 0; right: 0; background: rgba(5,5,5,0.8); backdrop-filter: var(--ios-blur); padding: 15px 20px; z-index: 1100; border-bottom: 1px solid rgba(255,255,255,0.05); }
+            .header-section h1 { font-size: 1.2rem; }
+            .header-section p { display: none; }
+            
+            .table-container { background: transparent; border: none; padding: 0; }
+            table, thead, tbody, th, td, tr { display: block; }
+            thead { display: none; }
+            tr { background: var(--card-bg); margin-bottom: 15px; padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.03); }
+            td { padding: 5px 0; border: none; }
+            .client-info { margin-bottom: 10px; }
+            .btn-save { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="toast">✦ <span id="toastMsg">CLIENTE REGISTRADO</span></div>
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">✦ TAMAKU</div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="agenda.html" class="nav-item"><i class="fa-solid fa-calendar-alt"></i> Agenda</a>
+            <a href="clientes.html" class="nav-item active"><i class="fa-solid fa-star"></i> Clientes</a>
+            <a href="profesionales.html" class="nav-item"><i class="fa-solid fa-user-tie"></i> Profesionales</a>
+            <a href="ajustes.html" class="nav-item"><i class="fa-solid fa-gear"></i> Ajustes</a>
+        </nav>
+        <a href="#" onclick="cerrarSesion()" class="logout-btn">Cerrar Sesión</a>
+    </aside>
+
+    <nav class="mobile-tab-bar">
+        <a href="dashboard.html" class="tab-item"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
+        <a href="agenda.html" class="tab-item"><i class="fa-solid fa-calendar"></i><span>Agenda</span></a>
+        <a href="profesionales.html" class="tab-item"><i class="fa-solid fa-user-tie"></i><span>Staff</span></a>
+        <a href="clientes.html" class="tab-item active"><i class="fa-solid fa-users"></i><span>VIP</span></a>
+        <a href="ajustes.html" class="tab-item"><i class="fa-solid fa-gear"></i><span>Ajustes</span></a>
+    </nav>
+
+    <main class="main-content">
+        <header class="header-section">
+            <h1>Directorio VIP</h1>
+            <button class="btn-new-client" onclick="abrirModal()">+ NUEVO</button>
+        </header>
+
+        <input type="text" id="buscador" class="search-bar" placeholder="Buscar cliente...">
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Teléfono</th>
+                        <th style="text-align: center;">Reservas/Mes</th>
+                        <th>Categoría</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaClientes"></tbody>
+            </table>
+        </div>
+    </main>
+    <script src="../assets/js/menu.js"></script>
+    <div id="modalCliente" class="modal-overlay">
+        <div class="modal-card">
+            <div style="width: 40px; height: 5px; background: #333; border-radius: 10px; margin: 0 auto 20px;"></div>
+            <h2>Nuevo Perfil</h2>
+            <div class="form-group">
+                <label>Nombre del Cliente</label>
+                <input type="text" id="nombreCli" placeholder="Ej. Juan Pérez">
+            </div>
+            <div class="form-group">
+                <label>WhatsApp</label>
+                <input type="text" id="telCli" placeholder="300 123 4567">
+            </div>
+            <button class="btn-save" id="btnGuardar" onclick="guardarCliente()">CREAR PERFIL</button>
+            <button onclick="cerrarModal()" style="width:100%; background:transparent; border:none; color:#555; margin-top:20px; cursor:pointer; font-size:0.7rem; text-transform: uppercase;">Cancelar</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+        const supabaseUrl = "https://smibbddmwgdmqpwsuaqr.supabase.co";
+        const supabaseKey = "sb_publishable_kQQ7ldmjql3V5Jbn9jvxYw_IAoSz1Uj";
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        const tiendaInfo = JSON.parse(localStorage.getItem("tienda"));
+        if (!tiendaInfo) window.location.href = "../index.html";
+
+        async function cargarClientes() {
+            const { data: clientes } = await supabase.from("clientes").select("*").eq("id_tienda", tiendaInfo.id).order('nombre', {ascending: true});
+            const tabla = document.getElementById("tablaClientes");
+            tabla.innerHTML = "";
+
+            if (clientes) {
+                clientes.forEach(c => {
+                    const iniciales = c.nombre.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2);
+                    tabla.innerHTML += `
+                        <tr>
+                            <td>
+                                <div class="client-info">
+                                    <div class="client-avatar">${iniciales}</div>
+                                    <span style="font-weight: 600; color: #fff;">${c.nombre}</span>
+                                </div>
+                            </td>
+                            <td style="color: #666;">${c.telefono}</td>
+                            <td style="text-align: center; font-weight: 700;">0</td>
+                            <td><span class="tag frecuente">Frecuente</span></td>
+                            <td><button class="btn-save" style="padding: 8px 15px; font-size: 0.6rem;">HISTORIAL</button></td>
+                        </tr>`;
+                });
+            }
+        }
+
+        window.guardarCliente = async () => {
+            const nombre = document.getElementById("nombreCli").value.trim();
+            const telefono = document.getElementById("telCli").value.trim();
+            if(!nombre || !telefono) return mostrarToast("CAMPOS OBLIGATORIOS", true);
+
+            const { error } = await supabase.from("clientes").insert([{ nombre, telefono, id_tienda: tiendaInfo.id }]);
+            if (!error) { cerrarModal(); mostrarToast("CLIENTE CREADO"); cargarClientes(); }
+        };
+
+        function mostrarToast(mensaje, esError = false) {
+            const t = document.getElementById("toast");
+            document.getElementById("toastMsg").innerText = mensaje;
+            t.style.borderColor = esError ? "#ff4d4d" : "var(--gold)";
+            t.classList.add("show");
+            setTimeout(() => t.classList.remove("show"), 3000);
+        }
+
+        window.abrirModal = () => document.getElementById("modalCliente").style.display = "flex";
+        window.cerrarModal = () => document.getElementById("modalCliente").style.display = "none";
+        
+
+        cargarClientes();
+    </script>
+</body>
+</html>

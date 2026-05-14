@@ -174,23 +174,6 @@ export function renderizarAgenda({
 
     body.className = "calendar-body";
 
-    // ⏰ LÍNEAS HORARIAS
-    for (let h = 8; h <= 20; h++) {
-      const line = document.createElement("div");
-
-      line.className = "hour-line";
-
-      line.innerHTML = `
-
-                <span>
-                    ${h}:00
-                </span>
-
-            `;
-
-      body.appendChild(line);
-    }
-
     // 📌 CITAS DEL BARBERO
     const citasBarbero = citasDelDia.filter(
       (c) => String(c.id_barbero) === String(barbero.id_barbero),
@@ -203,31 +186,115 @@ export function renderizarAgenda({
 
       // 📍 POSICIÓN
       const top = ((inicio - 480) / 60) * 120;
+      // 📏 ALTURA DINÁMICA
+      const calculatedHeight = ((fin - inicio) / 60) * 120;
 
-      // 📏 ALTURA
-      const height = ((fin - inicio) / 60) * 120;
-
+      // 👇 altura mínima elegante
+      const height = Math.max(calculatedHeight, 170);
       const bloque = document.createElement("div");
 
       bloque.className = "calendar-event";
-
       bloque.style.top = `${top}px`;
-
       bloque.style.height = `${height}px`;
-
       bloque.innerHTML = `
 
-                <div class="event-client">
-                    ${cita.nombre_cliente}
-                </div>
+<div class="event-glow"></div>
 
-                <div class="event-hour">
+<div class="event-top-row">
 
-                    ${normalizarHora(cita.hora_inicio)}
+    <div class="event-hour">
 
-                </div>
+        <i class="fa-regular fa-clock"></i>
 
-            `;
+        ${normalizarHora(cita.hora_inicio)}
+        —
+        ${normalizarHora(cita.hora_fin)}
+
+    </div>
+
+    <div class="event-chip">
+
+        Confirmada
+
+    </div>
+
+</div>
+
+<div class="event-main">
+
+    <div class="event-avatar">
+
+        ${cita.nombre_cliente.charAt(0)}
+
+    </div>
+
+    <div class="event-data">
+
+        <div class="event-client">
+
+            ${cita.nombre_cliente}
+
+        </div>
+
+        <div class="event-service">
+
+            ${cita.servicio_nombre || "Servicio"}
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="event-phone">
+
+    <i class="fa-solid fa-phone"></i>
+
+    ${cita.telefono || "Sin teléfono"}
+
+</div>
+
+<div class="event-actions">
+
+    <button
+        class="event-btn whatsapp"
+        onclick="
+            event.stopPropagation();
+
+            window.open(
+                'https://wa.me/57${cita.telefono}',
+                '_blank'
+            )
+        "
+    >
+        <i class="fa-brands fa-whatsapp"></i>
+    </button>
+
+    <button
+        class="event-btn call"
+        onclick="
+            event.stopPropagation();
+
+            window.location.href='tel:${cita.telefono}'
+        "
+    >
+        <i class="fa-solid fa-phone"></i>
+    </button>
+
+    <button
+        class="event-btn cancel"
+        onclick="
+            event.stopPropagation();
+
+            confirmarCancelacion('${cita.id_cita}')
+        "
+    >
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+
+</div>
+
+`;
 
       body.appendChild(bloque);
     });

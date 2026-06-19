@@ -1,51 +1,44 @@
 // 🧠 ESTADO CENTRAL DE AGENDA
 
 export const agendaState = {
+  // 📅 Fecha actual seleccionada
+  fechaSeleccionada: new Date(),
 
-    // 📅 Fecha actual seleccionada
-    fechaSeleccionada: new Date(),
+  // 👨‍💼 Profesionales/barberos
+  listaBarberos: [],
 
-    // 👨‍💼 Profesionales/barberos
-    listaBarberos: [],
+  // 📋 Reservas/citas del día
+  citasDelDia: [],
 
-    // 📋 Reservas/citas del día
-    citasDelDia: [],
+  // ❌ Reserva a cancelar
+  citaACancelar: null,
 
-    // ❌ Reserva a cancelar
-    citaACancelar: null,
+  // ➕ Datos nueva reserva
+  datosNuevaReserva: {},
 
-    // ➕ Datos nueva reserva
-    datosNuevaReserva: {},
-
-    // 👤 Profesional seleccionado móvil
-    barberoActivo: null
+  // 👤 Profesional seleccionado móvil
+  barberoActivo: null,
 };
 
 // 🔄 ACTUALIZAR STATE
 export function setState(key, value) {
+  if (!(key in agendaState)) {
+    console.warn(`⚠️ Estado inexistente: ${key}`);
 
-    if (!(key in agendaState)) {
+    return;
+  }
 
-        console.warn(
-            `⚠️ Estado inexistente: ${key}`
-        );
-
-        return;
-    }
-
-    agendaState[key] = value;
+  agendaState[key] = value;
 }
 
 // 📦 OBTENER STATE
 export function getState(key) {
-
-    return agendaState[key];
+  return agendaState[key];
 }
 
 // ♻️ RESET PARCIAL
 export function resetReserva() {
+  agendaState.datosNuevaReserva = {};
 
-    agendaState.datosNuevaReserva = {};
-
-    agendaState.citaACancelar = null;
+  agendaState.citaACancelar = null;
 }

@@ -7,10 +7,10 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Función de ayuda para obtener la tienda actual de forma segura
 export function getTiendaId() {
-    const tienda = JSON.parse(localStorage.getItem("tienda"));
-    if (!tienda || !tienda.id) {
-        window.location.href = "index.html";
-        return null;
-    }
-    return tienda;
+  const tienda = JSON.parse(localStorage.getItem("tamaku_tienda"));
+  if (!tienda || !tienda.id) {
+    window.location.href = "index.html";
+    return null;
+  }
+  return tienda;
 }

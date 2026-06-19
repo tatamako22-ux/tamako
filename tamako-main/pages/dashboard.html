@@ -167,6 +167,20 @@ if (!tiendaInfo) {
 }
 
 </script>
+<script>
+window.addEventListener('load', () => {
 
+    console.log('BODY:', getComputedStyle(document.body).overflow);
+
+    console.log('MAIN:', getComputedStyle(
+        document.querySelector('.main-content')
+    ).overflow);
+
+    console.log('HTML:', getComputedStyle(
+        document.documentElement
+    ).overflow);
+
+});
+</script>
 </body>
 </html>

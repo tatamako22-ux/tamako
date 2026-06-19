@@ -222,7 +222,7 @@
         const supabaseKey = "sb_publishable_kQQ7ldmjql3V5Jbn9jvxYw_IAoSz1Uj";
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        let tiendaInfo = JSON.parse(localStorage.getItem("tienda"));
+        let tiendaInfo = JSON.parse(localStorage.getItem("tamaku_tienda"));
         const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
         function horaToMin(hora) {
             const [h, m] = hora.split(":").map(Number);
@@ -247,7 +247,7 @@
             const { data } = await supabase.from("tiendas").select("*").eq("id", tiendaInfo.id).single();
             if(data) {
                 // 🔥 SINCRONIZAR SIEMPRE LOCALSTORAGE CON BASE DE DATOS
-                localStorage.setItem("tienda", JSON.stringify(data));
+                localStorage.setItem("tamaku_tienda", JSON.stringify(data));
                 tiendaInfo = data; // 🔥 ESTA ES LA CLAVE QUE TE FALTA
                 document.getElementById('shopName').value = data.nombre || "";
                 document.getElementById('shopAddress').value = data.direccion || "";
@@ -409,7 +409,7 @@
                 window.horarioTienda = obj; 
                 // ACTUALIZAR LOCALSTORAGE
                 tiendaInfo.horario_general = obj;
-                localStorage.setItem("tienda", JSON.stringify(tiendaInfo));
+                localStorage.setItem("tamaku_tienda", JSON.stringify(tiendaInfo));
                 alert("Horario guardado correctamente");
                 await init();
             }
@@ -434,7 +434,7 @@
                 tiendaInfo.direccion = direccion;
                 tiendaInfo.logo_url = logo;
                 
-                localStorage.setItem("tienda", JSON.stringify(tiendaInfo));
+                localStorage.setItem("tamaku_tienda", JSON.stringify(tiendaInfo));
                 
                 alert("Identidad guardada y sincronizada");
                 await init();
@@ -481,7 +481,7 @@
             } else {
                 // ACTUALIZAR LOCALSTORAGE
                 tiendaInfo.cierres_temporales = data;
-                localStorage.setItem("tienda", JSON.stringify(tiendaInfo));
+                localStorage.setItem("tamaku_tienda", JSON.stringify(tiendaInfo));
                 alert("Cierres guardados correctamente");
                 await init();
             }
@@ -505,7 +505,7 @@
             alert("Error al guardar: " + error.message);
             } else {
                 const tiendaActualizada = { ...tiendaInfo, ...datos };
-                localStorage.setItem("tienda", JSON.stringify(tiendaActualizada));
+                localStorage.setItem("tamaku_tienda", JSON.stringify(tiendaActualizada));
                 alert("¡Configuración guardada con éxito!");
 
                 await init(); // 🔥 RECARGA REAL DESDE SUPABASE

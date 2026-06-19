@@ -60,6 +60,12 @@ export function iniciarAgenda({
 
       idBarbero,
     });
+    console.log("📋 CITAS RECIBIDAS:", citas);
+    console.log("📋 PRIMERA CITA COMPLETA:");
+    console.table(citas);
+
+    console.log("SERVICIO NOMBRE:", citas[0]?.servicio_nombre);
+    console.log("SERVICIO:", citas[0]?.servicio);
 
     setState("citasDelDia", citas);
 
@@ -68,6 +74,10 @@ export function iniciarAgenda({
 
   // 📆 ACTUALIZAR FECHA
   async function actualizarFecha() {
+    console.log(
+      "🔄 ACTUALIZANDO AGENDA CON FECHA:",
+      getState("fechaSeleccionada"),
+    );
     const fecha = getState("fechaSeleccionada");
 
     const fechaElem = document.getElementById("fechaActual");
@@ -76,12 +86,25 @@ export function iniciarAgenda({
       fechaElem.innerText = formatearFecha(fecha);
     }
 
+    // Actualiza dinámicamente las clases 'active' del mini-calendario si se usan los botones atrás/adelante
+    const fechaISO = fecha.toLocaleDateString("sv-SE");
+    document.querySelectorAll(".calendar-day").forEach((d) => {
+      if (d.dataset.fecha === fechaISO) {
+        d.classList.add("active");
+      } else {
+        d.classList.remove("active");
+      }
+    });
+
     await cargarCitasDelDia();
+    console.log("🎨 TERMINO CARGA, RENDERIZANDO");
+    renderizar();
   }
 
   // 👨‍💼 CARGAR BARBEROS
   async function cargarBarberos() {
     const barberos = await obtenerBarberos(tiendaInfo.id);
+    console.log("👨‍💼 BARBEROS COMPLETOS:", barberos);
 
     setState("listaBarberos", barberos);
 
@@ -330,6 +353,21 @@ export function iniciarAgenda({
   }
 
   // 🚀 INIT
+  // Escucha el clic de los días del mini-calendario dinámico
+  console.log("🎧 LISTENER FECHA CARGADO");
+  window.addEventListener("cambiar-fecha-agenda", async (e) => {
+    console.log("🔥 EVENTO RECIBIDO EN CONTROLLER:", e.detail);
+
+    const nuevaFecha = new Date(e.detail.fecha + "T00:00:00");
+
+    console.log("📅 NUEVA FECHA CREADA:", nuevaFecha);
+
+    setState("fechaSeleccionada", nuevaFecha);
+
+    console.log("📌 STATE DESPUÉS:", getState("fechaSeleccionada"));
+
+    await actualizarFecha();
+  });
   eventos();
 
   iniciarRealtime();

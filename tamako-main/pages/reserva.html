@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/reserva.css">
     
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -23,6 +22,7 @@
                 <a href="https://wa.me/573145038202" target="_blank" class="btn-nm" style="text-decoration: none; color: #25d366;"><i class="fa-brands fa-whatsapp"></i></a>
                 <button class="btn-nm" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
                 <button class="btn-auth" id="btn-auth-status" onclick="toggleAuthModal(true)">Mi Cuenta</button>
+                <button class="btn-auth" id="btn-mis-citas" style="display:none;" onclick="toggleCitasModal(true)">Mis Citas</button>
                 <button class="btn-nm" id="btn-logout" style="display:none;" onclick="handleLogout()"><i class="fa-solid fa-power-off"></i></button>
             </div>
             <div class="header-card">
@@ -99,6 +99,7 @@
         </div>
     </div>
 
+    <!-- MODAL AUTENTICACIÓN -->
     <div class="modal" id="modal-auth">
         <div id="auth-login-view">
             <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:40px;">ACCESO PRIVADO</h2>
@@ -123,22 +124,84 @@
 
         <p onclick="toggleAuthModal(false)" style="text-align:center; margin-top:40px; cursor:pointer; font-weight:800; opacity:0.5;">REGRESAR</p>
     </div>
+
+    <!-- MODAL MIS CITAS -->
+    <div class="modal" id="modal-citas" style="display:none; justify-content:center; align-items:center; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);">
+        <div style="width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 20px; box-sizing: border-box;">
+            <div class="header-card" style="padding: 30px 20px; box-shadow: var(--nm-out);">
+                <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:5px;">MIS CITAS</h2>
+                <p style="font-size:0.6rem; text-align:center; opacity:0.6; letter-spacing:2px; margin-bottom:25px;">TUS RESERVAS ÉLITE</p>
+                
+                <div id="lista-citas" style="display: flex; flex-direction: column; gap: 15px;">
+                    <!-- Aquí se cargarán dinámicamente -->
+                </div>
+
+                <button class="btn-main" onclick="toggleCitasModal(false)" style="margin-top: 25px;">CERRAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALERTA PERSONALIZADA -->
+    <div id="custom-alert" class="modal" style="display:none; position: fixed; inset: 0; justify-content: center; align-items: center; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border: none; z-index: 20000; padding: 20px;">
+        <div class="header-card" style="max-width: 320px; width: 100%; text-align: center; padding: 35px 25px; box-shadow: var(--nm-out);">
+            <i class="fa-solid fa-circle-exclamation" style="font-size: 2.5rem; color: var(--gold); margin-bottom: 20px; display: block;"></i>
+            <h3 style="font-family: 'Cinzel'; color: var(--gold); margin-bottom: 15px; font-size: 1.2rem; letter-spacing: 2px;">ATENCIÓN</h3>
+            <p id="alert-message" style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 25px; font-weight: 500; color: var(--text);"></p>
+            <button class="btn-main" onclick="closeAlert()" style="padding: 18px; font-size: 0.75rem; letter-spacing: 2px;">ENTENDIDO</button>
+        </div>
+    </div>
+
 <script type="module">
         import { supabase } from "../assets/js/config/supabaseClient.js";
-        import { calcularCita } from "../assets/js/agenda/core/agenda.engine.js";
+
     // --- VARIABLES GLOBALES ---
     let currentStep = 1, tiendaId, barberId, serviceId, user, tiendaData, horaSeleccionada = null, precioSeleccionado = 0, nombreServicioSel = "";
     
     const params = new URLSearchParams(window.location.search);
-        const tiendaRef = params.get("v");
+    const tiendaRef = params.get("v");
 
-        console.log("🔍 Buscando tienda:", tiendaRef);
+    console.log("🔍 Buscando tienda:", tiendaRef);
 
-        if (!tiendaRef) {
-            alert("Sede no identificada");
-            window.location.href = "../index.html";
-        }
+    if (!tiendaRef) {
+        alert("Sede no identificada");
+        window.location.href = "../index.html";
+    }
+
     const formatDinero = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 });
+
+    // --- FUNCIONES AUXILIARES ---
+    const horaToMin = (h) => {
+        if (!h) return 0;
+        const [hh, mm] = h.split(':').map(Number);
+        return hh * 60 + mm;
+    };
+    const minToHora = (min) => {
+        const hh = Math.floor(min / 60);
+        const mm = min % 60;
+        return `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
+    };
+
+    function obtenerHorarioDelDia(profesional, dia) {
+        const diaKey = dia.toLowerCase();
+        const horarios = profesional.horario_semanal || {};
+        const horario = horarios[diaKey];
+        if (horario && horario.activo && horario.inicio && horario.fin) {
+            return { inicio: horario.inicio, fin: horario.fin };
+        }
+        return { inicio: profesional.horario_inicio, fin: profesional.horario_fin };
+    }
+
+    // --- FUNCIONES DE ALERTA ---
+    window.showAlert = (msg) => {
+        const modal = document.getElementById("custom-alert");
+        document.getElementById("alert-message").innerText = msg;
+        modal.style.display = "flex";
+    };
+    window.closeAlert = () => {
+        document.getElementById("custom-alert").style.display = "none";
+    };
+
+    // --- GENERAR HORARIOS ---
     async function generarHorariosDisponibles() {
         const fechaInput = document.getElementById("res-date").value;
         const grid = document.getElementById("horas-grid");
@@ -168,9 +231,6 @@
         ]);
 
         const pro = proRes.data;
-        console.log("🧠 PROFESIONAL:", pro);
-        console.log("🧠 intervalo_citas:", pro.intervalo_citas);
-        console.log("🧠 modo_agenda:", pro.modo_agenda);
         if (!pro) return;
 
         const nombresDias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
@@ -187,15 +247,12 @@
         }
 
         const duracionReal = parseInt(window.duracionServicio) || 30;
-        const intervalo =
-        parseInt(pro.intervalo_citas) ||
-        parseInt(tiendaData.intervalo_minutos) ||
-        30;
-        const inicioJornadaMin = horaToMin(pro.horario_inicio);
-        const finJornadaMin = horaToMin(pro.horario_fin);
+        const intervalo = parseInt(pro.intervalo_citas) || parseInt(tiendaData.intervalo_minutos) || 30;
+        const horarioDia = obtenerHorarioDelDia(pro, diaNombreHoy);
+        const inicioJornadaMin = horaToMin(horarioDia.inicio);
+        const finJornadaMin = horaToMin(horarioDia.fin);
 
         const ocupados = (citasRes.data || []).map(c => ({ ini: horaToMin(c.hora_inicio), fin: horaToMin(c.hora_fin) }));
-        
         if (pro.almuerzo_inicio && pro.almuerzo_minutos > 0) {
             const aIni = horaToMin(pro.almuerzo_inicio);
             ocupados.push({ ini: aIni, fin: aIni + parseInt(pro.almuerzo_minutos) });
@@ -227,22 +284,15 @@
                 chip.className = "hora-chip";
                 const labelBloques = numBloques > 1 ? `<br><small style="font-size:0.5rem; color:var(--gold); font-weight:800;">${numBloques} BLOQUES</small>` : '';
                 const horaTxt = minToHora(currentMin);
-                
                 chip.innerHTML = `<span>${horaTxt}</span>${labelBloques}`;
-                const hInicio = horaTxt;
                 const hFin = minToHora(horaFinMin);
                 chip.onclick = () => {
-                    horaSeleccionada = hInicio;
+                    horaSeleccionada = horaTxt;
                     window.horaFinSeleccionada = hFin;
-
-                    document.querySelectorAll(".hora-chip")
-                        .forEach(c => c.classList.remove("selected"));
-
+                    document.querySelectorAll(".hora-chip").forEach(c => c.classList.remove("selected"));
                     chip.classList.add("selected");
-
                     document.getElementById("btn-next").style.display = "block";
                 };
-
                 grid.appendChild(chip);
             }
             currentMin += intervalo;
@@ -250,187 +300,234 @@
 
         if (!hayHoras) grid.innerHTML = `<div class="no-schedule-msg"><i class="fa-solid fa-clock"></i><p>SIN TURNOS</p></div>`;
     }
-    // --- LÓGICA DE ALERTA PERSONALIZADA ÉLITE ---
-    window.showAlert = (msg) => {
-        const modal = document.getElementById("custom-alert");
-        document.getElementById("alert-message").innerText = msg;
-        modal.style.display = "flex";
-    };
 
-    window.closeAlert = () => {
-        document.getElementById("custom-alert").style.display = "none";
-    };
-    
-    // --- FUNCIÓN PARA CONVERTIR HORA A MINUTOS ---
-    const horaToMin = (h) => {
-        if (!h) return 0;
-        const [hh, mm] = h.split(':').map(Number);
-        return hh * 60 + mm;
-    };
-        const minToHora = (min) => {
-        const hh = Math.floor(min / 60);
-        const mm = min % 60;
+        // --- CARGAR PROFESIONALES Y SERVICIOS ---
+        async function loadBarbers() {
+            const { data: pros, error } = await supabase
+                .from("profesionales")
+                .select("*")
+                .eq("id_tienda", tiendaId);
 
-        return `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
-    };
-    
-    // --- FUNCIÓN PARA SUMAR MINUTOS A UNA HORA ---
-    const sumarMinutos = (hora, minutos) => {
-        const totalMin = horaToMin(hora) + minutos;
-        const hh = Math.floor(totalMin / 60);
-        const mm = totalMin % 60;
-        return `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
-    };
-    
+            if (error) {
+                console.error("Error cargando profesionales:", error);
+                return;
+            }
+
+            const container = document.getElementById("pro-list");
+            container.innerHTML = "";
+            if (pros && pros.length > 0) {
+                pros.forEach(p => {
+                    const div = document.createElement("div");
+                    div.className = "pro-card";
+                    div.onclick = () => {
+                        barberId = p.id_barbero;
+                        document.querySelectorAll(".pro-card").forEach(c => c.classList.remove("selected"));
+                        div.classList.add("selected");
+                        document.getElementById("btn-next").style.display = "block";
+                        loadServices(p.id_barbero);
+                    };
+                    div.innerHTML = `
+                        <img src="${p.foto_url}" class="pro-img">
+                        <div class="pro-name">${p.nombre_empleado}</div>
+                    `;
+                    container.appendChild(div);
+                });
+            } else {
+                container.innerHTML = "<p style='text-align:center; opacity:0.5;'>No hay profesionales disponibles en esta sede.</p>";
+            }
+        }
+
+        async function loadServices(bId) {
+            const { data: svs } = await supabase.from("servicios").select("*").eq("id_barbero", bId);
+            const container = document.getElementById("service-list");
+            container.innerHTML = "";
+            if (svs) {
+                svs.forEach(s => {
+                    const div = document.createElement("div");
+                    div.className = "service-card";
+                    div.onclick = () => {
+                        serviceId = s.id_servicio;
+                        precioSeleccionado = s.precio;
+                        nombreServicioSel = s.nombre_servicio;
+                        window.duracionServicio = s.duracion_minutos;
+                        document.querySelectorAll(".service-card").forEach(c => c.classList.remove("selected"));
+                        div.classList.add("selected");
+                        document.getElementById("btn-next").style.display = "block";
+                    };
+                    div.innerHTML = `<div><p style="font-weight:800;">${s.nombre_servicio}</p><p style="font-size:0.6rem; opacity:0.6;">${s.duracion_minutos} MIN</p></div><div class="service-price">${formatDinero.format(s.precio)}</div>`;
+                    container.appendChild(div);
+                });
+            }
+        }
+
+        // --- CARGA Y ACTUALIZACIÓN DE PERFIL DE USUARIO ---
+        async function loadUserProfile() {
+            if (!user) {
+                console.warn("⚠️ No hay usuario logueado");
+                return false;
+            }
+
+            console.log("👤 Cargando perfil para:", user.id);
+
+            const { data: p, error } = await supabase
+                .from("perfiles_clientes")
+                .select("nombre_completo, whatsapp, correo")
+                .eq("id", user.id)
+                .maybeSingle();
+                console.log("USER ID:", user.id);
+    console.log("PERFIL:", p);
+    console.log("ERROR PERFIL:", error);
+
+            console.log("📦 Datos del perfil:", p);
+console.log("❌ Error (si existe):", error);
+
+// Si no existe perfil, lo creamos
+if (!p) {
+    console.log("📝 Perfil no encontrado, creando uno automáticamente...");
+                const nombreTemp = user.email?.split('@')[0] || 'Usuario';
+                const { data: insertData, error: insertError } = await supabase
+                    .from("perfiles_clientes")
+                    .insert([{
+                        id: user.id,
+                        nombre_completo: nombreTemp,
+                    whatsapp: "0000000000", // usar null en lugar de cadena vacía
+                        correo: user.email,
+                        fecha_registro: new Date().toISOString()
+                    }])
+                    .select(); // Para obtener el registro creado
+
+                if (insertError) {
+                    console.error("❌ Error creando perfil:", insertError.message);
+                    return false;
+                }
+
+                console.log("✅ Perfil creado:", insertData);
+
+                // Recargar el perfil recién creado
+                const { data: newP } = await supabase
+                    .from("perfiles_clientes")
+                    .select("nombre_completo, whatsapp, correo")
+                    .eq("id", user.id)
+                    .single();
+
+                if (newP) {
+                    window.userFullName = newP.nombre_completo;
+                    window.userWhatsApp = newP.whatsapp || '';
+                    actualizarUIUsuario(newP);
+                    return true;
+                }
+                return false;
+            }
+
+            if (error) {
+                console.error("❌ Error al cargar perfil:", error.message);
+                return false;
+            }
+
+            if (p) {
+                window.userFullName = p.nombre_completo;
+                window.userWhatsApp = p.whatsapp || '';
+                actualizarUIUsuario(p);
+                console.log("✅ Perfil cargado:", p.nombre_completo);
+                return true;
+            }
+
+        return false;
+    }
+
+    function actualizarUIUsuario(perfil) {
+        console.log("🎨 Actualizando UI con:", perfil.nombre_completo);
+        // Mostrar saludo
+        const welcomeDiv = document.getElementById("welcome-user");
+        const nameDisplay = document.getElementById("user-name-display");
+        if (welcomeDiv) welcomeDiv.style.display = "block";
+        if (nameDisplay) nameDisplay.innerText = perfil.nombre_completo.toUpperCase();
+
+        // Cambiar botón Mi Cuenta a MI PERFIL
+        const btnAuth = document.getElementById("btn-auth-status");
+        if (btnAuth) btnAuth.innerText = "MI PERFIL";
+
+        // Mostrar botón de cerrar sesión
+        const btnLogout = document.getElementById("btn-logout");
+        if (btnLogout) btnLogout.style.display = "flex";
+
+        // Mostrar botón Mis Citas
+        const btnCitas = document.getElementById("btn-mis-citas");
+        if (btnCitas) btnCitas.style.display = "inline-block";
+
+        // Si el modal de perfil está abierto, actualizar los datos
+        if (document.getElementById("auth-profile-view").style.display !== "none") {
+            document.getElementById("profile-name-text").innerText = perfil.nombre_completo.toUpperCase();
+            document.getElementById("profile-phone-text").innerText = perfil.whatsapp || "No registrado";
+        }
+    }
+
+    // --- INICIALIZACIÓN ---
     async function init() {
         try {
+            // Obtener sesión actual
             const { data: { session } } = await supabase.auth.getSession();
-            if(session) { user = session.user; await loadUserProfile(); }
-            
-            let query = supabase
-                .from("tiendas")
-                .select("*");
+            console.log("🔄 Sesión obtenida:", session);
+            if (session) {
+                user = session.user;
+                console.log("🔐 Sesión encontrada:", user.email);
+                await loadUserProfile();
+            } else {
+                console.log("🔓 No hay sesión activa");
+            }
 
+            // Cargar tienda
+            console.log("🏪 Buscando tienda con referencia:", tiendaRef);
+            let query = supabase.from("tiendas").select("*");
             if (tiendaRef.includes("-")) {
-                // UUID
                 query = query.eq("id", tiendaRef);
             } else {
-                // SLUG
                 query = query.eq("slug", tiendaRef);
             }
 
             const { data: tienda, error } = await query.single();
+            console.log("📦 Tienda encontrada:", tienda);
+            console.log("❌ Error tienda:", error);
 
             if (error || !tienda) {
-                console.error("❌ Error de Supabase:", error);
-                alert("⚠️ Error: La sede '" + tiendaRef + "' no existe en nuestra base de datos.");
-                window.location.href = "../index.html"; 
+                console.error("❌ Error cargando tienda:", error);
+                alert("⚠️ Error: La sede '" + tiendaRef + "' no existe.");
+                window.location.href = "../index.html";
                 return;
             }
-            console.log("✅ Tienda encontrada:", tienda.nombre);
 
             tiendaData = tienda;
             tiendaId = tienda.id;
-
             document.getElementById("shop-display").innerText = tienda.nombre.toUpperCase();
 
             await loadBarbers();
-            
+
             const hoy = new Date().toISOString().split('T')[0];
             const resDate = document.getElementById("res-date");
-
             if (resDate) {
                 resDate.setAttribute('min', hoy);
-                resDate.value = hoy; // fecha automática
+                resDate.value = hoy;
             }
 
-        } catch (e) { console.error("Error en carga:", e); }
-        
-        setTimeout(() => { 
+        } catch (e) {
+            console.error("Error en init:", e);
+        }
+
+        // Ocultar splash
+        setTimeout(() => {
             const splash = document.getElementById("splash");
             const app = document.getElementById("app");
-            if(splash) splash.style.opacity = "0"; 
-            if(app) app.style.opacity = "1"; 
-            setTimeout(() => { if(splash) splash.remove(); }, 600); 
-        }, 1000); 
-    }
-    
-    async function loadUserProfile() {
-        const { data: p, error } = await supabase
-            .from("perfiles_clientes")
-            .select("nombre_completo, whatsapp")
-            .eq("id", user.id)
-            .maybeSingle();
-
-        if (error) {
-            console.warn("⚠️ Perfil no encontrado o error 406:", error.message);
-            return;
-        }
-
-        if (p) {
-            const welcomeDiv = document.getElementById("welcome-user");
-            const nameDisplay = document.getElementById("user-name-display");
-            if (welcomeDiv) welcomeDiv.style.display = "block";
-            if (nameDisplay) nameDisplay.innerText = p.nombre_completo.toUpperCase();
-            
-            const btnAuth = document.getElementById("btn-auth-status");
-            const btnLogout = document.getElementById("btn-logout");
-            if (btnAuth) btnAuth.innerText = "MI PERFIL";
-            if (btnLogout) btnLogout.style.display = "flex";
-            
-            window.userWhatsApp = p.whatsapp; 
-            window.userFullName = p.nombre_completo;
-        } else {
-            const resEmail = document.getElementById("res-email");
-            if (resEmail) resEmail.value = user.email;
-        }
+            if (splash) splash.style.opacity = "0";
+            if (app) app.style.opacity = "1";
+            setTimeout(() => { if (splash) splash.remove(); }, 600);
+        }, 1000);
     }
 
-    async function loadBarbers() {
-        const { data: pros, error } = await supabase
-            .from("profesionales")
-            .select("*")
-            .eq("id_tienda", tiendaId); 
-
-        if (error) {
-            console.error("Error cargando profesionales:", error);
-            return;
-        }
-
-        const container = document.getElementById("pro-list");
-        container.innerHTML = "";
-        
-        if (pros && pros.length > 0) {
-            pros.forEach(p => {
-                const div = document.createElement("div");
-                div.className = "pro-card";
-                div.onclick = () => {
-                    barberId = p.id_barbero;
-                    document.querySelectorAll(".pro-card").forEach(c => c.classList.remove("selected"));
-                    div.classList.add("selected");
-                    document.getElementById("btn-next").style.display = "block";
-                    loadServices(p.id_barbero);
-                };
-                div.innerHTML = `
-                    <img src="${p.foto_url}" class="pro-img">
-                    <div class="pro-name">${p.nombre_empleado}</div>
-                `;
-                container.appendChild(div);
-            });
-        } else {
-            container.innerHTML = "<p style='text-align:center; opacity:0.5;'>No hay profesionales disponibles en esta sede.</p>";
-        }
-    }
-
-    async function loadServices(bId) {
-        const { data: svs } = await supabase.from("servicios").select("*").eq("id_barbero", bId);
-        const container = document.getElementById("service-list");
-        container.innerHTML = "";
-        if (svs) {
-            svs.forEach(s => {
-                const div = document.createElement("div");
-                div.className = "service-card";
-                div.onclick = () => {
-                    serviceId = s.id_servicio;
-                    precioSeleccionado = s.precio;
-                    nombreServicioSel = s.nombre_servicio;
-                    window.duracionServicio = s.duracion_minutos;
-                    document.querySelectorAll(".service-card").forEach(c => c.classList.remove("selected"));
-                    div.classList.add("selected");
-                    document.getElementById("btn-next").style.display = "block";
-                };
-                div.innerHTML = `<div><p style="font-weight:800;">${s.nombre_servicio}</p><p style="font-size:0.6rem; opacity:0.6;">${s.duracion_minutos} MIN</p></div><div class="service-price">${formatDinero.format(s.precio)}</div>`;
-                container.appendChild(div);
-            });
-        }
-    }
-    
-window.changeStep = (s) => {
+    // --- FLUJO DE RESERVA ---
+    window.changeStep = (s) => {
         document.querySelectorAll('.step-view').forEach((v, i) => v.classList.toggle('active', i + 1 === s));
         currentStep = s;
-        
         const btn = document.getElementById("btn-next");
-        
         if (s === 3) {
             btn.innerText = (user && window.userFullName) ? "Confirmar Reserva" : "Continuar";
         } else if (s === 4) {
@@ -438,265 +535,216 @@ window.changeStep = (s) => {
         } else {
             btn.innerText = "Continuar";
         }
-
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
-    
+
     window.handleFlow = () => {
-    if (currentStep === 1) {
-        changeStep(2);
-
-    } else if (currentStep === 2) {
-        changeStep(3);
-
-        const fechaInput = document.getElementById("res-date");
-
-        // evitar listeners duplicados
-        fechaInput.removeEventListener("change", generarHorariosDisponibles);
-        fechaInput.addEventListener("change", generarHorariosDisponibles);
-
-        // cargar horarios inmediatamente si ya existe fecha
-        if (fechaInput.value) {
-            generarHorariosDisponibles();
-        }
-
-    } else if (currentStep === 3) {
-        if (!horaSeleccionada) {
-            return alert("POR FAVOR ELIGE UN TURNO");
-        }
-
-        if (user && window.userFullName) {
+        if (currentStep === 1) {
+            changeStep(2);
+        } else if (currentStep === 2) {
+            changeStep(3);
+            const fechaInput = document.getElementById("res-date");
+            fechaInput.removeEventListener("change", generarHorariosDisponibles);
+            fechaInput.addEventListener("change", generarHorariosDisponibles);
+            if (fechaInput.value) generarHorariosDisponibles();
+        } else if (currentStep === 3) {
+            if (!horaSeleccionada) return alert("POR FAVOR ELIGE UN TURNO");
+            if (user && window.userFullName) {
+                finalizarReserva();
+            } else {
+                changeStep(4);
+            }
+        } else if (currentStep === 4) {
             finalizarReserva();
-        } else {
-            changeStep(4);
         }
+    };
 
-    } else if (currentStep === 4) {
-        finalizarReserva();
-    }
-};
     async function enviarCorreoConfirmacion(datos) {
         try {
-            emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
-            
-            const templateParams = {
-                to_email: datos.email, 
-                email: datos.email,
-                nombre: datos.nombre,
-                tienda: datos.tiendaNombre,
-                servicio: datos.servicio,
-                profesional: datos.profesional,
-                fecha: datos.fecha,
-                hora: datos.hora,
-                valor: datos.valor
-            };
-            
-            console.log("📧 Enviando correo a:", datos.email);
-            
-            const response = await emailjs.send(
-                EMAILJS_CONFIG.SERVICE_ID,
-                EMAILJS_CONFIG.TEMPLATE_ID,
-                templateParams
-            );
-            
-            console.log("✅ Correo enviado exitosamente!");
+            const response = await fetch("/api/send-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datos)
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || "Error enviando correo");
+            console.log("✅ Correo enviado");
             return true;
-            
         } catch (error) {
-            console.error("❌ Error al enviar correo:", error);
+            console.error("❌ Error correo:", error);
             return false;
         }
     }
-    
+
     async function finalizarReserva() {
         const btn = document.getElementById("btn-next");
         const date = document.getElementById("res-date").value;
         const horaSeleccionadaLocal = horaSeleccionada;
-        
-        if(!horaSeleccionadaLocal) return showAlert("POR FAVOR ELIGE UN TURNO");
-        
-        btn.disabled = true; 
+
+        if (!horaSeleccionadaLocal) return showAlert("POR FAVOR ELIGE UN TURNO");
+
+        btn.disabled = true;
         btn.innerText = "PROCESANDO RESERVA...";
-        
+
         let finalId = null;
         let finalName = "";
         let finalPhone = "";
         let finalEmail = "";
-        
-        // CASO 1: USUARIO LOGUEADO
+
         if (user && window.userFullName) {
             finalId = user.id;
             finalName = window.userFullName;
             finalPhone = window.userWhatsApp || "";
             finalEmail = user.email;
-            
             if (!finalName || !finalPhone || !finalEmail) {
-                showAlert("⚠️ Tu perfil está incompleto. Por favor, actualiza tus datos en 'Mi Cuenta'.");
+                showAlert("⚠️ Tu perfil está incompleto. Actualiza tus datos en 'Mi Cuenta'.");
                 btn.disabled = false;
                 btn.innerText = "Confirmar Reserva";
                 return;
             }
-        } 
-        // CASO 2: USUARIO NO LOGUEADO
-        else {
-            const name = document.getElementById("res-name") ? document.getElementById("res-name").value.trim() : "";
-            const phone = document.getElementById("res-phone") ? document.getElementById("res-phone").value.trim() : "";
-            const email = document.getElementById("res-email") ? document.getElementById("res-email").value.trim() : "";
-            const pass = document.getElementById("res-password-step4") ? document.getElementById("res-password-step4").value : "";
-            
+        } else {
+            const name = document.getElementById("res-name")?.value.trim() || "";
+            const phone = document.getElementById("res-phone")?.value.trim() || "";
+            const email = document.getElementById("res-email")?.value.trim() || "";
+            const pass = document.getElementById("res-password-step4")?.value || "";
+
             if (name === "" || phone === "" || email === "") {
                 showAlert("⚠️ TODOS LOS CAMPOS SON OBLIGATORIOS: Nombre, WhatsApp y Email");
                 btn.disabled = false;
                 btn.innerText = "Finalizar y Unirme";
-                return; 
+                return;
             }
             if (phone.length !== 10) {
-                showAlert("⚠️ Ingresa un número de WhatsApp válido de 10 dígitos (Ej: 3001234567)");
+                showAlert("⚠️ Ingresa un número de WhatsApp válido de 10 dígitos.");
                 btn.disabled = false;
                 btn.innerText = "Finalizar y Unirme";
                 return;
             }
             if (!email.includes('@') || !email.includes('.')) {
-                showAlert("⚠️ Ingresa un email válido (ejemplo: correo@dominio.com)");
+                showAlert("⚠️ Ingresa un email válido.");
                 btn.disabled = false;
                 btn.innerText = "Finalizar y Unirme";
                 return;
             }
-            
+
+            // Verificar si ya existe usuario con ese email o whatsapp
             const { data: emailExiste } = await supabase
                 .from("perfiles_clientes")
                 .select("correo, whatsapp, id, nombre_completo")
                 .eq("correo", email)
                 .maybeSingle();
-                
+
             const { data: whatsappExiste } = await supabase
                 .from("perfiles_clientes")
                 .select("correo, whatsapp, id, nombre_completo")
                 .eq("whatsapp", phone)
                 .maybeSingle();
-                
+
             if (emailExiste && (!user || user.email !== email)) {
-                showAlert("⚠️ Este email ya está registrado. Por favor, inicia sesión con tu cuenta.");
+                showAlert("⚠️ Este email ya está registrado. Inicia sesión con tu cuenta.");
                 btn.disabled = false;
                 btn.innerText = "Finalizar y Unirme";
                 return;
             }
-            
             if (whatsappExiste && (!user || window.userWhatsApp !== phone)) {
-                showAlert("⚠️ Este número de WhatsApp ya está registrado. Por favor, inicia sesión con tu cuenta.");
+                showAlert("⚠️ Este número de WhatsApp ya está registrado. Inicia sesión con tu cuenta.");
                 btn.disabled = false;
                 btn.innerText = "Finalizar y Unirme";
                 return;
             }
-            
+
             if (emailExiste || whatsappExiste) {
                 const usuarioExistente = emailExiste || whatsappExiste;
                 finalId = usuarioExistente.id;
                 finalName = usuarioExistente.nombre_completo || name;
                 finalPhone = usuarioExistente.whatsapp;
                 finalEmail = usuarioExistente.correo;
-            }
-            else if (pass.length >= 6) {
-                const { data: authData, error: authError } = await supabase.auth.signUp({ 
-                    email: email, 
+            } else if (pass.length >= 6) {
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
                     password: pass
                 });
-                
                 if (authError) {
                     showAlert("❌ Error de Registro: " + authError.message);
                     btn.disabled = false;
                     btn.innerText = "Finalizar y Unirme";
                     return;
                 }
-
                 if (authData?.user) {
                     finalId = authData.user.id;
-                    
                     const { error: profileError } = await supabase
                         .from("perfiles_clientes")
-                        .insert([{ 
-                            id: finalId, 
-                            nombre_completo: name, 
-                            whatsapp: phone, 
+                        .insert([{
+                            id: finalId,
+                            nombre_completo: name,
+                            whatsapp: phone,
                             correo: email,
                             fecha_registro: new Date().toISOString()
                         }]);
-
-                    if (profileError) {
-                        console.error("Fallo al insertar en perfiles_clientes:", profileError.message);
-                    }
-
+                    if (profileError) console.error("Error al crear perfil:", profileError.message);
                     finalName = name;
                     finalPhone = phone;
                     finalEmail = email;
                     showAlert("✅ ¡Bienvenido al Club Élite!");
                 }
-            } 
-            else {
+            } else {
                 finalId = null;
                 finalName = name;
                 finalPhone = phone;
                 finalEmail = email;
             }
         }
-        
-        // GUARDAR LA CITA
+
+        // Verificar conflicto de horario
         const duracionServicioFinal = window.duracionServicio || 30;
-        // VALIDAR SI EL HORARIO SIGUE DISPONIBLE
-const { data: citasExistentes } = await supabase
-    .from("citas")
-    .select("id, hora_inicio, hora_fin")
-    .eq("id_barbero", barberId)
-    .eq("fecha", date)
-    .neq("estado", "CANCELADA");
+        const { data: citasExistentes } = await supabase
+            .from("citas")
+            .select("id, hora_inicio, hora_fin")
+            .eq("id_barbero", barberId)
+            .eq("fecha", date)
+            .neq("estado", "CANCELADA");
 
-const nuevaIni = horaToMin(horaSeleccionadaLocal);
-const nuevaFin = horaToMin(window.horaFinSeleccionada);
+        const nuevaIni = horaToMin(horaSeleccionadaLocal);
+        const nuevaFin = horaToMin(window.horaFinSeleccionada);
+        const conflicto = (citasExistentes || []).some(c => {
+            const ini = horaToMin(c.hora_inicio);
+            const fin = horaToMin(c.hora_fin);
+            return nuevaIni < fin && nuevaFin > ini;
+        });
 
-const conflicto = (citasExistentes || []).some(c => {
-    const ini = horaToMin(c.hora_inicio);
-    const fin = horaToMin(c.hora_fin);
+        if (conflicto) {
+            btn.disabled = false;
+            btn.innerText = user ? "Confirmar Reserva" : "Finalizar y Unirme";
+            showAlert("⚠️ Este turno acaba de ser reservado. Elige otro horario.");
+            await generarHorariosDisponibles();
+            return;
+        }
 
-    return nuevaIni < fin && nuevaFin > ini;
-});
-
-if (conflicto) {
-    btn.disabled = false;
-    btn.innerText = user ? "Confirmar Reserva" : "Finalizar y Unirme";
-
-    showAlert("⚠️ Este turno acaba de ser reservado por otro cliente. Por favor elige otro horario.");
-
-    await generarHorariosDisponibles();
-
-    return;
-}
-        const { error } = await supabase.from("citas").insert([{ 
-            id_tienda: tiendaId, 
-            id_barbero: barberId, 
-            // Usamos 'servicio' para el UUID que ya venías usando
-            servicio: serviceId, 
-            // Mandamos el nombre a la columna nueva para que la Agenda lo lea
-            servicio_nombre: nombreServicioSel, 
-            nombre_cliente: finalName, 
-            telefono_cliente: finalPhone, 
+        // Insertar cita
+        const { error } = await supabase.from("citas").insert([{
+            id_tienda: tiendaId,
+            id_barbero: barberId,
+            servicio: serviceId,
+            servicio_nombre: nombreServicioSel,
+            nombre_cliente: finalName,
+            telefono_cliente: finalPhone,
             email_cliente: finalEmail,
-            fecha: date, 
+            fecha: date,
             hora_inicio: horaSeleccionadaLocal,
             hora_fin: window.horaFinSeleccionada,
             duracion_minutos: duracionServicioFinal,
-            user_id: finalId, 
+            user_id: finalId,
             estado: "PENDIENTE",
-            // Aseguramos que el valor sea un número para evitar el error 400
-            valor_servicio: Number(precioSeleccionado) 
+            valor_servicio: Number(precioSeleccionado)
         }]);
-        
-        if(!error) {
+
+        if (!error) {
             const { data: profesional } = await supabase
                 .from("profesionales")
                 .select("nombre_empleado")
                 .eq("id_barbero", barberId)
                 .single();
-            
+
             await enviarCorreoConfirmacion({
                 email: finalEmail,
                 nombre: finalName,
@@ -707,35 +755,155 @@ if (conflicto) {
                 hora: horaSeleccionadaLocal,
                 valor: formatDinero.format(precioSeleccionado)
             });
-            
-            showAlert("¡RESERVA ÉLITE EXITOSA! Revisa tu correo para la confirmación.");
+
+            showAlert("¡RESERVA ÉLITE EXITOSA! Revisa tu correo.");
             setTimeout(() => location.reload(), 3000);
-        }
-        else { 
-            btn.disabled = false; 
-            btn.innerText = user ? "Confirmar Reserva" : "Finalizar y Unirme"; 
+        } else {
+            btn.disabled = false;
+            btn.innerText = user ? "Confirmar Reserva" : "Finalizar y Unirme";
             showAlert("Error al reservar: " + error.message);
         }
     }
-    
-    // Funciones de UI Globales
+
+    // --- FUNCIONES PARA CITAS ---
+    window.toggleCitasModal = (mostrar) => {
+        const modal = document.getElementById("modal-citas");
+        if (!mostrar) { modal.style.display = "none"; return; }
+        if (!user || !window.userFullName) {
+            showAlert("Debes iniciar sesión para ver tus citas.");
+            return;
+        }
+        modal.style.display = "flex";
+        cargarCitasUsuario();
+    };
+
+    async function cargarCitasUsuario() {
+        const contenedor = document.getElementById("lista-citas");
+        contenedor.innerHTML = "<p style='text-align:center; opacity:0.6;'>Cargando tus citas...</p>";
+
+        try {
+            const { data: citas, error } = await supabase
+                .from("citas")
+                .select("*, profesionales!inner(nombre_empleado)")
+                .eq("user_id", user.id)
+                .order("fecha", { ascending: false });
+
+            if (error) {
+                console.error("Error al cargar citas:", error);
+                contenedor.innerHTML = "<p style='text-align:center; color:#ff4d4d;'>Error al cargar tus citas.</p>";
+                return;
+            }
+
+            if (!citas || citas.length === 0) {
+                contenedor.innerHTML = `
+                    <div style="text-align:center; padding: 30px 0;">
+                        <i class="fa-solid fa-calendar-plus" style="font-size: 2rem; opacity: 0.3; margin-bottom: 15px; display:block;"></i>
+                        <p style="font-weight:300;">Aún no tienes citas agendadas.</p>
+                        <p style="font-size:0.7rem; opacity:0.5;">¡Agenda tu primera experiencia Élite!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            contenedor.innerHTML = "";
+            citas.forEach(c => {
+                const card = document.createElement("div");
+                card.style.cssText = `
+                    background: var(--bg);
+                    border-radius: 18px;
+                    padding: 18px 15px;
+                    box-shadow: var(--nm-out);
+                    border-left: 4px solid ${c.estado === 'CANCELADA' ? '#ff4d4d' : 'var(--gold)'};
+                    transition: 0.3s;
+                `;
+
+                const profesionalNombre = c.profesionales?.nombre_empleado || "No asignado";
+
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:start; gap:10px;">
+                        <div style="text-align:left; flex:1;">
+                            <p style="font-weight:800; font-size:0.9rem; color:var(--gold);">${c.servicio_nombre || 'Servicio'}</p>
+                            <p style="font-size:0.75rem; opacity:0.7;"><i class="fa-regular fa-calendar"></i> ${c.fecha} - ${c.hora_inicio}</p>
+                            <p style="font-size:0.7rem; opacity:0.6;"><i class="fa-regular fa-user"></i> ${profesionalNombre}</p>
+                        </div>
+                        <div style="text-align:right;">
+                            <span style="display:inline-block; padding:3px 10px; border-radius:30px; font-size:0.6rem; font-weight:800; letter-spacing:1px; background: ${c.estado === 'CANCELADA' ? '#ff4d4d33' : '#25d36633'}; color: ${c.estado === 'CANCELADA' ? '#ff4d4d' : '#25d366'};">
+                                ${c.estado}
+                            </span>
+                            ${c.estado !== 'CANCELADA'
+ ? `<button class="btn-cancelar"
+      data-id="${c.id_cita}" style="margin-top:8px; background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:4px 12px; border-radius:20px; font-size:0.65rem; font-weight:700; cursor:pointer; transition:0.2s;">Cancelar</button>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                contenedor.appendChild(card);
+
+                const btnCancel = card.querySelector('.btn-cancelar');
+                if (btnCancel) {
+                    btnCancel.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const citaId = btnCancel.dataset.id;
+                        await cancelarCita(citaId);
+                    });
+                }
+            });
+
+        } catch (err) {
+            console.error("Error inesperado:", err);
+            contenedor.innerHTML = "<p style='text-align:center; color:#ff4d4d;'>Ocurrió un error inesperado.</p>";
+        }
+    }
+
+    async function cancelarCita(citaId) {
+        if (!confirm("¿Estás seguro de que deseas cancelar esta cita?")) return;
+
+        try {
+            const { error } = await supabase
+            .from("citas")
+            .update({ estado: "CANCELADA" })
+            .eq("id_cita", citaId)
+            .eq("user_id", user.id);
+
+            if (error) {
+                showAlert("Error al cancelar: " + error.message);
+                return;
+            }
+
+            showAlert("✅ Cita cancelada exitosamente.");
+cargarCitasUsuario();
+
+const notificar = confirm(
+    "¿Deseas notificar la cancelación a la tienda por WhatsApp?"
+);
+
+if (notificar) {
+    console.log("📲 Usuario desea notificar la cancelación");
+}
+        } catch (err) {
+            showAlert("Error inesperado: " + err.message);
+        }
+    }
+
+    // --- FUNCIONES DE UI ---
     window.togglePass = (id, el) => {
         const input = document.getElementById(id);
-        if(input.type === "password") { 
-            input.type = "text"; el.classList.replace("fa-eye", "fa-eye-slash"); 
-        } else { 
-            input.type = "password"; el.classList.replace("fa-eye-slash", "fa-eye"); 
+        if (input.type === "password") {
+            input.type = "text";
+            el.classList.replace("fa-eye", "fa-eye-slash");
+        } else {
+            input.type = "password";
+            el.classList.replace("fa-eye-slash", "fa-eye");
         }
     };
-    
+
     window.toggleTheme = () => document.body.classList.toggle("dark-mode");
-    
+
     window.toggleAuthModal = (s) => {
         const modal = document.getElementById("modal-auth");
         if (!s) { modal.style.display = "none"; return; }
-
         modal.style.display = "flex";
-        
+
         if (user && window.userFullName) {
             document.getElementById("auth-login-view").style.display = "none";
             document.getElementById("auth-profile-view").style.display = "block";
@@ -746,25 +914,75 @@ if (conflicto) {
             document.getElementById("auth-profile-view").style.display = "none";
         }
     };
-    
-    window.executeAuth = async () => {
-        const email = document.getElementById("auth-email").value;
-        const pass = document.getElementById("auth-pass").value;
-        const { error } = await supabase.auth.signInWithPassword({ email: email, password: pass });
-        if(!error) location.reload(); else alert(error.message);
-    };
-    
-    window.handleLogout = async () => { await supabase.auth.signOut(); location.reload(); };
 
+    // --- LOGIN ---
+    window.executeAuth = async () => {
+        const email = document.getElementById("auth-email").value.trim();
+        const pass = document.getElementById("auth-pass").value.trim();
+
+        if (!email || !pass) {
+            showAlert("⚠️ Por favor, ingresa tu email y contraseña.");
+            return;
+        }
+
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: pass
+            });
+
+            if (error) {
+                let mensaje = "❌ Error al iniciar sesión.";
+                if (error.message.includes("Invalid login credentials")) {
+                    mensaje = "❌ Email o contraseña incorrectos. Verifica tus datos.";
+                } else if (error.message.includes("Email not confirmed")) {
+                    mensaje = "❌ Debes confirmar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.";
+                } else if (error.message.includes("User not found")) {
+                    mensaje = "❌ No existe una cuenta con este email. ¿Deseas registrarte?";
+                } else {
+                    mensaje = `❌ ${error.message}`;
+                }
+                showAlert(mensaje);
+                return;
+            }
+
+            if (data?.user) {
+                user = data.user;
+                const cargado = await loadUserProfile();
+                if (cargado) {
+                    showAlert(`✅ ¡Bienvenido, ${window.userFullName || user.email?.split('@')[0] || 'Usuario'}!`);
+                } else {
+                    showAlert(`✅ ¡Bienvenido!`);
+                }
+                toggleAuthModal(false);
+                if (currentStep === 3) {
+                    document.getElementById("btn-next").innerText = "Confirmar Reserva";
+                }
+            }
+
+        } catch (err) {
+            console.error("Error inesperado:", err);
+            showAlert("❌ Ocurrió un error inesperado. Inténtalo de nuevo.");
+        }
+    };
+
+    window.handleLogout = async () => {
+        await supabase.auth.signOut();
+        user = null;
+        window.userFullName = null;
+        window.userWhatsApp = null;
+        document.getElementById("welcome-user").style.display = "none";
+        document.getElementById("btn-auth-status").innerText = "Mi Cuenta";
+        document.getElementById("btn-logout").style.display = "none";
+        document.getElementById("btn-mis-citas").style.display = "none";
+        if (currentStep === 3) {
+            document.getElementById("btn-next").innerText = "Continuar";
+        }
+        showAlert("🔒 Sesión cerrada.");
+    };
+
+    // --- INICIAR APLICACIÓN ---
     init();
 </script>
-<div id="custom-alert" class="modal" style="display:none; position: fixed; inset: 0; justify-content: center; align-items: center; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border: none; z-index: 20000; padding: 20px;">
-    <div class="header-card" style="max-width: 320px; width: 100%; text-align: center; padding: 35px 25px; box-shadow: var(--nm-out);">
-        <i class="fa-solid fa-circle-exclamation" style="font-size: 2.5rem; color: var(--gold); margin-bottom: 20px; display: block;"></i>
-        <h3 style="font-family: 'Cinzel'; color: var(--gold); margin-bottom: 15px; font-size: 1.2rem; letter-spacing: 2px;">ATENCIÓN</h3>
-        <p id="alert-message" style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 25px; font-weight: 500; color: var(--text);"></p>
-        <button class="btn-main" onclick="closeAlert()" style="padding: 18px; font-size: 0.75rem; letter-spacing: 2px;">ENTENDIDO</button>
-    </div>
-</div>
 </body>
-</html>>>
+</html>

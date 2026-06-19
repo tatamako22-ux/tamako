@@ -140,7 +140,7 @@
         const supabaseKey = "sb_publishable_kQQ7ldmjql3V5Jbn9jvxYw_IAoSz1Uj";
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        const tiendaInfo = JSON.parse(localStorage.getItem("tienda"));
+        const tiendaInfo = JSON.parse(localStorage.getItem("tamaku_tienda"));
         if (!tiendaInfo) window.location.href = "../index.html";
 
         async function cargarClientes() {

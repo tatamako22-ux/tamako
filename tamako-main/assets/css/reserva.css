@@ -277,6 +277,13 @@ header { padding:0; }
 }
 
 @media (max-width:900px) {
+  .top-nav {
+    width:100%;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-left:auto;
+    margin-right:auto;
+  }
   .header-card {
     min-height:260px;
     padding:22px;
@@ -299,6 +306,8 @@ header { padding:0; }
 }
 
 @media (max-width:390px) {
+  .top-nav { padding-inline:2px; gap:5px; }
+  .btn-nm,.btn-auth { flex-shrink:0; }
   .header-card { min-height:245px; padding:18px; grid-template-columns:70px minmax(0,1fr); gap:14px; }
   .brand-logo-shell { width:70px; height:70px; border-radius:17px; }
   .brand-promise { padding:11px; }

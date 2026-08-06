@@ -192,7 +192,7 @@
 
   <script type="module">
     import { requireTiendaInfo } from "../assets/js/core/session.js";
-    import { initDashboard } from "../assets/js/dashboard/dashboard.init.js";
+    import { initDashboard } from "../assets/js/dashboard/dashboard.init.js?v=2";
 
     const tiendaInfo = await requireTiendaInfo();
     if (tiendaInfo) initDashboard(tiendaInfo);

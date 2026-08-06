@@ -398,6 +398,7 @@ function mostrarError(error) {
 export function initOverview(tiendaInfo) {
   let cargando = false;
   let refrescoPendiente;
+  let refrescoPeriodico;
 
   const cargar = async ({ silencioso = false } = {}) => {
     if (cargando) return;
@@ -421,7 +422,17 @@ export function initOverview(tiendaInfo) {
 
   document.getElementById("btnRefrescarDashboard")?.addEventListener("click", () => cargar());
   window.addEventListener("focus", () => cargar({ silencioso: true }));
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") programarRefresco();
+  });
   const desuscribir = suscribirDashboard(tiendaInfo.id, programarRefresco);
-  window.addEventListener("beforeunload", desuscribir, { once: true });
+  refrescoPeriodico = setInterval(() => {
+    if (document.visibilityState === "visible") cargar({ silencioso: true });
+  }, 12000);
+  window.addEventListener("pagehide", () => {
+    clearTimeout(refrescoPendiente);
+    clearInterval(refrescoPeriodico);
+    desuscribir();
+  }, { once: true });
   cargar();
 }

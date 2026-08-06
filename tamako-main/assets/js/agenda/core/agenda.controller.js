@@ -390,7 +390,7 @@ export function iniciarAgenda({
 
   // 🔴 REALTIME
   function iniciarRealtime() {
-    supabase
+    const canal = supabase
 
       .channel(`agenda-${tiendaInfo.id}`)
 
@@ -407,12 +407,49 @@ export function iniciarAgenda({
           filter: `id_tienda=eq.${tiendaInfo.id}`,
         },
 
-        async () => {
-          await cargarCitasDelDia();
+        (cambio) => {
+          const fechaVisible = getState("fechaSeleccionada").toLocaleDateString("sv-SE");
+          const profesionalVisible = selectorBarbero?.value;
+          const esNuevaCitaVisible =
+            cambio.eventType === "INSERT" &&
+            cambio.new?.fecha === fechaVisible &&
+            String(cambio.new?.id_barbero) === String(profesionalVisible);
+
+          if (esNuevaCitaVisible) {
+            window.TamakuUI?.success?.("La agenda se actualizó automáticamente.", {
+              titulo: "Nueva cita recibida",
+              duracion: 3500,
+            });
+          }
+          programarActualizacion();
         },
       )
 
-      .subscribe();
+      .subscribe((estado) => {
+        console.log("Estado Realtime de Agenda:", estado);
+      });
+
+    return canal;
+  }
+
+  // Realtime actualiza al instante. Este respaldo vuelve a consultar cuando
+  // la publicación de Supabase o la conexión móvil no están disponibles.
+  let temporizadorActualizacion;
+  let intervaloActualizacion;
+
+  function programarActualizacion() {
+    clearTimeout(temporizadorActualizacion);
+    temporizadorActualizacion = setTimeout(cargarCitasDelDia, 350);
+  }
+
+  function iniciarActualizacionAutomatica() {
+    intervaloActualizacion = setInterval(() => {
+      if (document.visibilityState === "visible") cargarCitasDelDia();
+    }, 12000);
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") programarActualizacion();
+    });
   }
 
   // 🎧 EVENTOS
@@ -540,7 +577,13 @@ export function iniciarAgenda({
   });
   eventos();
 
-  iniciarRealtime();
-
+  const canalRealtime = iniciarRealtime();
+  iniciarActualizacionAutomatica();
   cargarAgenda();
+
+  window.addEventListener("pagehide", () => {
+    clearTimeout(temporizadorActualizacion);
+    clearInterval(intervaloActualizacion);
+    supabase.removeChannel(canalRealtime);
+  }, { once: true });
 }

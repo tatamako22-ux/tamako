@@ -52,11 +52,28 @@ function generarYMostrarQR() {
 async function copiarAlPortapapeles() {
   if (!linkFinal) return;
   try {
-    await navigator.clipboard.writeText(linkFinal);
-    window.TamakuUI?.toast?.("Link de clientes copiado.", "success");
+    if (navigator.clipboard?.writeText && window.isSecureContext) {
+      await navigator.clipboard.writeText(linkFinal);
+    } else {
+      const campoTemporal = document.createElement("textarea");
+      campoTemporal.value = linkFinal;
+      campoTemporal.setAttribute("readonly", "");
+      campoTemporal.style.position = "fixed";
+      campoTemporal.style.opacity = "0";
+      document.body.appendChild(campoTemporal);
+      campoTemporal.select();
+      const copiado = document.execCommand("copy");
+      campoTemporal.remove();
+      if (!copiado) throw new Error("El navegador rechazó la copia");
+    }
+
+    window.TamakuUI?.success?.("Ya puedes compartirlo con tus clientes.", {
+      titulo: "¡Link copiado!",
+      duracion: 3200,
+    });
   } catch (error) {
     console.error("No se pudo copiar el link:", error);
-    window.TamakuUI?.toast?.("No se pudo copiar el link.", "error");
+    window.TamakuUI?.error?.("No se pudo copiar el link. Intenta nuevamente.");
   }
 }
 

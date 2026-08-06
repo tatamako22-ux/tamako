@@ -15,6 +15,50 @@ window.toggleMobileMore = (show) => {
   document.body.classList.toggle("mobile-menu-open", show);
 };
 
+/* Feedback sutil para los controles de la interfaz móvil. */
+function activarFeedbackMovil() {
+  const esMovil = () => window.matchMedia("(max-width: 900px)").matches;
+  let audioContext;
+
+  const reproducirTono = () => {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+
+    try {
+      audioContext ||= new AudioContext();
+      if (audioContext.state === "suspended") audioContext.resume();
+
+      const inicio = audioContext.currentTime;
+      const oscilador = audioContext.createOscillator();
+      const volumen = audioContext.createGain();
+      oscilador.type = "sine";
+      oscilador.frequency.setValueAtTime(620, inicio);
+      oscilador.frequency.exponentialRampToValueAtTime(760, inicio + 0.07);
+      volumen.gain.setValueAtTime(0.0001, inicio);
+      volumen.gain.exponentialRampToValueAtTime(0.035, inicio + 0.012);
+      volumen.gain.exponentialRampToValueAtTime(0.0001, inicio + 0.09);
+      oscilador.connect(volumen).connect(audioContext.destination);
+      oscilador.start(inicio);
+      oscilador.stop(inicio + 0.095);
+    } catch (error) {
+      console.debug("Feedback sonoro no disponible:", error);
+    }
+  };
+
+  document.addEventListener("click", (event) => {
+    if (!esMovil()) return;
+    const control = event.target.closest(
+      'button, [role="button"], .tab-item, .nav-item, a[class*="btn-"]',
+    );
+    if (!control || control.disabled || control.getAttribute("aria-disabled") === "true") return;
+
+    reproducirTono();
+    navigator.vibrate?.(14);
+  }, { capture: true });
+}
+
+activarFeedbackMovil();
+
 window.tamakuContextReady = import("./session.js").then((session) => {
   window.cerrarSesion = session.cerrarSesion;
   return session.requireTiendaInfo();

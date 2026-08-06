@@ -1,4 +1,4 @@
-import { initQR } from "./dashboard.qr.js";
+import { initQR } from "./dashboard.qr.js?v=2";
 import { initOverview } from "./dashboard.overview.js";
 
 export function initDashboard(tiendaInfo) {

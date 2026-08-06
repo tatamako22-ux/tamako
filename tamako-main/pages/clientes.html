@@ -2,103 +2,717 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>TAMAKU | Clientes VIP</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/menu.css">
     <style>
+        /* --- VARIABLES GLOBALES --- */
+        :root {
+            --gold: #bf953f;
+            --gold-light: #ffd277;
+            --card-bg: #0d0d0d;
+            --ios-blur: blur(12px);
+            --shadow-gold: 0 0 25px rgba(191,149,63,0.15);
+        }
 
-        /* --- CONTENIDO --- */
-        .main-content { flex-grow: 1; padding: 50px 5%; height: 100vh; overflow-y: auto; }
-        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 30px; }
-        .header-section h1 { font-family: 'Cinzel'; font-size: 1.8rem; letter-spacing: 3px; }
+        /* --- RESET --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #050505;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto; /* Permite el scroll vertical en todas las vistas */
+        }
 
-        .btn-new-client { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; border-radius: 50px; font-size: 0.7rem; font-weight: 700; cursor: pointer; letter-spacing: 2px; transition: 0.3s; text-transform: uppercase; }
-        .btn-new-client:hover { background: var(--gold); color: black; box-shadow: 0 0 20px rgba(191,149,63,0.3); }
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: var(--ios-blur);
+            padding: 40px 25px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255,255,255,0.03);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+        .sidebar-logo {
+            font-family: 'Cinzel';
+            font-size: 1.4rem;
+            color: var(--gold);
+            letter-spacing: 4px;
+            margin-bottom: 50px;
+        }
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+        .nav-item {
+            color: #777;
+            text-decoration: none;
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .nav-item i { width: 20px; font-size: 1rem; }
+        .nav-item:hover { background: rgba(191,149,63,0.08); color: #fff; }
+        .nav-item.active {
+            background: rgba(191,149,63,0.12);
+            color: var(--gold);
+            border: 1px solid rgba(191,149,63,0.15);
+        }
+        .logout-btn {
+            margin-top: 30px;
+            color: #ff4d4d;
+            text-decoration: none;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            padding: 14px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.03);
+            cursor: pointer;
+        }
+        .logout-btn:hover { color: #ff4d4d; }
 
-        .search-bar { background: var(--card-bg); border: 1px solid rgba(191,149,63,0.2); padding: 18px 30px; border-radius: 50px; width: 100%; max-width: 600px; color: white; outline: none; margin-bottom: 30px; font-family: 'Montserrat'; font-size: 0.9rem; }
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 50px 5% 40px;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .page-badge {
+            display: inline-flex;
+            align-items: center;
+            width: max-content;
+            padding: 6px 14px;
+            border-radius: 50px;
+            background: rgba(191,149,63,0.10);
+            border: 1px solid rgba(191,149,63,0.25);
+            color: var(--gold);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .header-left h1 {
+            font-family: 'Cinzel';
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            color: #fff;
+        }
+        .header-left p {
+            color: #777;
+            font-size: 0.9rem;
+            margin: 0;
+            letter-spacing: 0.5px;
+            max-width: 500px;
+        }
+        .btn-new-client {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .btn-new-client i { margin-right: 8px; }
+        .btn-new-client:hover {
+            background: var(--gold);
+            color: black;
+            box-shadow: 0 0 20px rgba(191,149,63,0.3);
+        }
 
-        /* --- TABLA ESCRITORIO / LISTA MÓVIL --- */
-        .table-container { background: var(--card-bg); border-radius: 24px; padding: 35px; border: 1px solid rgba(255, 255, 255, 0.05); }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { padding: 18px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: #444; border-bottom: 1px solid rgba(191, 149, 63, 0.1); }
-        td { padding: 22px 18px; font-size: 0.85rem; color: #ccc; border-bottom: 1px solid rgba(255, 255, 255, 0.02); }
+        .search-bar {
+            width: 100%;
+            height: 58px;
+            padding: 0 28px;
+            border-radius: 18px;
+            background: #101010;
+            border: 1px solid rgba(191,149,63,0.12);
+            color: #fff;
+            font-size: 0.95rem;
+            transition: 0.35s;
+            margin: 25px 0 35px;
+            font-family: 'Montserrat';
+        }
+        .search-bar::placeholder { color: #666; }
+        .search-bar:hover { border-color: rgba(191,149,63,0.30); }
+        .search-bar:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 4px rgba(191,149,63,0.08), 0 12px 35px rgba(0,0,0,0.35);
+            outline: none;
+        }
 
-        .client-info { display: flex; align-items: center; gap: 15px; }
-        .client-avatar { width: 42px; height: 42px; background: rgba(191,149,63,0.1); color: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; border: 1px solid rgba(191,149,63,0.3); }
-        
-        .tag { padding: 6px 14px; border-radius: 50px; font-size: 0.6rem; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
-        .tag.vip { background: var(--gold); color: black; box-shadow: 0 0 10px rgba(191,149,63,0.4); }
-        .tag.frecuente { background: rgba(255,255,255,0.05); color: #888; border: 1px solid #333; }
+        /* --- ESTADÍSTICAS --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1.7fr;
+            gap: 18px;
+            margin: 0 0 45px;
+        }
+        .stat-card {
+            background: linear-gradient(180deg,#131313,#0a0a0a);
+            border: 1px solid rgba(191,149,63,0.12);
+            border-radius: 22px;
+            padding: 22px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            transition: 0.35s;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg,#bf953f,#ffd277);
+        }
+        .stat-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(191,149,63,0.35);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.45);
+        }
+        .stat-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(191,149,63,0.10);
+            border: 1px solid rgba(191,149,63,0.25);
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+        .stat-info { display: flex; flex-direction: column; }
+        .stat-info span {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+        }
+        .stat-info small {
+            margin-top: 6px;
+            color: #777;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
 
-        /* --- MODAL iPHONE STYLE --- */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: flex-end; backdrop-filter: blur(10px); }
-        .modal-card { background: #0a0a0a; border: 1px solid var(--gold); border-bottom: none; padding: 40px; border-radius: 30px 30px 0 0; width: 100%; max-width: 500px; animation: slideUp 0.4s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
-        .modal-card h2 { font-family: 'Cinzel'; color: var(--gold); margin-bottom: 25px; text-align: center; letter-spacing: 2px; }
+        /* ==========================================
+           NUEVO ESTILO DE TABLA / TARJETAS VIP
+           ========================================== */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px 15px;
+            border: 1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+            width: 100%;
+            overflow-x: hidden; /* Adiós al scroll horizontal en PC */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 12px;
+        }
+
+        thead th {
+            padding: 14px 16px;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #666;
+            border-bottom: 1px solid rgba(191,149,63,0.08);
+            font-weight: 600;
+            text-align: left;
+            background: transparent;
+        }
+        thead th:not(:first-child) { text-align: center; }
+
+        /* --- FILAS DE LA TABLA (escritorio) --- */
+        tbody tr {
+            background: linear-gradient(145deg, #131313, #0a0a0a);
+            border-radius: 18px;
+            transition: 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        tbody tr:hover {
+            transform: translateY(-4px) scale(1.01);
+            border-color: rgba(191,149,63,0.25);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5), var(--shadow-gold);
+            background: linear-gradient(145deg, #181818, #0d0d0d);
+        }
+
+        tbody td {
+            padding: 18px 16px;
+            font-size: 0.85rem;
+            color: #ccc;
+            border: none;
+            vertical-align: middle;
+            background: transparent;
+        }
+        tbody td:first-child { border-radius: 18px 0 0 18px; }
+        tbody td:last-child { border-radius: 0 18px 18px 0; }
+
+        /* --- Información del cliente (avatar + nombre) --- */
+        .client-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .client-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(145deg, rgba(191,149,63,0.15), rgba(191,149,63,0.05));
+            color: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border: 1px solid rgba(191,149,63,0.25);
+            flex-shrink: 0;
+            box-shadow: 0 0 15px rgba(191,149,63,0.05);
+        }
+        .client-name {
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .client-phone {
+            color: #888;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .client-phone i { font-size: 0.7rem; color: var(--gold); }
+
+        /* --- Celdas de datos (visitas, gastado, etc.) --- */
+        .data-cell {
+            text-align: center;
+            font-weight: 600;
+        }
+        .data-cell .number {
+            font-size: 1.2rem;
+            color: #fff;
+            display: block;
+            line-height: 1.2;
+        }
+        .data-cell .label {
+            font-size: 0.55rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .data-cell .currency {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        /* --- Etiqueta de categoría --- */
+        .tag {
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.6rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 700;
+            display: inline-block;
+            text-align: center;
+            min-width: 80px;
+        }
+        .tag.vip {
+            background: linear-gradient(145deg, #bf953f, #f3d27e);
+            color: #0a0a0a;
+            box-shadow: 0 0 25px rgba(191,149,63,0.3);
+        }
+        .tag.frecuente {
+            background: rgba(255,255,255,0.06);
+            color: #aaa;
+            border: 1px solid #333;
+        }
+
+        /* --- Botón historial --- */
+        .btn-historial {
+            background: rgba(191,149,63,0.08);
+            border: 1px solid rgba(191,149,63,0.15);
+            color: var(--gold);
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-historial i { font-size: 0.7rem; }
+        .btn-historial:hover {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(191,149,63,0.2);
+        }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: flex-end;
+            backdrop-filter: blur(10px);
+        }
+        .modal-card {
+            background: #0a0a0a;
+            border: 1px solid var(--gold);
+            border-bottom: none;
+            padding: 40px 30px 30px;
+            border-radius: 30px 30px 0 0;
+            width: 100%;
+            max-width: 500px;
+            animation: slideUp 0.4s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .modal-card h2 {
+            font-family: 'Cinzel';
+            color: var(--gold);
+            margin-bottom: 25px;
+            text-align: center;
+            letter-spacing: 2px;
+            font-size: 1.4rem;
+        }
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 0.65rem; color: #888; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        .form-group input { width: 100%; padding: 16px; background: #111; border: 1px solid #222; color: white; border-radius: 15px; outline: none; font-size: 0.9rem; }
-        .btn-save { width: 100%; padding: 18px; background: var(--gold); border: none; color: black; font-weight: 700; border-radius: 50px; cursor: pointer; letter-spacing: 2px; font-size: 0.9rem; }
+        .form-group label {
+            display: block;
+            font-size: 0.65rem;
+            color: #888;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 16px;
+            background: #111;
+            border: 1px solid #222;
+            color: white;
+            border-radius: 15px;
+            outline: none;
+            font-size: 0.9rem;
+            font-family: 'Montserrat';
+        }
+        .form-group input:focus { border-color: var(--gold); }
+        .btn-save {
+            width: 100%;
+            padding: 18px;
+            background: var(--gold);
+            border: none;
+            color: black;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .btn-save:hover { opacity: 0.85; }
+        .btn-cancel-modal {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #555;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 10px;
+        }
+        .btn-cancel-modal:hover { color: #888; }
 
-        /* TOAST */
-        .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #0a0a0a; border: 1px solid var(--gold); color: var(--gold); padding: 15px 35px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; z-index: 3000; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        /* --- TOAST --- */
+        .toast {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a0a0a;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 3000;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            white-space: nowrap;
+        }
         .toast.show { bottom: 100px; }
 
-        /* --- RESPONSIVE ADAPTIVE --- */
+       /* =========================================================
+           DISEÑO MÓVIL AUTOMÁTICO TARJETAS NATIVAS
+           ========================================================= */
         @media (max-width: 900px) {
-            body { flex-direction: column; overflow: auto; }
-            .sidebar { display: none; }
-            .mobile-tab-bar { display: flex; }
-            .main-content { padding: 100px 20px 180px; height: auto; }
-            
-            .header-section { position: fixed; top: 0; left: 0; right: 0; background: rgba(5,5,5,0.8); backdrop-filter: var(--ios-blur); padding: 15px 20px; z-index: 1100; border-bottom: 1px solid rgba(255,255,255,0.05); }
-            .header-section h1 { font-size: 1.2rem; }
-            .header-section p { display: none; }
-            
-            .table-container { background: transparent; border: none; padding: 0; }
-            table, thead, tbody, th, td, tr { display: block; }
-            thead { display: none; }
-            tr { background: var(--card-bg); margin-bottom: 15px; padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.03); }
-            td { padding: 5px 0; border: none; }
-            .client-info { margin-bottom: 10px; }
-            .btn-save { padding: 12px; }
+            body { 
+                display: block !important;
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+            }
+            .sidebar { display: none !important; }
+            .mobile-tab-bar { display: flex !important; }
+
+            .main-content { 
+                padding: 85px 10px 140px !important; 
+                width: 100% !important;
+                max-width: 100vw !important;
+                box-sizing: border-box !important;
+            }
+
+            .header-section {
+                position: fixed; top: 0; left: 0; right: 0;
+                background: rgba(5,5,5,0.95); backdrop-filter: var(--ios-blur);
+                padding: 12px 14px; z-index: 1100;
+                border-bottom: 1px solid rgba(255,255,255,0.08);
+            }
+            .header-left h1 { font-size: 1.1rem; }
+            .header-left p { display: none; }
+
+            .search-bar {
+                margin: 10px 0 15px !important;
+                height: 44px !important;
+                padding: 0 14px !important;
+                font-size: 0.8rem !important;
+                width: 100% !important;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+            .stat-card { padding: 8px 10px; gap: 8px; }
+
+            .table-container {
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+            }
+
+            /* Estilo para los Checkboxes personalizados */
+            .cli-checkbox {
+                width: 18px;
+                height: 18px;
+                accent-color: #ff4d4d;
+                cursor: pointer;
+                flex-shrink: 0;
+            }
+
+            /* Tarjeta VIP NATIVA en celular */
+            .mobile-card-vip {
+                background: linear-gradient(160deg, #121212 0%, #080808 100%);
+                border: 1px solid rgba(191, 149, 63, 0.22);
+                border-radius: 14px;
+                padding: 12px;
+                margin-bottom: 12px;
+                width: 100%;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .card-top {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                border-bottom: 1px solid rgba(255,255,255,0.08);
+                padding-bottom: 8px;
+            }
+
+            .card-metrics {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .metric-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                padding: 8px 10px;
+                border-radius: 8px;
+            }
+
+            .metric-row span:first-child {
+                color: var(--gold);
+                font-weight: 800;
+                font-size: 0.6rem;
+                letter-spacing: 0.5px;
+            }
+
+            .metric-row span:last-child {
+                color: #fff;
+                font-weight: 800;
+                font-size: 0.8rem;
+                white-space: nowrap;
+            }
+
+            .card-actions {
+                display: flex;
+                gap: 8px;
+                margin-top: 2px;
+            }
+
+            .card-actions button, .card-actions a {
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 9px 0;
+                border-radius: 8px;
+                font-size: 0.65rem;
+                font-weight: 700;
+                text-decoration: none;
+            }
         }
     </style>
+<link rel="stylesheet" href="../assets/css/clientes.css?v=3">
+<link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<script src="../assets/js/core/notifications.js?v=1" defer></script>
 </head>
 <body>
 
     <div id="toast" class="toast">✦ <span id="toastMsg">CLIENTE REGISTRADO</span></div>
 
-    <aside class="sidebar">
-        <div class="sidebar-logo">✦ TAMAKU</div>
-        <nav class="nav-menu">
-            <a href="dashboard.html" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <a href="agenda.html" class="nav-item"><i class="fa-solid fa-calendar-alt"></i> Agenda</a>
-            <a href="clientes.html" class="nav-item active"><i class="fa-solid fa-star"></i> Clientes</a>
-            <a href="profesionales.html" class="nav-item"><i class="fa-solid fa-user-tie"></i> Profesionales</a>
-            <a href="ajustes.html" class="nav-item"><i class="fa-solid fa-gear"></i> Ajustes</a>
-        </nav>
-        <a href="#" onclick="cerrarSesion()" class="logout-btn">Cerrar Sesión</a>
-    </aside>
-
-    <nav class="mobile-tab-bar">
-        <a href="dashboard.html" class="tab-item"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
-        <a href="agenda.html" class="tab-item"><i class="fa-solid fa-calendar"></i><span>Agenda</span></a>
-        <a href="profesionales.html" class="tab-item"><i class="fa-solid fa-user-tie"></i><span>Staff</span></a>
-        <a href="clientes.html" class="tab-item active"><i class="fa-solid fa-users"></i><span>VIP</span></a>
-        <a href="ajustes.html" class="tab-item"><i class="fa-solid fa-gear"></i><span>Ajustes</span></a>
-    </nav>
+    <aside class="sidebar"></aside>
+    <nav class="mobile-tab-bar"></nav>
 
     <main class="main-content">
-        <header class="header-section">
-            <h1>Directorio VIP</h1>
-            <button class="btn-new-client" onclick="abrirModal()">+ NUEVO</button>
+        <header class="header-section tamaku-module-header">
+            <div class="header-left">
+                <span class="page-badge">✦ CRM</span>
+                <h1>Directorio VIP</h1>
+                <p>Gestiona, conoce y fideliza a tus mejores clientes.</p>
+            </div>
+            <button class="btn-new-client" onclick="abrirModal()">
+                <i class="fa-solid fa-plus"></i> Nuevo Cliente
+            </button>
         </header>
 
-        <input type="text" id="buscador" class="search-bar" placeholder="Buscar cliente...">
+        <div class="clients-toolbar">
+            <div class="client-search-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="buscador" class="search-bar" placeholder="Buscar por nombre o teléfono...">
+                <kbd>CTRL K</kbd>
+            </div>
+            <div class="directory-status"><span></span> Directorio actualizado</div>
+        </div>
+        <!-- BARRA DE ACCIÓN MASIVA (Aparece cuando seleccionas 1 o más clientes) -->
+        <div id="bulkActionBar" style="display: none; background: linear-gradient(145deg, #1c1010, #0c0808); border: 1px solid rgba(255, 77, 77, 0.4); border-radius: 16px; padding: 12px 20px; margin-bottom: 20px; align-items: center; justify-content: space-between; box-shadow: 0 10px 30px rgba(255,77,77,0.15);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="bulkCount" style="color: #ff5c5c; font-weight: 800; font-size: 0.9rem;">0 seleccionados</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="deseleccionarTodos()" style="background: transparent; border: 1px solid #555; color: #ccc; padding: 8px 16px; border-radius: 50px; font-size: 0.7rem; cursor: pointer; font-weight: 700;">CANCELAR</button>
+                <button onclick="eliminarSeleccionados()" style="background: var(--red, #ff4d4d); border: none; color: #fff; padding: 8px 20px; border-radius: 50px; font-size: 0.7rem; cursor: pointer; font-weight: 800; letter-spacing: 1px;">ELIMINAR SELECCIONADOS</button>
+            </div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card" onclick="filtrarCategoria('todos')" style="cursor: pointer;" title="Ver todos los clientes">
+                <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                <div class="stat-info">
+                    <span id="totalClientes">0</span>
+                    <small>Clientes (Todos)</small>
+                </div>
+            </div>
+            <div class="stat-card" onclick="filtrarCategoria('vip')" style="cursor: pointer;" title="Filtrar VIP">
+                <div class="stat-icon"><i class="fa-solid fa-crown"></i></div>
+                <div class="stat-info">
+                    <span id="clientesVip">0</span>
+                    <small style="color: var(--gold-light);">VIP (≥ 5)</small>
+                </div>
+            </div>
+            <div class="stat-card" onclick="filtrarCategoria('frecuentes')" style="cursor: pointer;" title="Filtrar Frecuentes">
+                <div class="stat-icon"><i class="fa-solid fa-repeat"></i></div>
+                <div class="stat-info">
+                    <span id="clientesFrecuentes">0</span>
+                    <small>Frecuentes (&lt; 5)</small>
+                </div>
+            </div>
+            <div class="stat-card" onclick="filtrarCategoria('nuevos')" style="cursor: pointer;" title="Filtrar Nuevos este mes">
+                <div class="stat-icon"><i class="fa-solid fa-user-plus"></i></div>
+                <div class="stat-info">
+                    <span id="clientesNuevos">0</span>
+                    <small>Nuevos (Mes)</small>
+                </div>
+            </div>
+            <div class="stat-card" onclick="cargarBloqueados()" style="cursor: pointer; border-color: rgba(255,77,77,0.4);" title="Ver Bloqueados">
+                <div class="stat-icon" style="color: #ff4d4d; background: rgba(255,77,77,0.1); border-color: rgba(255,77,77,0.3);"><i class="fa-solid fa-ban"></i></div>
+                <div class="stat-info">
+                    <span id="totalBloqueados">0</span>
+                    <small style="color: #ff4d4d;">Bloqueados</small>
+                </div>
+            </div>
+        </div>
 
         <div class="table-container">
             <table>
@@ -106,16 +720,19 @@
                     <tr>
                         <th>Cliente</th>
                         <th>Teléfono</th>
-                        <th style="text-align: center;">Reservas/Mes</th>
+                        <th style="text-align:center;">Visitas</th>
+                        <th style="text-align:center;">Gastado</th>
+                        <th>Última visita</th>
                         <th>Categoría</th>
-                        <th>Acciones</th>
+                        <th style="text-align:center;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="tablaClientes"></tbody>
             </table>
         </div>
     </main>
-    <script src="../assets/js/menu.js"></script>
+
+    <!-- MODAL -->
     <div id="modalCliente" class="modal-overlay">
         <div class="modal-card">
             <div style="width: 40px; height: 5px; background: #333; border-radius: 10px; margin: 0 auto 20px;"></div>
@@ -129,66 +746,637 @@
                 <input type="text" id="telCli" placeholder="300 123 4567">
             </div>
             <button class="btn-save" id="btnGuardar" onclick="guardarCliente()">CREAR PERFIL</button>
-            <button onclick="cerrarModal()" style="width:100%; background:transparent; border:none; color:#555; margin-top:20px; cursor:pointer; font-size:0.7rem; text-transform: uppercase;">Cancelar</button>
+            <button class="btn-cancel-modal" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    </div>
+    <!-- MODAL EDITAR CLIENTE -->
+    <div id="modalEditarCliente" class="modal-overlay">
+        <div class="modal-card">
+            <div style="width: 40px; height: 5px; background: #333; border-radius: 10px; margin: 0 auto 20px;"></div>
+            <h2>Editar Cliente</h2>
+            <input type="hidden" id="editTelOriginal">
+            <div class="form-group">
+                <label>Nombre del Cliente</label>
+                <input type="text" id="editNombreCli" placeholder="Nombre completo">
+            </div>
+            <div class="form-group">
+                <label>Teléfono / WhatsApp</label>
+                <input type="text" id="editTelCli" placeholder="3001234567">
+            </div>
+            <div class="form-group">
+                <label>Correo Electrónico</label>
+                <input type="email" id="editEmailCli" placeholder="correo@ejemplo.com">
+            </div>
+            <button class="btn-save" id="btnGuardarEdit" onclick="actualizarCliente()">GUARDAR CAMBIOS</button>
+            <button class="btn-cancel-modal" onclick="cerrarModalEditar()">Cancelar</button>
+        </div>
+    </div>
+     <!-- MODAL BLOQUEO -->
+    <div id="modalBloqueo" class="modal-overlay">
+        <div class="modal-card" style="border-color: #ff4d4d;">
+            <div style="width: 40px; height: 5px; background: #333; border-radius: 10px; margin: 0 auto 20px;"></div>
+            <h2 style="color: #ff4d4d;"><i class="fa-solid fa-ban"></i> Bloquear Cliente</h2>
+            <p style="text-align: center; color: #ccc; font-size: 0.8rem; margin-bottom: 20px;">
+                ¿Cómo deseas restringir a <strong id="nombreBloqueo" style="color: white;"></strong>?
+            </p>
+            
+            <div class="form-group">
+                <label>Nivel de Bloqueo</label>
+                <select id="tipoBloqueo" style="width: 100%; padding: 16px; background: #111; border: 1px solid #222; color: white; border-radius: 15px; outline: none; font-size: 0.9rem; font-family: 'Montserrat';">
+                    <option value="global">Bloquear de toda la tienda</option>
+                    <option value="parcial">Bloquear solo para un profesional</option>
+                </select>
+            </div>
+
+            <!-- Este selector se mostrará luego si elige "parcial" -->
+            <div class="form-group" id="grupoProfesionalBloqueo" style="display: none;">
+                <label>Selecciona el Profesional</label>
+                <select id="profesionalBloqueo" style="width: 100%; padding: 16px; background: #111; border: 1px solid #222; color: white; border-radius: 15px; outline: none; font-size: 0.9rem; font-family: 'Montserrat';">
+                    <option value="">Cargando profesionales...</option>
+                </select>
+            </div>
+
+            <button class="btn-save" onclick="guardarBloqueo()" style="background: #ff4d4d; color: white;">APLICAR BLOQUEO</button>
+            <button class="btn-cancel-modal" onclick="cerrarModalBloqueo()">Cancelar</button>
         </div>
     </div>
 
+    <script src="../assets/js/core/menu.js?v=5" defer></script>
+
+
     <script type="module">
-        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+        import { supabase } from "../assets/js/config/supabaseClient.js";
+        import { requireTiendaInfo } from "../assets/js/core/session.js";
 
-        const supabaseUrl = "https://smibbddmwgdmqpwsuaqr.supabase.co";
-        const supabaseKey = "sb_publishable_kQQ7ldmjql3V5Jbn9jvxYw_IAoSz1Uj";
-        const supabase = createClient(supabaseUrl, supabaseKey);
+        const tiendaInfo = await requireTiendaInfo();
+        if (!tiendaInfo) throw new Error("No existe una tienda válida para esta sesión");
 
-        const tiendaInfo = JSON.parse(localStorage.getItem("tamaku_tienda"));
-        if (!tiendaInfo) window.location.href = "../index.html";
+        // --- FUNCIONES GLOBALES ---
+        window.abrirModal = () => {
+            document.getElementById("modalCliente").style.display = "flex";
+            document.getElementById("nombreCli").value = "";
+            document.getElementById("telCli").value = "";
+        };
+        window.cerrarModal = () => {
+            document.getElementById("modalCliente").style.display = "none";
+        };
+        // --- FUNCIONES EDICIÓN DE CLIENTE ---
+        window.abrirModalEditar = (telefono, nombre, email) => {
+            document.getElementById("editTelOriginal").value = telefono || "";
+            document.getElementById("editNombreCli").value = nombre || "";
+            document.getElementById("editTelCli").value = telefono || "";
+            document.getElementById("editEmailCli").value = (email && email !== "Sin correo") ? email : "";
+            document.getElementById("modalEditarCliente").style.display = "flex";
+        };
 
-        async function cargarClientes() {
-            const { data: clientes } = await supabase.from("clientes").select("*").eq("id_tienda", tiendaInfo.id).order('nombre', {ascending: true});
-            const tabla = document.getElementById("tablaClientes");
-            tabla.innerHTML = "";
+        window.cerrarModalEditar = () => {
+            document.getElementById("modalEditarCliente").style.display = "none";
+        };
 
-            if (clientes) {
-                clientes.forEach(c => {
-                    const iniciales = c.nombre.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2);
-                    tabla.innerHTML += `
-                        <tr>
-                            <td>
-                                <div class="client-info">
-                                    <div class="client-avatar">${iniciales}</div>
-                                    <span style="font-weight: 600; color: #fff;">${c.nombre}</span>
-                                </div>
-                            </td>
-                            <td style="color: #666;">${c.telefono}</td>
-                            <td style="text-align: center; font-weight: 700;">0</td>
-                            <td><span class="tag frecuente">Frecuente</span></td>
-                            <td><button class="btn-save" style="padding: 8px 15px; font-size: 0.6rem;">HISTORIAL</button></td>
-                        </tr>`;
-                });
+        window.actualizarCliente = async () => {
+            const telOriginal = document.getElementById("editTelOriginal").value;
+            const nuevoNombre = document.getElementById("editNombreCli").value.trim();
+            const nuevoTel = document.getElementById("editTelCli").value.replace(/\D/g, "").trim();
+            const nuevoEmail = document.getElementById("editEmailCli").value.trim();
+
+            if (!nuevoNombre || !nuevoTel) {
+                mostrarToast("❌ El nombre y el teléfono son obligatorios", true);
+                return;
             }
-        }
 
-        window.guardarCliente = async () => {
-            const nombre = document.getElementById("nombreCli").value.trim();
-            const telefono = document.getElementById("telCli").value.trim();
-            if(!nombre || !telefono) return mostrarToast("CAMPOS OBLIGATORIOS", true);
+            const btn = document.getElementById("btnGuardarEdit");
+            btn.innerText = "GUARDANDO...";
 
-            const { error } = await supabase.from("clientes").insert([{ nombre, telefono, id_tienda: tiendaInfo.id }]);
-            if (!error) { cerrarModal(); mostrarToast("CLIENTE CREADO"); cargarClientes(); }
+            // Actualizamos en la tabla de citas todos los registros de ese cliente
+            const { error } = await supabase
+                .from("citas")
+                .update({
+                    nombre_cliente: nuevoNombre,
+                    telefono_cliente: nuevoTel,
+                    email_cliente: nuevoEmail || null
+                })
+                .eq("id_tienda", tiendaInfo.id)
+                .eq("telefono_cliente", telOriginal);
+
+            if (error) {
+                console.error("Error al actualizar:", error);
+                mostrarToast("❌ Error al actualizar datos", true);
+            } else {
+                mostrarToast("✦ Cliente actualizado correctamente");
+                cerrarModalEditar();
+                cargarClientes(); // Recargar lista automáticamente
+            }
+
+            btn.innerText = "GUARDAR CAMBIOS";
+        };
+
+        // --- FUNCIONES MODAL BLOQUEO ---
+        let clienteParaBloquear = {}; // Memoria temporal para guardar los datos
+
+        window.abrirModalBloqueo = async (telefono, nombre) => {
+            clienteParaBloquear = { telefono: telefono, nombre: nombre }; // Guardamos el cliente
+            document.getElementById("modalBloqueo").style.display = "flex";
+            document.getElementById("nombreBloqueo").innerText = nombre;
+            
+            // Si cambian el select, mostramos u ocultamos la lista de profesionales
+            document.getElementById("tipoBloqueo").onchange = function() {
+                const esParcial = this.value === "parcial";
+                document.getElementById("grupoProfesionalBloqueo").style.display = esParcial ? "block" : "none";
+            };
+
+            // Traer los profesionales exclusivos de esta tienda
+            const selectProf = document.getElementById("profesionalBloqueo");
+            selectProf.innerHTML = '<option value="">Cargando profesionales...</option>';
+            
+            const { data, error } = await supabase
+                .from("profesionales")
+                .select("id_barbero, nombre_empleado")
+                .eq("id_tienda", tiendaInfo.id);
+
+            if (error || !data || data.length === 0) {
+                selectProf.innerHTML = '<option value="">No hay profesionales registrados</option>';
+                return;
+            }
+
+            selectProf.innerHTML = '<option value="">Selecciona un profesional...</option>';
+            data.forEach(p => {
+                selectProf.innerHTML += `<option value="${p.id_barbero}">${p.nombre_empleado}</option>`;
+            });
+        };
+
+        window.cerrarModalBloqueo = () => {
+            document.getElementById("modalBloqueo").style.display = "none";
+            document.getElementById("tipoBloqueo").value = "global";
+            document.getElementById("grupoProfesionalBloqueo").style.display = "none";
+        };
+
+        window.guardarBloqueo = async () => {
+            const btn = document.querySelector("#modalBloqueo .btn-save");
+            btn.innerText = "BLOQUEANDO...";
+            
+            const tipoBloqueo = document.getElementById("tipoBloqueo").value;
+            const idBarbero = document.getElementById("profesionalBloqueo").value;
+            
+            // Si es parcial y no seleccionó a nadie, frenamos
+            if (tipoBloqueo === "parcial" && !idBarbero) {
+                alert("Por favor selecciona un profesional de la lista.");
+                btn.innerText = "APLICAR BLOQUEO";
+                return;
+            }
+
+            // Insertamos el castigo en Supabase
+            const { error } = await supabase
+                .from("clientes_bloqueados")
+                .insert([{
+                    id_tienda: tiendaInfo.id,
+                    telefono_cliente: clienteParaBloquear.telefono,
+                    nombre_cliente: clienteParaBloquear.nombre,
+                    tipo_bloqueo: tipoBloqueo,
+                    id_barbero: tipoBloqueo === "parcial" ? idBarbero : null
+                }]);
+
+            if (error) {
+                console.error("Error al bloquear:", error);
+                alert("Hubo un problema al aplicar el bloqueo.");
+            } else {
+                alert(clienteParaBloquear.nombre + " ha sido bloqueado exitosamente.");
+                cerrarModalBloqueo();
+            }
+            
+            btn.innerText = "APLICAR BLOQUEO";
+        };
+
+        // --- FUNCIONES DE LISTA DE BLOQUEADOS ---
+        window.cargarBloqueados = async () => {
+            const tbody = document.querySelector("#tablaClientes");
+            const thead = document.querySelector("thead");
+            
+            // Ocultamos los encabezados de la tabla VIP porque esta lista es más sencilla
+            if (thead) thead.style.display = "none"; 
+            
+            tbody.innerHTML = "<tr><td colspan='100%' style='text-align:center; padding: 30px;'>Buscando lista de bloqueados...</td></tr>";
+
+            // Buscamos en la base de datos cruzando con la tabla de profesionales
+            const { data, error } = await supabase
+                .from("clientes_bloqueados")
+                .select("id, telefono_cliente, nombre_cliente, tipo_bloqueo, profesionales(nombre_empleado)")
+                .eq("id_tienda", tiendaInfo.id);
+
+            if (error) {
+                console.error("Error cargando bloqueados:", error);
+                tbody.innerHTML = "<tr><td colspan='100%' style='text-align:center; color:#ff4d4d;'>Error al cargar la lista.</td></tr>";
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='100%' style='text-align:center; color:#ccc; padding: 30px;'>No tienes clientes bloqueados.</td></tr>";
+                return;
+            }
+
+            tbody.innerHTML = "";
+            data.forEach(b => {
+                const tr = document.createElement("tr");
+                const nombreProf = b.profesionales ? b.profesionales.nombre_empleado : "un profesional";
+                const textoBloqueo = b.tipo_bloqueo === "global" ? "Bloqueado de toda la tienda" : "Bloqueado para " + nombreProf;
+
+                tr.innerHTML = `
+                    <td class="data-cell" style="text-align: left;">
+                        <strong style="color: white; font-size: 1.1rem; display: block;">${b.nombre_cliente || 'Desconocido'}</strong>
+                        <span style="color: #aaa; font-size: 0.85rem;">${b.telefono_cliente}</span>
+                    </td>
+                    <td class="data-cell" style="text-align: center; color: #ff4d4d;">
+                        <span style="padding: 6px 12px; background: rgba(255,77,77,0.1); border-radius: 8px; border: 1px solid rgba(255,77,77,0.3); font-size: 0.85rem;">
+                            <i class="fa-solid fa-ban"></i> ${textoBloqueo}
+                        </span>
+                    </td>
+                    <td class="data-cell" style="text-align: center;">
+                        <button onclick="desbloquearCliente('${b.id}', '${b.nombre_cliente}')" class="btn-historial" style="color: #25d366; border-color: rgba(37,211,102,0.4); background: rgba(37,211,102,0.1);">
+                            <i class="fa-solid fa-unlock"></i> Desbloquear
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.desbloquearCliente = async (id, nombre) => {
+            if (!(await TamakuUI.confirm({
+                titulo: "¿Desbloquear cliente?",
+                mensaje: `${nombre} podrá volver a reservar citas.`,
+                textoConfirmar: "Desbloquear"
+            }))) return;
+
+            const { error } = await supabase
+                .from("clientes_bloqueados")
+                .delete()
+                .eq("id", id)
+                .eq("id_tienda", tiendaInfo.id);
+
+            if(error) {
+                alert("Hubo un error al intentar desbloquear.");
+            } else {
+                alert(nombre + " ha sido desbloqueado y ya puede agendar de nuevo.");
+                cargarBloqueados(); // Recargamos la lista automáticamente
+            }
         };
 
         function mostrarToast(mensaje, esError = false) {
-            const t = document.getElementById("toast");
-            document.getElementById("toastMsg").innerText = mensaje;
-            t.style.borderColor = esError ? "#ff4d4d" : "var(--gold)";
-            t.classList.add("show");
-            setTimeout(() => t.classList.remove("show"), 3000);
+            TamakuUI.notify(mensaje, esError ? "error" : "success");
         }
 
-        window.abrirModal = () => document.getElementById("modalCliente").style.display = "flex";
-        window.cerrarModal = () => document.getElementById("modalCliente").style.display = "none";
-        
+        // --- SELECCIÓN Y ELIMINACIÓN DE CLIENTES ---
+        window.toggleSeleccionCliente = () => {
+            const checks = document.querySelectorAll(".cli-checkbox:checked");
+            const bar = document.getElementById("bulkActionBar");
+            const countText = document.getElementById("bulkCount");
 
+            if (bar && countText) {
+                if (checks.length > 0) {
+                    bar.style.display = "flex";
+                    countText.innerText = `${checks.length} cliente(s) seleccionado(s)`;
+                } else {
+                    bar.style.display = "none";
+                }
+            }
+        };
+
+        window.deseleccionarTodos = () => {
+            document.querySelectorAll(".cli-checkbox").forEach(chk => chk.checked = false);
+            const bar = document.getElementById("bulkActionBar");
+            if (bar) bar.style.display = "none";
+        };
+
+        // Eliminación Individual en Supabase
+        window.eliminarCliente = async (telefono, nombre) => {
+            if (!(await TamakuUI.confirm({
+                titulo: "¿Eliminar cliente?",
+                mensaje: `Se eliminarán permanentemente las citas asociadas a ${nombre}.`,
+                textoConfirmar: "Eliminar",
+                peligro: true
+            }))) return;
+
+            const { error } = await supabase
+                .from("citas")
+                .delete()
+                .eq("id_tienda", tiendaInfo.id)
+                .eq("telefono_cliente", telefono);
+
+            if (error) {
+                console.error("Error al eliminar:", error);
+                mostrarToast("❌ Error al eliminar cliente", true);
+            } else {
+                mostrarToast("✦ Cliente eliminado con éxito");
+                cargarClientes();
+            }
+        };
+
+        // Eliminación Masiva en Supabase
+        window.eliminarSeleccionados = async () => {
+            const seleccionados = Array.from(document.querySelectorAll(".cli-checkbox:checked")).map(chk => chk.value);
+            
+            if (seleccionados.length === 0) return;
+
+            if (!(await TamakuUI.confirm({
+                titulo: "¿Eliminar clientes?",
+                mensaje: `Se eliminarán ${seleccionados.length} clientes seleccionados. Esta acción es irreversible.`,
+                textoConfirmar: "Eliminar todos",
+                peligro: true
+            }))) return;
+
+            const btn = document.querySelector("#bulkActionBar button:last-child");
+            if (btn) btn.innerText = "ELIMINANDO...";
+
+            const { error } = await supabase
+                .from("citas")
+                .delete()
+                .eq("id_tienda", tiendaInfo.id)
+                .in("telefono_cliente", seleccionados);
+
+            if (error) {
+                console.error("Error en borrado masivo:", error);
+                mostrarToast("❌ Error al borrar los seleccionados", true);
+            } else {
+                mostrarToast(`✦ ${seleccionados.length} clientes eliminados correctamente`);
+                deseleccionarTodos();
+                cargarClientes();
+            }
+
+            if (btn) btn.innerText = "ELIMINAR SELECCIONADOS";
+        };
+
+        // --- GUARDAR CLIENTE (inserta una cita de ejemplo) ---
+        window.guardarCliente = async () => {
+            const nombre = document.getElementById("nombreCli").value.trim();
+            const telefono = document.getElementById("telCli").value.trim();
+            if (!nombre || !telefono) {
+                mostrarToast("❌ Nombre y teléfono son obligatorios", true);
+                return;
+            }
+
+            const hoy = new Date().toISOString().split('T')[0];
+
+            const { error } = await supabase
+                .from("citas")
+                .insert([{
+                    nombre_cliente: nombre,
+                    telefono_cliente: telefono,
+                    fecha: hoy,
+                    valor_servicio: 0,
+                    id_tienda: tiendaInfo.id
+                }]);
+
+            if (error) {
+                console.error("Error al guardar:", error);
+                mostrarToast("❌ Error al crear el cliente", true);
+                return;
+            }
+
+            cerrarModal();
+            mostrarToast("✦ Cliente creado correctamente");
+            cargarClientes();
+        };
+
+        // Variable en memoria global para almacenar el listado procesado
+        window.listaClientesGlobal = [];
+        window.filtroCategoriaActual = 'todos';
+
+        // --- CARGAR CLIENTES DESDE CITAS ---
+        async function cargarClientes() {
+            const { data: citas, error } = await supabase
+                .from("citas")
+                .select("nombre_cliente, telefono_cliente, email_cliente, fecha, valor_servicio")
+                .eq("id_tienda", tiendaInfo.id)
+                .order("fecha", { ascending: false });
+
+            if (error) {
+                console.error("Error cargando citas:", error);
+                return;
+            }
+
+            const mapa = {};
+            citas.forEach(c => {
+                const tel = (c.telefono_cliente || "").replace(/\D/g, "");
+                if (!tel) return;
+                if (!mapa[tel]) {
+                    mapa[tel] = {
+                        nombre: c.nombre_cliente || "CLIENTE",
+                        telefono: tel,
+                        email: c.email_cliente || "Sin correo",
+                        visitas: 0,
+                        gastado: 0,
+                        ultimaFecha: c.fecha
+                    };
+                }
+                if (c.email_cliente && c.email_cliente.includes("@")) {
+                    mapa[tel].email = c.email_cliente.toLowerCase();
+                }
+                mapa[tel].visitas++;
+                mapa[tel].gastado += Number(c.valor_servicio || 0);
+                if (c.fecha > mapa[tel].ultimaFecha) {
+                    mapa[tel].ultimaFecha = c.fecha;
+                }
+            });
+
+            window.listaClientesGlobal = Object.values(mapa).sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+            // Actualizar Métricas de las Tarjetas
+            const hoy = new Date();
+            document.getElementById("totalClientes").textContent = window.listaClientesGlobal.length;
+            document.getElementById("clientesVip").textContent = window.listaClientesGlobal.filter(c => c.visitas >= 5).length;
+            document.getElementById("clientesFrecuentes").textContent = window.listaClientesGlobal.filter(c => c.visitas < 5).length;
+            document.getElementById("clientesNuevos").textContent = window.listaClientesGlobal.filter(c => {
+                const f = new Date(c.ultimaFecha);
+                return f.getMonth() === hoy.getMonth() && f.getFullYear() === hoy.getFullYear();
+            }).length;
+
+            const { count } = await supabase.from("clientes_bloqueados").select("*", { count: 'exact', head: true }).eq("id_tienda", tiendaInfo.id);
+            document.getElementById("totalBloqueados").textContent = count || 0;
+
+            renderizarLista();
+        }
+
+        // --- FILTRAR POR CATEGORÍA DESDE LAS TARJETAS ---
+        window.filtrarCategoria = (categoria) => {
+            window.filtroCategoriaActual = categoria;
+            renderizarLista();
+        };
+
+        // --- RENDERIZAR SEGÚN EL FILTRO ACTIVO ---
+        function renderizarLista() {
+            const hoy = new Date();
+            let listaFiltrada = [...window.listaClientesGlobal];
+
+            // Aplicar categoría seleccionada
+            if (window.filtroCategoriaActual === 'vip') {
+                listaFiltrada = listaFiltrada.filter(c => c.visitas >= 5);
+            } else if (window.filtroCategoriaActual === 'frecuentes') {
+                listaFiltrada = listaFiltrada.filter(c => c.visitas < 5);
+            } else if (window.filtroCategoriaActual === 'nuevos') {
+                listaFiltrada = listaFiltrada.filter(c => {
+                    const f = new Date(c.ultimaFecha);
+                    return f.getMonth() === hoy.getMonth() && f.getFullYear() === hoy.getFullYear();
+                });
+            }
+
+            const esMovil = window.innerWidth <= 900;
+            const tbody = document.getElementById("tablaClientes");
+            const thead = document.querySelector("thead");
+
+            tbody.innerHTML = "";
+
+            if (listaFiltrada.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#666;padding:40px 0;">No hay clientes en esta categoría.</td></tr>`;
+                return;
+            }
+
+            if (esMovil) {
+                if (thead) thead.style.display = "none";
+
+                listaFiltrada.forEach(c => {
+                    const nombre = c.nombre.toUpperCase();
+                    const iniciales = nombre.split(" ").map(n => n[0]).join("").substring(0, 2);
+                    const fechaFormateada = c.ultimaFecha ? new Date(c.ultimaFecha).toLocaleDateString() : "—";
+                    const gastadoFormateado = "$" + c.gastado.toLocaleString('es-CO');
+                    const telLimpio = "57" + c.telefono.replace(/\D/g, "");
+                    const nombreLimpio = nombre.replace(/'/g, "\\'");
+                    const emailLimpio = (c.email || "").replace(/'/g, "\\'");
+
+                    const card = document.createElement("div");
+                    card.className = "mobile-card-vip";
+                    card.innerHTML = `
+                        <div class="card-top">
+                            <input type="checkbox" class="cli-checkbox" value="${c.telefono}" onchange="toggleSeleccionCliente()">
+                            <div class="client-avatar">${iniciales}</div>
+                            <div style="flex:1;">
+                                <div class="client-name">${nombre}</div>
+                                <div class="client-phone"><i class="fa-brands fa-whatsapp" style="color:var(--gold)"></i> ${c.telefono}</div>
+                            </div>
+                        </div>
+                        <div class="card-metrics">
+                            <div class="metric-row"><span>VISITAS</span><span>${c.visitas}</span></div>
+                            <div class="metric-row"><span>GASTADO</span><span>${gastadoFormateado}</span></div>
+                            <div class="metric-row"><span>ÚLTIMA VISITA</span><span>${fechaFormateada}</span></div>
+                        </div>
+                        <div class="card-actions">
+                            <button onclick="abrirModalEditar('${c.telefono}', '${nombreLimpio}', '${emailLimpio}')" class="btn-historial" style="color: var(--gold); border: 1px solid rgba(191,149,63,0.3); background: rgba(191,149,63,0.08);">
+                                <i class="fa-solid fa-pen"></i> Editar
+                            </button>
+                            <a href="https://wa.me/${telLimpio}" target="_blank" class="btn-historial" style="color: #25D366; border: 1px solid rgba(37,211,102,0.3); background: rgba(37,211,102,0.08);">
+                                <i class="fa-brands fa-whatsapp"></i> Chat
+                            </a>
+                            <button onclick="eliminarCliente('${c.telefono}', '${nombreLimpio}')" class="btn-historial" style="color: #ff4d4d; border: 1px solid rgba(255,77,77,0.3); background: rgba(255,77,77,0.08);">
+                                <i class="fa-solid fa-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    `;
+                    tbody.appendChild(card);
+                });
+            } else {
+                if (thead) {
+                    thead.style.display = "";
+                    thead.innerHTML = `
+                        <tr>
+                            <th style="width: 40px; text-align: center;"></th>
+                            <th style="width: 35%;">Cliente / Acciones</th>
+                            <th style="text-align:center;">Visitas</th>
+                            <th style="text-align:center;">Gastado</th>
+                            <th style="text-align:center;">Última visita</th>
+                            <th style="text-align:center;">Categoría</th>
+                        </tr>
+                    `;
+                }
+
+                listaFiltrada.forEach(c => {
+                    const nombre = c.nombre.toUpperCase();
+                    const iniciales = nombre.split(" ").map(n => n[0]).join("").substring(0, 2);
+                    const categoria = c.visitas >= 5 ? "VIP" : "Frecuente";
+                    const tagClass = categoria === "VIP" ? "vip" : "frecuente";
+                    const fechaFormateada = c.ultimaFecha ? new Date(c.ultimaFecha).toLocaleDateString() : "—";
+                    const gastadoFormateado = "$" + c.gastado.toLocaleString('es-CO');
+                    const telLimpio = "57" + c.telefono.replace(/\D/g, "");
+                    const nombreLimpio = nombre.replace(/'/g, "\\'");
+                    const emailLimpio = (c.email || "").replace(/'/g, "\\'");
+
+                    const tr = document.createElement("tr");
+
+                    const tdCheck = document.createElement("td");
+                    tdCheck.style.textAlign = "center";
+                    tdCheck.innerHTML = `<input type="checkbox" class="cli-checkbox" value="${c.telefono}" onchange="toggleSeleccionCliente()">`;
+
+                    const td1 = document.createElement("td");
+                    td1.innerHTML = `
+                        <div class="client-info" style="margin-bottom: 8px;">
+                            <div class="client-avatar">${iniciales}</div>
+                            <div>
+                                <div class="client-name">${nombre}</div>
+                                <div class="client-phone"><i class="fa-brands fa-whatsapp"></i> ${c.telefono}</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-top: 6px;">
+                            <button onclick="abrirModalEditar('${c.telefono}', '${nombreLimpio}', '${emailLimpio}')" class="btn-historial" style="padding: 4px 10px; font-size: 0.6rem; color: var(--gold); border: 1px solid rgba(191,149,63,0.3); background: rgba(191,149,63,0.08); cursor: pointer;">
+                                <i class="fa-solid fa-pen"></i> Editar
+                            </button>
+                            <a href="https://wa.me/${telLimpio}" target="_blank" class="btn-historial" style="padding: 4px 10px; font-size: 0.6rem; text-decoration: none; color: #25D366; border: 1px solid rgba(37,211,102,0.3); background: rgba(37,211,102,0.08);">
+                                <i class="fa-brands fa-whatsapp"></i> Chat
+                            </a>
+                            <button onclick="eliminarCliente('${c.telefono}', '${nombreLimpio}')" class="btn-historial" style="padding: 4px 10px; font-size: 0.6rem; color: #ff4d4d; border: 1px solid rgba(255,77,77,0.3); background: rgba(255,77,77,0.08); cursor: pointer;">
+                                <i class="fa-solid fa-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    `;
+
+                    const td2 = document.createElement("td");
+                    td2.className = "data-cell";
+                    td2.innerHTML = `<span class="number">${c.visitas}</span><span class="label">visitas</span>`;
+
+                    const td3 = document.createElement("td");
+                    td3.className = "data-cell";
+                    td3.innerHTML = `<span class="number currency">${gastadoFormateado}</span><span class="label">gastado</span>`;
+
+                    const td4 = document.createElement("td");
+                    td4.className = "data-cell";
+                    td4.innerHTML = `<span class="number" style="font-size:0.85rem;">${fechaFormateada}</span>`;
+
+                    const td5 = document.createElement("td");
+                    td5.style.textAlign = "center";
+                    td5.innerHTML = `<span class="tag ${tagClass}">${categoria}</span>`;
+
+                    tr.appendChild(tdCheck);
+                    tr.appendChild(td1);
+                    tr.appendChild(td2);
+                    tr.appendChild(td3);
+                    tr.appendChild(td4);
+                    tr.appendChild(td5);
+
+                    tbody.appendChild(tr);
+                });
+            }
+
+            aplicarFiltro();
+        }
+
+        // --- FILTRO DE BÚSQUEDA DEL BUSCADOR ---
+        function aplicarFiltro() {
+            const input = document.getElementById("buscador");
+            const filtro = input.value.toLowerCase().trim();
+            const elementos = document.querySelectorAll("#tablaClientes tr, #tablaClientes .mobile-card-vip");
+
+            elementos.forEach(elem => {
+                if (elem.querySelector && elem.querySelector('td[colspan]')) return;
+                const texto = elem.textContent.toLowerCase();
+                elem.style.display = texto.includes(filtro) ? "" : "none";
+            });
+        }
+
+        document.getElementById("buscador").addEventListener("input", aplicarFiltro);
+        document.addEventListener("keydown", (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+                event.preventDefault();
+                document.getElementById("buscador")?.focus();
+            }
+        });
+
+        window.cargarClientes = cargarClientes;
         cargarClientes();
     </script>
 </body>

@@ -285,6 +285,77 @@ body{
     text-transform:uppercase;
 }
 
+.calendar-event.facturada {
+    border-color: rgba(46,204,113,.32);
+    background:
+        radial-gradient(circle at 100% 0%, rgba(46,204,113,.12), transparent 38%),
+        linear-gradient(145deg, rgba(20,30,25,.98), rgba(7,10,8,.98));
+}
+
+.calendar-event.facturada::after {
+    content:"";
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    width:3px;
+    background:linear-gradient(180deg,#78dfa0,#2ecc71);
+}
+
+.chip-facturada {
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    color:#78dfa0;
+    background:rgba(46,204,113,.12);
+    border-color:rgba(46,204,113,.28);
+}
+
+.event-invoice-status {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin:-2px 0 10px;
+    padding:8px 10px;
+    color:#78dfa0;
+    background:rgba(46,204,113,.07);
+    border:1px solid rgba(46,204,113,.15);
+    border-radius:11px;
+    font-size:.62rem;
+}
+
+.event-invoice-status span {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.event-invoice-status strong {
+    flex-shrink:0;
+    color:#a4f2bd;
+    font-size:.68rem;
+}
+
+.event-btn.cobrar {
+    color:#2ecc71;
+    background:rgba(46,204,113,.15);
+    border:1px solid rgba(46,204,113,.4);
+}
+
+.event-btn.cobrar:hover {
+    transform:translateY(-3px);
+    background:rgba(46,204,113,.24);
+}
+
+.event-btn.cobrada {
+    color:#78dfa0;
+    background:rgba(46,204,113,.1);
+    border:1px solid rgba(46,204,113,.2);
+    cursor:not-allowed;
+    opacity:.75;
+}
+
 /* ========== CLIENT DATA ========== */
 .event-main{
     display:flex;
@@ -604,85 +675,75 @@ body{
     .main-content{
         margin-left:260px;
         width:calc(100% - 260px);
-        padding:32px 40px 80px;
+        padding:32px 30px 80px;
     }
     
     .agenda-wrapper {
         width: 100%;
-        overflow-x: hidden; /* Adiós al scroll horizontal incómodo */
-        overflow-y: auto;
+        overflow-x: visible;
         padding-bottom: 30px;
     }
     
-    /* Cambiamos a un sistema Grid adaptativo de bloques anchos estilo ladrillo */
+    /* Grid adaptativo con minmax inteligente de 340px */
     .agenda-grid {
         display: grid !important;
-        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)) !important; /* Si hay espacio, se estiran automáticamente */
-        gap: 32px !important;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)) !important;
+        gap: 24px !important;
         width: 100% !important;
         max-width: 1600px;
     }
     
-    /* Cada bloque de barbero ahora es un contenedor "ladrillo" robusto */
     .calendar-column {
-        width: 100% !important; /* Toma todo el ancho de su celda del grid */
-        min-width: 0 !important; /* Evita que colapse */
+        width: 100% !important;
+        min-width: 0 !important;
         background: linear-gradient(180deg, #111111 0%, #070707 100%);
         border: 1px solid rgba(191,149,63,.2);
-        border-radius: 24px;
+        border-radius: 20px;
         box-shadow: 0 25px 60px rgba(0,0,0,0.6);
         display: flex;
         flex-direction: column;
         overflow: hidden;
     }
 
-    /* Cabecera del barbero más integrada */
     .calendar-barber {
-        background: rgba(18, 18, 18, 0.6) !important;
-        padding: 24px !important;
-        border-bottom: 1px solid rgba(191,149,63,0.1);
+        background: rgba(18, 18, 18, 0.8) !important;
+        padding: 18px !important;
+        border-bottom: 1px solid rgba(191,149,63,0.15);
     }
     
-    /* Cuerpo del contenedor de citas */
     .calendar-body {
         position: relative !important;
-        padding: 24px !important;
-        height: auto !important; /* Deja que crezca según las citas que tenga */
-        min-height: 400px !important;
+        padding: 16px !important;
+        height: auto !important;
+        min-height: 350px !important;
         background: transparent;
         display: flex !important;
         flex-direction: column !important;
-        gap: 16px !important; /* Espacio limpio entre bloques de citas */
+        gap: 14px !important;
     }
 
-    /* Ocultar líneas residuales */
     .hour-line {
         display: none !important;
     }
 
-    /* ========== TARJETAS ESTILO LADRILLO ANCHO MÁXIMO ========== */
+    /* Tarjetas limpias en vertical para evitar ocultamiento de datos */
     .calendar-event {
         position: relative !important;
         top: auto !important;
         left: auto !important;
         right: auto !important;
         width: 100% !important;
-        min-height: 90px !important;
+        min-height: auto !important;
         height: auto !important;
-        padding: 20px 28px !important; /* Más aire interno */
+        padding: 16px 18px !important;
         border-radius: 16px !important;
-        
-        background: linear-gradient(145deg, rgba(28, 28, 28, 0.9) 0%, rgba(14, 14, 14, 0.95) 100%) !important;
-        border: 1px solid rgba(191, 149, 63, 0.18) !important;
-        box-shadow: 0 12px 35px rgba(0,0,0,0.4) !important;
-        
-        /* Organización en formato fila espaciosa */
+        background: linear-gradient(145deg, rgba(25, 25, 25, 0.95) 0%, rgba(12, 12, 12, 0.98) 100%) !important;
+        border: 1px solid rgba(191, 149, 63, 0.2) !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4) !important;
         display: flex !important;
-        flex-direction: row !important;
-        align-items: center;
-        justify-content: space-between;
-        gap: 24px;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        flex-direction: column !important;
+        gap: 12px;
+        transition: all 0.2s ease;
     }
 
     .calendar-event::after {
@@ -697,104 +758,92 @@ body{
     }
 
     .calendar-event:hover {
-        transform: translateY(-3px) scale(1.005) !important;
+        transform: translateY(-2px) !important;
         border-color: var(--gold-light) !important;
-        box-shadow: 0 16px 40px rgba(191, 149, 63, 0.12) !important;
+        box-shadow: 0 14px 30px rgba(191, 149, 63, 0.15) !important;
     }
 
-    /* Datos principales de la cita (Izquierda) */
     .calendar-event .event-main {
         margin-bottom: 0 !important;
-        gap: 20px;
+        gap: 14px;
         flex: 1;
         min-width: 0;
     }
 
     .calendar-event .event-avatar {
-        width: 50px !important;
-        height: 50px !important;
-        border-radius: 14px !important;
-        font-size: 1.2rem !important;
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 12px !important;
+        font-size: 1.1rem !important;
         background: #161616;
         border: 1px solid rgba(191, 149, 63, 0.3);
         color: var(--gold-light);
     }
 
     .calendar-event .event-client {
-        font-size: 1.15rem !important; /* Texto claro y dominante */
+        font-size: 1rem !important;
         font-weight: 800;
         color: #ffffff;
-        margin-bottom: 6px !important;
+        margin-bottom: 4px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .calendar-event .event-service {
-        font-size: 0.68rem !important;
-        padding: 5px 12px !important;
+        font-size: 0.65rem !important;
+        padding: 4px 10px !important;
         font-weight: 700;
     }
 
-    /* Rango de Horas y Chip (Derecha) */
     .calendar-event .event-top-row {
         margin-bottom: 0 !important;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 8px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
     }
 
     .calendar-event .event-hour {
-        font-size: 1rem !important; /* Hora grande y destacada */
+        font-size: 0.9rem !important;
         font-weight: 800;
         color: var(--gold-light);
         letter-spacing: 0.5px;
     }
 
     .calendar-event .event-chip {
-        padding: 4px 10px !important;
+        padding: 4px 8px !important;
         font-size: 0.58rem !important;
-        letter-spacing: 0.5px;
     }
 
-    .calendar-event .event-phone {
-        display: none !important;
-    }
-
-    /* Botones de acción flotantes */
+    /* Botones visibles dentro del flujo sin posiciones absolutas */
     .calendar-event .event-actions {
-        position: absolute;
-        right: 110px;
-        top: 50%;
-        transform: translateY(-50%);
-        opacity: 0;
-        background: #111;
-        padding: 6px;
-        border-radius: 12px;
-        border: 1px solid rgba(191, 149, 63, 0.25);
-        transition: all 0.2s ease;
+        position: static !important;
+        transform: none !important;
+        opacity: 1 !important;
+        background: transparent !important;
+        padding: 0 !important;
+        border: none !important;
         display: flex !important;
+        justify-content: flex-end;
         gap: 8px !important;
-    }
-
-    .calendar-event:hover .event-actions {
-        opacity: 1;
-        right: 125px;
+        margin-top: 4px;
     }
 
     .calendar-event .event-btn {
-        width: 34px !important;
-        height: 34px !important;
+        width: 32px !important;
+        height: 32px !important;
         border-radius: 8px !important;
     }
 
-    /* Mensaje de Sin Citas centrado y estético */
     .empty-message {
-        padding: 80px 20px !important;
+        padding: 60px 20px !important;
     }
 
-    /* Habilitamos el selector para que funcione como Filtro Maestro en Escritorio */
     #mobileBarberSelector {
         display: block !important;
-        width: 320px !important; /* Un ancho elegante para PC */
-        margin: 0 auto 24px !important; /* Centrado debajo del mini-calendario */
+        width: 300px !important;
+        margin: 0 auto 20px !important;
     }
 }
 /* ========== TARJETA DE BLOQUE DISPONIBLE (CONTRASTE BLANCO/TRANSLÚCIDO) ========== */
@@ -848,4 +897,469 @@ body{
     background: rgba(255, 255, 255, 0.08) !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
     color: #ffffff !important;
+}
+/*=========================
+TOAST
+=========================*/
+
+.toast-agenda{
+
+    position:fixed;
+
+    left:50%;
+
+    bottom:30px;
+
+    transform:translateX(-50%) translateY(100px);
+
+    background:#111;
+
+    color:#fff;
+
+    padding:14px 22px;
+
+    border-radius:50px;
+
+    font-size:.9rem;
+
+    font-weight:600;
+
+    z-index:99999;
+
+    opacity:0;
+
+    transition:.35s;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.35);
+
+}
+
+.toast-agenda.show{
+
+    opacity:1;
+
+    transform:translateX(-50%) translateY(0);
+
+}
+
+.toast-success{
+
+    border-left:5px solid #2ecc71;
+
+}
+
+.toast-error{
+
+    border-left:5px solid #e74c3c;
+
+}
+
+.toast-warning{
+
+    border-left:5px solid #f39c12;
+
+}
+
+/* =========================================================
+   AGENDA V3 — COMPOSICIÓN PREMIUM Y CENTRADA
+   ========================================================= */
+.agenda-eyebrow {
+    display:block;
+    margin-bottom:8px;
+    color:var(--gold);
+    font-size:.66rem;
+    font-weight:800;
+    letter-spacing:.24em;
+}
+
+.agenda-title-row {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    margin-bottom:24px;
+}
+
+.agenda-header-v3 .agenda-title-row h1 {
+    margin:0;
+    color:#fff;
+    font-family:'Montserrat',sans-serif;
+    font-size:clamp(1.8rem,3vw,2.7rem);
+    line-height:1.05;
+    letter-spacing:-.045em;
+    text-align:left;
+    text-shadow:none;
+    text-transform:uppercase;
+}
+
+.agenda-title-row p {
+    margin-top:9px;
+    color:#777;
+    font-size:.78rem;
+    line-height:1.5;
+}
+
+.agenda-new-booking {
+    min-height:46px;
+    padding:0 18px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    color:#111;
+    background:linear-gradient(135deg,var(--gold-light),var(--gold));
+    border:1px solid rgba(245,212,135,.5);
+    border-radius:14px;
+    box-shadow:0 12px 30px rgba(191,149,63,.14);
+    font-size:.7rem;
+    font-weight:800;
+    text-decoration:none;
+    transition:.25s ease;
+}
+
+.agenda-new-booking:hover {
+    transform:translateY(-2px);
+    box-shadow:0 16px 36px rgba(191,149,63,.24);
+}
+
+.calendar-strip-shell {
+    padding:12px;
+    background:rgba(255,255,255,.018);
+    border:1px solid rgba(255,255,255,.055);
+    border-radius:24px;
+}
+
+.agenda-header-v3 .calendar-strip {
+    justify-content:flex-start;
+    gap:10px;
+    padding:0;
+}
+
+.agenda-header-v3 .calendar-day {
+    min-width:112px;
+    min-height:116px;
+    padding:15px 13px;
+    border-radius:18px;
+    background:#0d0d0d;
+}
+
+.agenda-header-v3 .calendar-day:hover {
+    transform:translateY(-2px);
+    background:#121212;
+}
+
+.agenda-header-v3 .calendar-day.active {
+    background:
+        radial-gradient(circle at 50% 0%,rgba(245,212,135,.13),transparent 58%),
+        linear-gradient(145deg,rgba(191,149,63,.16),#101010);
+    border-color:rgba(245,212,135,.42);
+    box-shadow:inset 0 1px rgba(255,255,255,.04),0 12px 30px rgba(0,0,0,.35);
+}
+
+.agenda-toolbar {
+    display:grid;
+    grid-template-columns:minmax(0,1.45fr) minmax(280px,.55fr);
+    align-items:stretch;
+    gap:14px;
+    margin-top:16px;
+}
+
+.agenda-toolbar .date-selector {
+    min-height:70px;
+    margin:0;
+    padding:9px;
+    border-radius:18px;
+    box-shadow:none;
+}
+
+.current-date-block {
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:5px;
+}
+
+.current-date-block small,
+.professional-selector-wrap label {
+    color:#686868;
+    font-size:.57rem;
+    font-weight:800;
+    letter-spacing:.18em;
+}
+
+.agenda-toolbar #fechaActual {
+    font-size:.84rem;
+    letter-spacing:.04em;
+}
+
+.agenda-toolbar .date-btn {
+    width:48px;
+    height:48px;
+    flex:0 0 48px;
+    display:grid;
+    place-items:center;
+    color:var(--gold-light);
+    background:rgba(191,149,63,.08);
+    border:1px solid rgba(191,149,63,.18);
+    border-radius:13px;
+    cursor:pointer;
+    transition:.22s ease;
+}
+
+.agenda-toolbar .date-btn:hover {
+    color:#111;
+    background:var(--gold-light);
+    transform:scale(1.04);
+}
+
+.professional-selector-wrap {
+    position:relative;
+    min-width:0;
+    padding:10px 14px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:7px;
+    background:linear-gradient(145deg,#151515,#0b0b0b);
+    border:1px solid rgba(191,149,63,.22);
+    border-radius:18px;
+}
+
+.professional-selector-wrap label i {
+    margin-right:6px;
+    color:var(--gold);
+}
+
+.agenda-toolbar #mobileBarberSelector {
+    width:100% !important;
+    margin:0 !important;
+    padding:0 28px 0 0;
+    color:#fff;
+    background-color:transparent;
+    border:0;
+    border-radius:0;
+    font-size:.78rem;
+    letter-spacing:.08em;
+}
+
+.calendar-column {
+    border-radius:24px !important;
+    border-color:rgba(191,149,63,.22) !important;
+    box-shadow:0 30px 80px rgba(0,0,0,.42) !important;
+}
+
+.calendar-barber {
+    padding:22px !important;
+    background:
+        radial-gradient(circle at 50% 0%,rgba(191,149,63,.09),transparent 56%),
+        #101010 !important;
+}
+
+.barber-photo {
+    width:92px;
+    height:92px;
+    box-shadow:0 0 0 5px rgba(191,149,63,.08),0 16px 35px rgba(0,0,0,.55);
+}
+
+.calendar-event {
+    border-radius:18px !important;
+}
+
+.calendar-event .event-actions {
+    padding-top:11px !important;
+    border-top:1px solid rgba(255,255,255,.055) !important;
+}
+
+.calendar-event .event-btn {
+    width:38px !important;
+    height:38px !important;
+    border-radius:11px !important;
+    font-size:.82rem;
+    box-shadow:inset 0 1px rgba(255,255,255,.04);
+}
+
+.event-btn.edit {
+    color:#e5c56f;
+    background:rgba(191,149,63,.1);
+    border:1px solid rgba(191,149,63,.25);
+}
+
+.event-btn.edit:hover,
+.event-btn.cobrar:hover,
+.event-btn.whatsapp:hover,
+.event-btn.call:hover,
+.event-btn.cancel:hover {
+    transform:translateY(-2px) scale(1.04) !important;
+    filter:brightness(1.16);
+}
+
+@media(min-width:901px) {
+    body > .main-content {
+        width:auto !important;
+        min-width:0;
+        margin-left:0 !important;
+        padding:42px clamp(28px,4vw,72px) 90px !important;
+        align-items:center;
+    }
+
+    .agenda-header-v3,
+    .agenda-wrapper {
+        width:min(100%,1280px) !important;
+        max-width:1280px !important;
+        margin-left:auto;
+        margin-right:auto;
+    }
+
+    .agenda-grid {
+        width:100% !important;
+        max-width:1280px !important;
+        margin:0 auto;
+    }
+}
+
+@media(max-width:900px) {
+    .agenda-title-row {
+        align-items:flex-start;
+        margin-bottom:17px;
+    }
+
+    .agenda-header-v3 .agenda-title-row h1 {
+        font-size:1.55rem;
+    }
+
+    .agenda-title-row p { display:none; }
+
+    .agenda-new-booking {
+        width:44px;
+        min-width:44px;
+        height:44px;
+        padding:0;
+        border-radius:13px;
+    }
+
+    .agenda-new-booking span { display:none; }
+
+    .calendar-strip-shell {
+        margin-left:-10px;
+        margin-right:-10px;
+        padding:10px;
+        border-left:0;
+        border-right:0;
+        border-radius:0;
+    }
+
+    .agenda-header-v3 .calendar-day {
+        min-width:78px;
+        min-height:98px;
+        border-radius:16px;
+    }
+
+    .agenda-toolbar {
+        grid-template-columns:1fr;
+        gap:10px;
+        margin-top:12px;
+    }
+
+    .agenda-toolbar .date-selector { min-height:64px; }
+    .agenda-toolbar .date-btn { width:44px; height:44px; flex-basis:44px; }
+    .professional-selector-wrap { min-height:64px; }
+    .agenda-toolbar #mobileBarberSelector { display:block !important; }
+}
+
+@media(max-width:480px) {
+    .agenda-toolbar #fechaActual { font-size:.72rem; }
+    .current-date-block small { font-size:.5rem; }
+    .calendar-event .event-actions { justify-content:space-between !important; }
+    .calendar-event .event-btn { width:40px !important; height:40px !important; }
+}
+
+@media(max-width:350px) {
+    body > .main-content { padding-left:9px !important; padding-right:9px !important; }
+    .agenda-title-row { gap:10px; }
+    .agenda-header-v3 .agenda-title-row h1 { font-size:1.38rem; }
+    .agenda-toolbar .date-selector { padding:7px; }
+    .agenda-toolbar .date-btn { width:40px; height:40px; flex-basis:40px; }
+    .agenda-toolbar #fechaActual { font-size:.65rem; }
+    .calendar-event { padding:14px !important; }
+}
+
+/* Formularios y decisiones con el mismo lenguaje visual */
+.modal-content {
+    padding:28px;
+    border-radius:24px;
+    background:
+        radial-gradient(circle at 100% 0%,rgba(191,149,63,.1),transparent 35%),
+        linear-gradient(145deg,#171717,#0a0a0a);
+    box-shadow:0 30px 90px rgba(0,0,0,.8);
+}
+
+.modal-content input,
+.modal-content select,
+#res_servicio,
+#agendaEditNombre,
+#agendaEditTel {
+    min-height:50px;
+    padding:0 15px !important;
+    color:#fff !important;
+    background:#101010 !important;
+    border:1px solid rgba(255,255,255,.09) !important;
+    border-radius:14px !important;
+    outline:none;
+    transition:.2s ease;
+}
+
+.modal-content input:focus,
+.modal-content select:focus {
+    border-color:rgba(245,212,135,.52) !important;
+    box-shadow:0 0 0 3px rgba(191,149,63,.08);
+}
+
+.btn-gold,
+#btnGuardarAgendaEdit {
+    min-height:50px;
+    border-radius:14px !important;
+    letter-spacing:.04em;
+    box-shadow:0 12px 28px rgba(191,149,63,.14);
+    transition:.22s ease;
+}
+
+.btn-gold:hover,
+#btnGuardarAgendaEdit:hover {
+    transform:translateY(-2px);
+    box-shadow:0 16px 34px rgba(191,149,63,.24);
+}
+
+#btnCerrarWhatsapp,
+#btnCancelarNo,
+#btnCancelarSi {
+    min-height:46px;
+    border-radius:13px !important;
+    font-weight:800;
+    letter-spacing:.05em;
+}
+
+#btnCerrarWhatsapp,
+#btnCancelarNo {
+    color:#aaa !important;
+    background:#151515 !important;
+    border:1px solid rgba(255,255,255,.09) !important;
+}
+
+#btnCancelarSi {
+    color:#ff9a9a !important;
+    background:rgba(255,77,77,.1) !important;
+    border:1px solid rgba(255,77,77,.28) !important;
+}
+
+.close-modal {
+    width:38px;
+    height:38px;
+    display:grid;
+    place-items:center;
+    color:#999;
+    background:#1c1c1c;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:12px;
+    line-height:1;
 }

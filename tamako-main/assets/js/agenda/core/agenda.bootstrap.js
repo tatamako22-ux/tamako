@@ -1,6 +1,6 @@
 import { supabase } from "../../config/supabaseClient.js";
 
-import { getTiendaInfo } from "../../core/session.js";
+import { requireTiendaInfo } from "../../core/session.js";
 
 import { calcularCita } from "./agenda.engine.js";
 
@@ -9,14 +9,14 @@ import { renderSkeleton, renderizarAgenda } from "../ui/agenda.renderer.js";
 import { iniciarAgenda } from "./agenda.controller.js";
 
 // 🚀 BOOTSTRAP APP
-export function iniciarAppAgenda() {
+export async function iniciarAppAgenda() {
   // 🔐 VALIDAR SESIÓN
-  const tiendaInfo = getTiendaInfo();
+  const tiendaInfo = await requireTiendaInfo();
 
   console.log("🏪 TIENDA:", tiendaInfo);
 
   if (!tiendaInfo) {
-    throw new Error("❌ Sesión no válida");
+    return;
   }
 
   console.log("🚀 Tamaku Engine iniciado para:", tiendaInfo.nombre_tienda);

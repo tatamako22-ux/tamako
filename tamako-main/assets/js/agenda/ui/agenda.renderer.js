@@ -66,7 +66,7 @@ function crearHeaderBarbero(barbero) {
       <img
         src="${
           barbero.foto_url ||
-          "https://ui-avatars.com/api/?name=Barber&background=111111&color=bf953f&size=256"
+          "https://ui-avatars.com/api/?name=Profesional&background=111111&color=bf953f&size=256"
         }"
         class="barber-photo"
         alt="${barbero.nombre_empleado || "Profesional"}"
@@ -75,7 +75,7 @@ function crearHeaderBarbero(barbero) {
         <div class="barber-name">
           ${barbero.nombre_empleado || "PROFESIONAL"}
         </div>
-        <div class="barber-role">BARBER PRO</div>
+        <div class="barber-role">PROFESIONAL</div>
       </div>
     </div>
   `;
@@ -88,10 +88,14 @@ function crearTarjetaCita(cita, esMovil = false) {
 
   // Si no tiene id_cita significa que es un bloque disponible generado sintéticamente
   const esDisponible = !cita.id_cita;
+  const factura = Array.isArray(cita.facturas)
+    ? cita.facturas[0]
+    : cita.facturas;
+  const esFacturada = Boolean(factura?.id_factura);
 
   evento.className = esDisponible
     ? "calendar-event disponible"
-    : "calendar-event";
+    : `calendar-event${esFacturada ? " facturada" : ""}`;
 
   if (esMovil) {
     evento.style.position = "relative";
@@ -109,12 +113,17 @@ function crearTarjetaCita(cita, esMovil = false) {
       `abrirModalReserva('${cita.id_barbero}', '${cita.hora_inicio}', '${cita.hora_fin}')`,
     );
   }
-
-  const telefono = cita.telefono
-    ? String(cita.telefono).replace(/\D/g, "")
+  console.log("CITA RENDER:", cita);
+  console.log("telefono:", cita.telefono);
+  console.log("telefono_cliente:", cita.telefono_cliente);
+  const telefono = cita.telefono_cliente
+    ? String(cita.telefono_cliente).replace(/\D/g, "")
     : "";
   const telefonoWhatsApp = telefono ? `57${telefono}` : "";
   const telefonoLlamar = telefono ? `tel:${telefono}` : "#";
+  console.log("📞 telefono:", telefono);
+  console.log("📱 whatsapp:", telefonoWhatsApp);
+  console.log("☎️ llamar:", telefonoLlamar);
 
   // Renderizado condicional según el estado del bloque
   evento.innerHTML = `
@@ -126,7 +135,9 @@ function crearTarjetaCita(cita, esMovil = false) {
       ${
         esDisponible
           ? `<div class="event-chip chip-libre">Disponible</div>`
-          : `<div class="event-chip">Confirmada</div>`
+          : esFacturada
+            ? `<div class="event-chip chip-facturada"><i class="fa-solid fa-circle-check"></i> Facturada</div>`
+            : `<div class="event-chip">Confirmada</div>`
       }
     </div>
     <div class="event-main">
@@ -146,16 +157,47 @@ function crearTarjetaCita(cita, esMovil = false) {
 </div>
       </div>
     </div>
-    ${esDisponible ? "" : `<div class="event-phone">${cita.telefono || "Sin teléfono"}</div>`}
+    ${
+      esFacturada
+        ? `<div class="event-invoice-status">
+            <span><i class="fa-solid fa-receipt"></i> ${factura.metodo_pago || "Pagada"}</span>
+            <strong>${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 }).format(Number(factura.total) || 0)}</strong>
+          </div>`
+        : ""
+    }
+    ${esDisponible ? "" : `<div class="event-phone">${cita.telefono_cliente || "Sin teléfono"}</div>`}
     
     ${
       esDisponible
         ? ""
         : `
     <div class="event-actions">
-      <button class="event-btn whatsapp" onclick="event.stopPropagation(); ${telefonoWhatsApp ? `window.open('https://wa.me/${telefonoWhatsApp}', '_blank')` : "alert('No hay número')"}" title="WhatsApp">WA</button>
-      <button class="event-btn call" onclick="event.stopPropagation(); ${telefonoLlamar !== "#" ? `window.location.href='${telefonoLlamar}'` : "alert('No hay número')"}" title="Llamar">📞</button>
-      <button class="event-btn cancel" onclick="event.stopPropagation(); confirmarCancelacion('${cita.id_cita}')" title="Cancelar">✕</button>
+      ${
+        esFacturada
+          ? `<button type="button" class="event-btn cobrada" title="Esta cita ya fue facturada" disabled>
+              <i class="fa-solid fa-receipt"></i>
+            </button>`
+          : `<button type="button" class="event-btn cobrar"
+              onclick="event.stopPropagation(); window.abrirFacturacionDesdeCita(${JSON.stringify(cita).replace(/"/g, "&quot;")})"
+              title="Finalizar y cobrar">
+              <i class="fa-solid fa-money-bill-wave"></i>
+            </button>`
+      }
+
+      <button type="button" class="event-btn edit"
+onclick="event.stopPropagation(); window.abrirModalEditarAgenda('${cita.id_cita || cita.id || ""}', '${(cita.nombre_cliente || "").replace(/'/g, "\\'")}', '${cita.telefono_cliente || cita.telefono || ""}')"
+title="Editar Cliente"
+style="background: rgba(191,149,63,0.15); border: 1px solid rgba(191,149,63,0.4); color: var(--gold-light); cursor: pointer;">
+<i class="fa-solid fa-pen"></i>
+</button>
+      <button class="event-btn whatsapp"
+onclick="event.stopPropagation(); abrirWhatsappCita(${JSON.stringify(cita).replace(/"/g, "&quot;")})"
+title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
+      ${
+        esFacturada
+          ? ""
+          : `<button class="event-btn cancel" onclick="event.stopPropagation(); confirmarCancelacion('${cita.id_cita}')" title="Cancelar"><i class="fa-solid fa-xmark"></i></button>`
+      }
     </div>
     `
     }
@@ -507,3 +549,37 @@ export function renderizarMiniCalendario(
     container.appendChild(diaDiv);
   }
 }
+window.abrirWhatsappCita = function (cita) {
+  const telefono = cita.telefono_cliente
+    ? String(cita.telefono_cliente).replace(/\D/g, "")
+    : "";
+
+  if (!telefono) {
+    alert("No hay número de teléfono");
+    return;
+  }
+
+  const tienda = window.TIENDA_ACTUAL?.nombre || "kleos";
+
+  const mensaje = `Buen día 👋
+Te escribimos desde *${tienda}* para confirmar tu cita.
+
+📅 Hora: ${cita.hora_inicio} - ${cita.hora_fin}
+
+
+¡Te esperamos ${cita.nombre_cliente || ""}! 💈`;
+
+  const url = `https://wa.me/57${telefono}?text=${encodeURIComponent(mensaje)}`;
+
+  window.open(url, "_blank");
+};
+// 💰 ABRIR FACTURACIÓN DESDE LA AGENDA
+window.abrirFacturacionDesdeCita = function (cita) {
+  console.log("Llevando cita a facturación:", cita);
+
+  // Guardamos la cita en la memoria temporal del navegador
+  localStorage.setItem("facturar_cita", JSON.stringify(cita));
+
+  // Redireccionamos a la pantalla de facturación
+  window.location.href = "facturacion.html"; // Ajusta la ruta si es necesario (ej. "../pages/facturacion.html")
+};

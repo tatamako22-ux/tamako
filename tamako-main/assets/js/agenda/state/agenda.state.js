@@ -18,6 +18,8 @@ export const agendaState = {
 
   // 👤 Profesional seleccionado móvil
   barberoActivo: null,
+  // 📱 Datos para enviar WhatsApp
+  whatsappReserva: null,
 };
 
 // 🔄 ACTUALIZAR STATE

@@ -7,10 +7,15 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/reserva.css">
+    <link rel="stylesheet" href="../assets/css/reserva.css?v=3">
+    <!-- Conexión PWA -->
+    <link rel="manifest" href="../manifest.json">
+    <link rel="stylesheet" href="../assets/css/pwa.css">
     
+<link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<script src="../assets/js/core/notifications.js?v=1" defer></script>
 </head>
-<body>
+<body class="dark-mode">
 
     <div id="splash">
         <div class="splash-logo">TAMAKÚ</div>
@@ -20,20 +25,41 @@
         <header>
             <div class="top-nav">
                 <a href="https://wa.me/573145038202" target="_blank" class="btn-nm" style="text-decoration: none; color: #25d366;"><i class="fa-brands fa-whatsapp"></i></a>
-                <button class="btn-nm" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
+                <button class="btn-nm" onclick="toggleTheme()" aria-label="Cambiar tema blanco o negro" title="Cambiar tema"><i class="fa-solid fa-circle-half-stroke"></i></button>
                 <button class="btn-auth" id="btn-auth-status" onclick="toggleAuthModal(true)">Mi Cuenta</button>
                 <button class="btn-auth" id="btn-mis-citas" style="display:none;" onclick="toggleCitasModal(true)">Mis Citas</button>
                 <button class="btn-nm" id="btn-logout" style="display:none;" onclick="handleLogout()"><i class="fa-solid fa-power-off"></i></button>
             </div>
             <div class="header-card">
-                <span class="exp-label">EXPERIENCIA ÉLITE</span>
-                <h1 class="shop-name" id="shop-display">KLEOS</h1>
-                <div id="welcome-user" style="display:none; margin-top: 15px; animation: slideUp 0.8s ease;">
-                    <p style="font-size: 0.65rem; letter-spacing: 3px; opacity: 0.8; margin-bottom: 5px;">BIENVENIDO</p>
-                    <p id="user-name-display" style="font-family: 'Cinzel'; color: var(--gold); font-size: 1.1rem; font-weight: 700; letter-spacing: 2px; text-shadow: 0 0 10px rgba(191,149,63,0.3);"></p>
+                <div class="brand-logo-shell">
+                    <img id="booking-shop-logo" alt="Logo de la tienda" hidden>
+                    <span id="booking-logo-placeholder">T</span>
+                </div>
+                <div class="brand-copy">
+                    <span class="exp-label">RESERVA TU EXPERIENCIA</span>
+                    <h1 class="shop-name" id="shop-display">KLEOS</h1>
+                    <p class="shop-location" id="shop-location"><i class="fa-solid fa-location-dot"></i> Agenda online</p>
+                </div>
+                <div class="brand-promise">
+                    <i class="fa-regular fa-calendar-check"></i>
+                    <div><strong>Reserva inmediata</strong><span>Elige profesional, servicio y horario.</span></div>
+                </div>
+                <div id="welcome-user" style="display:none;">
+                    <p>BIENVENIDO</p>
+                    <strong id="user-name-display"></strong>
                 </div>
             </div>
         </header>
+
+        <nav class="booking-progress" aria-label="Progreso de la reserva">
+            <div class="progress-item active" data-progress="1"><span>1</span><small>Profesional</small></div>
+            <div class="progress-line"></div>
+            <div class="progress-item" data-progress="2"><span>2</span><small>Servicio</small></div>
+            <div class="progress-line"></div>
+            <div class="progress-item" data-progress="3"><span>3</span><small>Horario</small></div>
+            <div class="progress-line"></div>
+            <div class="progress-item" data-progress="4"><span>4</span><small>Confirmar</small></div>
+        </nav>
 
         <main class="content">
             <section id="step-1" class="step-view active">
@@ -69,8 +95,8 @@
                 <div class="section-tag">04 / ÚNETE AL CLUB ÉLITE</div>
 
                 <div class="vip-info-card">
-                    <p style="margin-bottom: 10px; font-size: 0.9rem; font-weight: 800; letter-spacing: 1px;">¿DESEAS ELEVAR TU EXPERIENCIA?</p>
-                    <p style="font-weight: 400; opacity: 0.9;">Si continúas sin clave, tu reserva será como <b>Invitado</b>. Sin embargo, al crear tu llave VIP, aseguras tu lugar en nuestro Club: no volverás a llenar formularios y desbloquearás acceso exclusivo a servicios Premium y beneficios de fidelidad.</p>
+                    <p style="margin-bottom: 10px; font-size: 0.9rem; font-weight: 800; letter-spacing: 1px;">CREA TU PERFIL VIP</p>
+                    <p style="font-weight: 400; opacity: 0.9;">Para asegurar tu reserva, por favor crea tu Llave Élite. Esto te dará acceso a nuestro Club: no volverás a llenar formularios en el futuro y desbloquearás acceso exclusivo a beneficios.</p>
                 </div>
                     <div class="field-3d">
                     <label>Nombre Completo</label>
@@ -87,8 +113,9 @@
                     </div>
                     
                     <div class="field-3d">
-                    <label>CREAR LLAVE ÉLITE (OPCIONAL)</label>
-                    <input type="password" id="res-password-step4" placeholder="Crea una clave para no repetir datos">
+                    <!-- SE CAMBIÓ LA ETIQUETA PARA QUE SEA OBLIGATORIO -->
+                    <label>CREAR LLAVE ÉLITE (MÍN. 6 CARACTERES)</label>
+                    <input type="password" id="res-password-step4" placeholder="Crea tu clave de acceso" required>
                     <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('res-password-step4', this)"></i>
                 </div>
                 </section>
@@ -110,16 +137,42 @@
                 <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('auth-pass', this)"></i>
             </div>
             <button class="btn-main" onclick="executeAuth()">INGRESAR</button>
+            
+            <!-- NUEVO: Botón de recuperar contraseña -->
+            <p onclick="recuperarClave()" style="text-align:center; margin-top:20px; cursor:pointer; font-size: 0.75rem; font-weight:600; color:var(--gold); text-decoration: underline; letter-spacing: 1px;">¿Olvidaste tu Llave VIP?</p>
         </div>
 
         <div id="auth-profile-view" style="display:none; text-align:center;">
             <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom:10px;">MI PERFIL ÉLITE</h2>
             <p style="font-size:0.7rem; letter-spacing:3px; opacity:0.6; margin-bottom:30px;">MIEMBRO EXCLUSIVO</p>
             
-            <div class="field-3d" style="text-align:left;"><label>Identidad</label><p id="profile-name-text" style="font-weight:700; color:var(--text);"></p></div>
-            <div class="field-3d" style="text-align:left;"><label>WhatsApp</label><p id="profile-phone-text" style="font-weight:700; color:var(--text);"></p></div>
+            <div class="field-3d" style="text-align:left;">
+                <label>EMAIL (NO EDITABLE)</label>
+                <input type="email" id="profile-email-input" readonly style="opacity: 0.7; cursor: not-allowed; background: rgba(0,0,0,0.2);">
+            </div>
+            <div class="field-3d" style="text-align:left;">
+                <label>IDENTIDAD (NOMBRE)</label>
+                <input type="text" id="profile-name-input" placeholder="Tu nombre" oninput="this.value = this.value.toUpperCase()">
+            </div>
+            <div class="field-3d" style="text-align:left;">
+                <label>WHATSAPP</label>
+                <input type="tel" id="profile-phone-input" placeholder="Ej: 3001234567" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
             
-            <button class="btn-main" style="border-color:#ff4d4d; color:#ff4d4d;" onclick="handleLogout()">CERRAR SESIÓN</button>
+            <button class="btn-main" onclick="actualizarPerfil()" style="margin-bottom: 15px;">GUARDAR CAMBIOS</button>
+            <button class="btn-main" style="border-color:#ff4d4d; color:#ff4d4d; background: transparent;" onclick="handleLogout()">CERRAR SESIÓN</button>
+        </div>
+
+        <!-- NUEVO: Vista para ingresar la nueva contraseña -->
+        <div id="auth-update-pass-view" style="display:none; text-align:center;">
+            <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom:10px;">NUEVA LLAVE ÉLITE</h2>
+            <p style="font-size:0.8rem; margin-bottom:20px; opacity: 0.8;">Crea tu nueva llave de acceso.</p>
+            <div class="field-3d">
+                <label>NUEVA LLAVE VIP</label>
+                <input type="password" id="auth-new-pass">
+                <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('auth-new-pass', this)"></i>
+            </div>
+            <button class="btn-main" onclick="guardarNuevaClave()">GUARDAR LLAVE</button>
         </div>
 
         <p onclick="toggleAuthModal(false)" style="text-align:center; margin-top:40px; cursor:pointer; font-weight:800; opacity:0.5;">REGRESAR</p>
@@ -193,19 +246,53 @@
 
     // --- FUNCIONES DE ALERTA ---
     window.showAlert = (msg) => {
-        const modal = document.getElementById("custom-alert");
-        document.getElementById("alert-message").innerText = msg;
-        modal.style.display = "flex";
+        TamakuUI.notify(msg, /error|no se pudo|inválid/i.test(msg) ? "error" : "info");
     };
     window.closeAlert = () => {
-        document.getElementById("custom-alert").style.display = "none";
+        document.getElementById("custom-alert")?.style.setProperty("display", "none");
     };
 
     // --- GENERAR HORARIOS ---
     async function generarHorariosDisponibles() {
-        const fechaInput = document.getElementById("res-date").value;
         const grid = document.getElementById("horas-grid");
+        const fechaInput = document.getElementById("res-date").value;
+
         if (!fechaInput || !barberId) return;
+
+        if (user) {
+            console.log("🔍 Verificando bloqueos para el usuario:", user.email);
+            console.log("📱 Teléfono registrado en su perfil (el que usaremos para buscar):", window.userWhatsApp);
+            const { data: bloqueos, error: errBloqueo } = await supabase
+                .from("clientes_bloqueados")
+                .select("tipo_bloqueo, id_barbero")
+                .eq("id_tienda", tiendaId)
+                .eq("telefono_cliente", window.userWhatsApp);
+
+            console.log("🛑 Resultado de bloqueos en Supabase:", bloqueos);
+            if (errBloqueo) console.error("❌ Error consultando bloqueos:", errBloqueo);
+
+            if (bloqueos && bloqueos.length > 0) {
+                let estaBloqueado = false;
+                bloqueos.forEach(b => {
+                    // Validamos si es global o total
+                    if (b.tipo_bloqueo === "global" || b.tipo_bloqueo === "total") estaBloqueado = true;
+                    
+                    // Validamos si es profesional o parcial, y que sea el mismo barbero
+                    if ((b.tipo_bloqueo === "profesional" || b.tipo_bloqueo === "parcial") && b.id_barbero == barberId) estaBloqueado = true;
+                });
+
+                if (estaBloqueado) {
+                    console.log("⛔ EL CLIENTE ESTÁ BLOQUEADO. Mostrando 'SIN TURNOS'.");
+                    grid.innerHTML = `<div class="no-schedule-msg"><i class="fa-solid fa-clock"></i><p>SIN TURNOS DISPONIBLES</p></div>`;
+                    return; // Cortamos la función aquí
+                } else {
+                    console.log("✅ El cliente tiene un bloqueo, pero no le afecta para este barbero.");
+                }
+            } else {
+                console.log("✅ No se encontraron bloqueos para este teléfono.");
+            }
+        }
+        // ------------------------------------------------
 
         const ahora = new Date();
         const hoyLocal = ahora.toLocaleDateString('en-CA');
@@ -226,7 +313,10 @@
         }
 
         const [citasRes, proRes] = await Promise.all([
-            supabase.from("citas").select("hora_inicio, hora_fin").eq("id_barbero", barberId).eq("fecha", fechaInput).neq("estado", "CANCELADA"),
+            supabase.rpc("obtener_horarios_ocupados", {
+                p_id_barbero: barberId,
+                p_fecha: fechaInput
+            }),
             supabase.from("profesionales").select("*").eq("id_barbero", barberId).single()
         ]);
 
@@ -270,7 +360,7 @@
             const horaFinMin = currentMin + duracionReal;
             if (horaFinMin > finJornadaMin) break;
 
-            if (esHoy && currentMin <= horaActualEnMinutos + 15) {
+            if (esHoy && currentMin < horaActualEnMinutos) {
                 currentMin += intervalo;
                 continue;
             }
@@ -327,7 +417,7 @@
                         loadServices(p.id_barbero);
                     };
                     div.innerHTML = `
-                        <img src="${p.foto_url}" class="pro-img">
+                        ${p.foto_url ? `<img src="${p.foto_url}" class="pro-img" alt="${p.nombre_empleado || 'Profesional'}">` : `<div class="pro-img pro-img-placeholder"><i class="fa-solid fa-user"></i></div>`}
                         <div class="pro-name">${p.nombre_empleado}</div>
                     `;
                     container.appendChild(div);
@@ -454,12 +544,6 @@ if (!p) {
         // Mostrar botón Mis Citas
         const btnCitas = document.getElementById("btn-mis-citas");
         if (btnCitas) btnCitas.style.display = "inline-block";
-
-        // Si el modal de perfil está abierto, actualizar los datos
-        if (document.getElementById("auth-profile-view").style.display !== "none") {
-            document.getElementById("profile-name-text").innerText = perfil.nombre_completo.toUpperCase();
-            document.getElementById("profile-phone-text").innerText = perfil.whatsapp || "No registrado";
-        }
     }
 
     // --- INICIALIZACIÓN ---
@@ -499,15 +583,39 @@ if (!p) {
             tiendaData = tienda;
             tiendaId = tienda.id;
             document.getElementById("shop-display").innerText = tienda.nombre.toUpperCase();
+            document.getElementById("shop-location").innerHTML = `<i class="fa-solid fa-location-dot"></i> ${tienda.direccion || "Reserva online"}`;
+
+            const logoReserva = document.getElementById("booking-shop-logo");
+            const logoPlaceholder = document.getElementById("booking-logo-placeholder");
+            if (tienda.logo_url && logoReserva) {
+                logoReserva.src = tienda.logo_url;
+                logoReserva.hidden = false;
+                if (logoPlaceholder) logoPlaceholder.hidden = true;
+                logoReserva.onerror = () => {
+                    logoReserva.hidden = true;
+                    if (logoPlaceholder) {
+                        logoPlaceholder.hidden = false;
+                        logoPlaceholder.textContent = (tienda.nombre || "T").trim().charAt(0).toUpperCase();
+                    }
+                };
+            } else if (logoPlaceholder) {
+                logoPlaceholder.textContent = (tienda.nombre || "T").trim().charAt(0).toUpperCase();
+            }
 
             await loadBarbers();
 
-            const hoy = new Date().toISOString().split('T')[0];
-            const resDate = document.getElementById("res-date");
-            if (resDate) {
-                resDate.setAttribute('min', hoy);
-                resDate.value = hoy;
-            }
+            const ahora = new Date();
+
+const hoy = ahora.toLocaleDateString('en-CA', {
+    timeZone: 'America/Bogota'
+});
+
+const resDate = document.getElementById("res-date");
+
+if (resDate) {
+    resDate.setAttribute('min', hoy);
+    resDate.value = hoy;
+}
 
         } catch (e) {
             console.error("Error en init:", e);
@@ -526,6 +634,14 @@ if (!p) {
     // --- FLUJO DE RESERVA ---
     window.changeStep = (s) => {
         document.querySelectorAll('.step-view').forEach((v, i) => v.classList.toggle('active', i + 1 === s));
+        document.querySelectorAll('.progress-item').forEach((item) => {
+            const paso = Number(item.dataset.progress);
+            item.classList.toggle('active', paso === s);
+            item.classList.toggle('completed', paso < s);
+        });
+        document.querySelectorAll('.progress-line').forEach((line, index) => {
+            line.classList.toggle('completed', index + 1 < s);
+        });
         currentStep = s;
         const btn = document.getElementById("btn-next");
         if (s === 3) {
@@ -596,6 +712,7 @@ if (!p) {
             finalName = window.userFullName;
             finalPhone = window.userWhatsApp || "";
             finalEmail = user.email;
+            console.log("Nombre que se enviará al correo:", finalName);
             if (!finalName || !finalPhone || !finalEmail) {
                 showAlert("⚠️ Tu perfil está incompleto. Actualiza tus datos en 'Mi Cuenta'.");
                 btn.disabled = false;
@@ -608,8 +725,9 @@ if (!p) {
             const email = document.getElementById("res-email")?.value.trim() || "";
             const pass = document.getElementById("res-password-step4")?.value || "";
 
-            if (name === "" || phone === "" || email === "") {
-                showAlert("⚠️ TODOS LOS CAMPOS SON OBLIGATORIOS: Nombre, WhatsApp y Email");
+            // 1. VALIDAMOS QUE LA CLAVE NO ESTÉ VACÍA
+            if (name === "" || phone === "" || email === "" || pass === "") {
+                showAlert("⚠️ TODOS LOS CAMPOS SON OBLIGATORIOS: Nombre, WhatsApp, Email y tu Llave Élite (Clave).");
                 btn.disabled = false;
                 btn.innerText = "Finalizar y Unirme";
                 return;
@@ -622,6 +740,13 @@ if (!p) {
             }
             if (!email.includes('@') || !email.includes('.')) {
                 showAlert("⚠️ Ingresa un email válido.");
+                btn.disabled = false;
+                btn.innerText = "Finalizar y Unirme";
+                return;
+            }
+            // 2. VALIDAMOS QUE LA CLAVE TENGA MÍNIMO 6 CARACTERES
+            if (pass.length < 6) {
+                showAlert("⚠️ Tu Llave Élite debe tener al menos 6 caracteres.");
                 btn.disabled = false;
                 btn.innerText = "Finalizar y Unirme";
                 return;
@@ -641,35 +766,38 @@ if (!p) {
                 .maybeSingle();
 
             if (emailExiste && (!user || user.email !== email)) {
-                showAlert("⚠️ Este email ya está registrado. Inicia sesión con tu cuenta.");
+                showAlert("⚠️ Este email ya está registrado. Por favor, inicia sesión en 'Mi Cuenta'.");
                 btn.disabled = false;
                 btn.innerText = "Finalizar y Unirme";
                 return;
             }
             if (whatsappExiste && (!user || window.userWhatsApp !== phone)) {
-                showAlert("⚠️ Este número de WhatsApp ya está registrado. Inicia sesión con tu cuenta.");
+                showAlert("⚠️ Este número de WhatsApp ya está registrado. Por favor, inicia sesión en 'Mi Cuenta'.");
                 btn.disabled = false;
                 btn.innerText = "Finalizar y Unirme";
                 return;
             }
 
+            // 3. COMO LA CLAVE ES OBLIGATORIA, SIEMPRE REGISTRAMOS
             if (emailExiste || whatsappExiste) {
                 const usuarioExistente = emailExiste || whatsappExiste;
                 finalId = usuarioExistente.id;
                 finalName = usuarioExistente.nombre_completo || name;
                 finalPhone = usuarioExistente.whatsapp;
                 finalEmail = usuarioExistente.correo;
-            } else if (pass.length >= 6) {
+            } else {
                 const { data: authData, error: authError } = await supabase.auth.signUp({
                     email: email,
                     password: pass
                 });
+                
                 if (authError) {
                     showAlert("❌ Error de Registro: " + authError.message);
                     btn.disabled = false;
                     btn.innerText = "Finalizar y Unirme";
                     return;
                 }
+                
                 if (authData?.user) {
                     finalId = authData.user.id;
                     const { error: profileError } = await supabase
@@ -681,28 +809,49 @@ if (!p) {
                             correo: email,
                             fecha_registro: new Date().toISOString()
                         }]);
+                        
                     if (profileError) console.error("Error al crear perfil:", profileError.message);
+                    
                     finalName = name;
                     finalPhone = phone;
                     finalEmail = email;
-                    showAlert("✅ ¡Bienvenido al Club Élite!");
+                    showAlert("✅ ¡Bienvenido al Club Élite! Tu perfil ha sido creado.");
                 }
-            } else {
-                finalId = null;
-                finalName = name;
-                finalPhone = phone;
-                finalEmail = email;
             }
         }
+        // --- VERIFICACIÓN DE USUARIO BLOQUEADO (EXCUSA DE TURNOS) ---
+        btn.innerText = "VERIFICANDO DISPONIBILIDAD...";
+        
+        const { data: bloqueos } = await supabase
+            .from("clientes_bloqueados")
+            .select("tipo_bloqueo, id_barbero")
+            .eq("id_tienda", tiendaId)
+            .eq("telefono_cliente", finalPhone);
 
+        if (bloqueos && bloqueos.length > 0) {
+            let estaBloqueado = false;
+
+            bloqueos.forEach(b => {
+                // Si está bloqueado de toda la tienda, o específicamente de este barbero
+                if (b.tipo_bloqueo === "global") estaBloqueado = true;
+                if (b.tipo_bloqueo === "profesional" && b.id_barbero === barberId) estaBloqueado = true;
+            });
+
+            if (estaBloqueado) {
+                btn.disabled = false;
+                btn.innerText = user ? "Confirmar Reserva" : "Finalizar y Unirme";
+                showAlert("⚠️ Lo sentimos, el profesional ya no tiene turnos disponibles en este horario. Por favor, intenta con otro profesional u otro horario.");
+                return; // Detiene la reserva silenciosamente
+            }
+        }
+        // ----------------------------------------------------------------
         // Verificar conflicto de horario
         const duracionServicioFinal = window.duracionServicio || 30;
         const { data: citasExistentes } = await supabase
-            .from("citas")
-            .select("id, hora_inicio, hora_fin")
-            .eq("id_barbero", barberId)
-            .eq("fecha", date)
-            .neq("estado", "CANCELADA");
+            .rpc("obtener_horarios_ocupados", {
+                p_id_barbero: barberId,
+                p_fecha: date
+            });
 
         const nuevaIni = horaToMin(horaSeleccionadaLocal);
         const nuevaFin = horaToMin(window.horaFinSeleccionada);
@@ -721,22 +870,26 @@ if (!p) {
         }
 
         // Insertar cita
-        const { error } = await supabase.from("citas").insert([{
-            id_tienda: tiendaId,
-            id_barbero: barberId,
-            servicio: serviceId,
-            servicio_nombre: nombreServicioSel,
-            nombre_cliente: finalName,
-            telefono_cliente: finalPhone,
-            email_cliente: finalEmail,
-            fecha: date,
-            hora_inicio: horaSeleccionadaLocal,
-            hora_fin: window.horaFinSeleccionada,
-            duracion_minutos: duracionServicioFinal,
-            user_id: finalId,
-            estado: "PENDIENTE",
-            valor_servicio: Number(precioSeleccionado)
-        }]);
+        const { data: nuevaCita, error } = await supabase
+.from("citas")
+.insert([{
+    id_tienda: tiendaId,
+    id_barbero: barberId,
+    servicio: serviceId,
+    servicio_nombre: nombreServicioSel,
+    nombre_cliente: finalName,
+    telefono_cliente: finalPhone,
+    email_cliente: finalEmail,
+    fecha: date,
+    hora_inicio: horaSeleccionadaLocal,
+    hora_fin: window.horaFinSeleccionada,
+    duracion_minutos: duracionServicioFinal,
+    user_id: finalId,
+    estado: "PENDIENTE",
+    valor_servicio: Number(precioSeleccionado)
+}])
+.select()
+.single();
 
         if (!error) {
             const { data: profesional } = await supabase
@@ -746,15 +899,16 @@ if (!p) {
                 .single();
 
             await enviarCorreoConfirmacion({
-                email: finalEmail,
-                nombre: finalName,
-                tiendaNombre: tiendaData.nombre,
-                servicio: nombreServicioSel,
-                profesional: profesional?.nombre_empleado || "Nuestro equipo",
-                fecha: date,
-                hora: horaSeleccionadaLocal,
-                valor: formatDinero.format(precioSeleccionado)
-            });
+    email: finalEmail,
+    nombre: finalName,
+    tiendaNombre: tiendaData.nombre,
+    servicio: nombreServicioSel,
+    profesional: profesional?.nombre_empleado || "Nuestro equipo",
+    fecha: date,
+    hora: horaSeleccionadaLocal,
+    valor: formatDinero.format(precioSeleccionado),
+    citaId: nuevaCita.id_cita
+});
 
             showAlert("¡RESERVA ÉLITE EXITOSA! Revisa tu correo.");
             setTimeout(() => location.reload(), 3000);
@@ -805,58 +959,139 @@ if (!p) {
                 return;
             }
 
-            contenedor.innerHTML = "";
-            citas.forEach(c => {
-                const card = document.createElement("div");
-                card.style.cssText = `
-                    background: var(--bg);
-                    border-radius: 18px;
-                    padding: 18px 15px;
-                    box-shadow: var(--nm-out);
-                    border-left: 4px solid ${c.estado === 'CANCELADA' ? '#ff4d4d' : 'var(--gold)'};
-                    transition: 0.3s;
-                `;
+            // 1. Obtener la fecha de hoy para comparar
+            const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Bogota' });
 
+            // 2. Clasificar las citas en 3 listas diferentes
+            const citasActivas = [];
+            const citasFinalizadas = [];
+            const citasCanceladas = [];
+
+            citas.forEach(c => {
+                if (c.estado === 'CANCELADA') {
+                    citasCanceladas.push(c);
+                } else if (c.fecha >= hoy) {
+                    citasActivas.push(c);
+                } else {
+                    citasFinalizadas.push(c);
+                }
+            });
+
+            // 3. Crear el menú de Pestañas (Tabs) y el contenedor donde irán las tarjetas
+            contenedor.innerHTML = `
+                <div id="tabs-citas" class="appointments-tabs">
+                    <button class="tab-cita active-tab" data-tab="activas"><span>Próximas</span><strong>${citasActivas.length}</strong></button>
+                    <button class="tab-cita" data-tab="finalizadas"><span>Finalizadas</span><strong>${citasFinalizadas.length}</strong></button>
+                    <button class="tab-cita" data-tab="canceladas"><span>Canceladas</span><strong>${citasCanceladas.length}</strong></button>
+                </div>
+                <div id="contenido-citas" class="appointments-content"></div>
+            `;
+
+            const btnTabs = contenedor.querySelectorAll('.tab-cita');
+            const contenidoCitas = document.getElementById("contenido-citas");
+
+            // 4. Función reutilizable para diseñar cada tarjeta
+            const crearCardCita = (c, esPasada, esCancelada) => {
+                const card = document.createElement("article");
+                
+                let estadoTexto = c.estado || "PENDIENTE";
+                let mostrarBotonCancelar = true;
+                let estadoClase = "upcoming";
+
+                if (esCancelada) {
+                    estadoTexto = 'CANCELADA';
+                    estadoClase = "cancelled";
+                    mostrarBotonCancelar = false;
+                } else if (esPasada) {
+                    estadoTexto = 'FINALIZADA';
+                    estadoClase = "finished";
+                    mostrarBotonCancelar = false;
+                }
+
+                card.className = `appointment-card ${estadoClase}`;
                 const profesionalNombre = c.profesionales?.nombre_empleado || "No asignado";
+                const fechaCita = new Date(`${c.fecha}T12:00:00`);
+                const dia = fechaCita.toLocaleDateString("es-CO", { day: "2-digit" });
+                const mes = fechaCita.toLocaleDateString("es-CO", { month: "short" }).replace(".", "").toUpperCase();
+                const fechaCompleta = fechaCita.toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" });
+                const horaCita = String(c.hora_inicio || "--:--").slice(0, 5);
 
                 card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:start; gap:10px;">
-                        <div style="text-align:left; flex:1;">
-                            <p style="font-weight:800; font-size:0.9rem; color:var(--gold);">${c.servicio_nombre || 'Servicio'}</p>
-                            <p style="font-size:0.75rem; opacity:0.7;"><i class="fa-regular fa-calendar"></i> ${c.fecha} - ${c.hora_inicio}</p>
-                            <p style="font-size:0.7rem; opacity:0.6;"><i class="fa-regular fa-user"></i> ${profesionalNombre}</p>
+                    <div class="appointment-date"><strong>${dia}</strong><span>${mes}</span></div>
+                    <div class="appointment-details">
+                        <div class="appointment-title-row">
+                            <div><small>${fechaCompleta}</small><h3>${c.servicio_nombre || c.servicio || 'Servicio'}</h3></div>
+                            <span class="appointment-status">${estadoTexto}</span>
                         </div>
-                        <div style="text-align:right;">
-                            <span style="display:inline-block; padding:3px 10px; border-radius:30px; font-size:0.6rem; font-weight:800; letter-spacing:1px; background: ${c.estado === 'CANCELADA' ? '#ff4d4d33' : '#25d36633'}; color: ${c.estado === 'CANCELADA' ? '#ff4d4d' : '#25d366'};">
-                                ${c.estado}
-                            </span>
-                            ${c.estado !== 'CANCELADA'
- ? `<button class="btn-cancelar"
-      data-id="${c.id_cita}" style="margin-top:8px; background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:4px 12px; border-radius:20px; font-size:0.65rem; font-weight:700; cursor:pointer; transition:0.2s;">Cancelar</button>` : ''}
+                        <div class="appointment-meta">
+                            <span><i class="fa-regular fa-clock"></i>${horaCita}</span>
+                            <span><i class="fa-regular fa-user"></i>${profesionalNombre}</span>
                         </div>
+                        ${mostrarBotonCancelar ? `<div class="appointment-actions"><button class="btn-cancelar" data-id="${c.id_cita}"><i class="fa-regular fa-circle-xmark"></i> Cancelar cita</button></div>` : ''}
                     </div>
                 `;
-
-                contenedor.appendChild(card);
 
                 const btnCancel = card.querySelector('.btn-cancelar');
                 if (btnCancel) {
                     btnCancel.addEventListener('click', async (e) => {
                         e.stopPropagation();
-                        const citaId = btnCancel.dataset.id;
-                        await cancelarCita(citaId);
+                        await cancelarCita(btnCancel.dataset.id);
                     });
                 }
+                return card;
+            };
+
+            // 5. Función que pinta la lista según el botón que toques
+            const renderizarLista = (tipo) => {
+                contenidoCitas.innerHTML = "";
+                let lista = [];
+                
+                if (tipo === 'activas') lista = citasActivas;
+                if (tipo === 'finalizadas') lista = citasFinalizadas;
+                if (tipo === 'canceladas') lista = citasCanceladas;
+
+                if (lista.length === 0) {
+                    contenidoCitas.innerHTML = `<div class="appointments-empty"><i class="fa-regular fa-calendar"></i><strong>No hay citas aquí</strong><span>Cuando tengas movimientos en esta sección aparecerán aquí.</span></div>`;
+                    return;
+                }
+
+                lista.forEach(c => {
+                    const esPasada = tipo === 'finalizadas';
+                    const esCancelada = tipo === 'canceladas';
+                    contenidoCitas.appendChild(crearCardCita(c, esPasada, esCancelada));
+                });
+            };
+
+            // 6. Darle vida a los botones (cambio de colores y filtro)
+            btnTabs.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // Apagamos todos los botones
+                    const tab = e.currentTarget;
+                    btnTabs.forEach(b => b.classList.remove("active-tab"));
+                    
+                    // Encendemos el botón que tocaste
+                    tab.classList.add("active-tab");
+
+                    // Pintamos las tarjetas correspondientes
+                    renderizarLista(tab.dataset.tab);
+                });
             });
+
+            // Arrancamos mostrando las "Próximas" por defecto
+            renderizarLista('activas');
 
         } catch (err) {
             console.error("Error inesperado:", err);
             contenedor.innerHTML = "<p style='text-align:center; color:#ff4d4d;'>Ocurrió un error inesperado.</p>";
         }
     }
-
     async function cancelarCita(citaId) {
-        if (!confirm("¿Estás seguro de que deseas cancelar esta cita?")) return;
+        if (!(await TamakuUI.confirm({
+            titulo: "¿Cancelar cita?",
+            mensaje: "La cita se marcará como cancelada y liberará el horario.",
+            textoConfirmar: "Cancelar cita",
+            peligro: true
+        }))) return;
 
         try {
             const { error } = await supabase
@@ -873,9 +1108,11 @@ if (!p) {
             showAlert("✅ Cita cancelada exitosamente.");
 cargarCitasUsuario();
 
-const notificar = confirm(
-    "¿Deseas notificar la cancelación a la tienda por WhatsApp?"
-);
+const notificar = await TamakuUI.confirm({
+    titulo: "¿Notificar por WhatsApp?",
+    mensaje: "Puedes avisar a la tienda que cancelaste la cita.",
+    textoConfirmar: "Notificar"
+});
 
 if (notificar) {
     console.log("📲 Usuario desea notificar la cancelación");
@@ -907,14 +1144,75 @@ if (notificar) {
         if (user && window.userFullName) {
             document.getElementById("auth-login-view").style.display = "none";
             document.getElementById("auth-profile-view").style.display = "block";
-            document.getElementById("profile-name-text").innerText = window.userFullName.toUpperCase();
-            document.getElementById("profile-phone-text").innerText = window.userWhatsApp || "No registrado";
+            
+            // Traemos exactamente los datos como están registrados
+            document.getElementById("profile-email-input").value = user.email;
+            document.getElementById("profile-name-input").value = window.userFullName.toUpperCase();
+            document.getElementById("profile-phone-input").value = window.userWhatsApp || "";
         } else {
             document.getElementById("auth-login-view").style.display = "block";
             document.getElementById("auth-profile-view").style.display = "none";
         }
     };
+    // --- RECUPERACIÓN DE CONTRASEÑA ---
 
+    // 1. Detectar retorno desde el correo electrónico
+    supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+            document.getElementById("modal-auth").style.display = "flex";
+            document.getElementById("auth-login-view").style.display = "none";
+            document.getElementById("auth-profile-view").style.display = "none";
+            document.getElementById("auth-update-pass-view").style.display = "block";
+        }
+    });
+
+    // 2. Enviar el correo de recuperación
+    window.recuperarClave = async () => {
+        const email = document.getElementById("auth-email").value.trim();
+        
+        if (!email) {
+            showAlert("⚠️ Ingresa tu EMAIL en la casilla de arriba para enviarte el enlace.");
+            return;
+        }
+
+        // Capturamos la URL exacta de la tienda para no perder la trazabilidad
+        const urlTiendaExacta = window.location.href;
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: urlTiendaExacta
+        });
+
+        if (error) {
+            showAlert("❌ Error: " + error.message);
+        } else {
+            // AVISO NUEVO INCLUYENDO LA ALERTA DE SPAM
+            showAlert("📩 ¡Listo! Te enviamos un enlace. Por favor revisa tu bandeja principal y también la carpeta de SPAM o Correo no deseado.");
+        }
+    };
+
+    // 3. Guardar la nueva llave
+    window.guardarNuevaClave = async () => {
+        const newPass = document.getElementById("auth-new-pass").value;
+        
+        if (newPass.length < 6) {
+            showAlert("⚠️ La Llave VIP debe tener al menos 6 caracteres.");
+            return;
+        }
+
+        const { error } = await supabase.auth.updateUser({ password: newPass });
+
+        if (error) {
+            showAlert("❌ Error al actualizar: " + error.message);
+        } else {
+            showAlert("✅ ¡Tu Llave VIP ha sido actualizada con éxito!");
+            
+            // Limpiamos la URL (quitamos el token largo) pero mantenemos la tienda base
+            const urlLimpia = window.location.origin + window.location.pathname + window.location.search;
+            
+            // Recargamos la tienda limpia para continuar la reserva normal
+            window.location.href = urlLimpia;
+        }
+    };
     // --- LOGIN ---
     window.executeAuth = async () => {
         const email = document.getElementById("auth-email").value.trim();
@@ -965,6 +1263,45 @@ if (notificar) {
             showAlert("❌ Ocurrió un error inesperado. Inténtalo de nuevo.");
         }
     };
+    
+    window.actualizarPerfil = async () => {
+        if (!user) return;
+
+        const newName = document.getElementById("profile-name-input").value.trim();
+        const newPhone = document.getElementById("profile-phone-input").value.trim();
+
+        if (!newName || newPhone.length !== 10) {
+            showAlert("⚠️ Debes ingresar tu nombre y un número de WhatsApp válido de 10 dígitos.");
+            return;
+        }
+
+        const btnGuardar = document.querySelector("#auth-profile-view .btn-main");
+        const btnTextoOriginal = btnGuardar.innerText;
+        btnGuardar.innerText = "GUARDANDO...";
+        btnGuardar.disabled = true;
+
+        try {
+            const { error } = await supabase
+                .from("perfiles_clientes")
+                .update({ nombre_completo: newName, whatsapp: newPhone })
+                .eq("id", user.id);
+
+            if (error) throw error;
+
+            window.userFullName = newName;
+            window.userWhatsApp = newPhone;
+            
+            document.getElementById("user-name-display").innerText = newName.toUpperCase();
+            showAlert("✅ ¡Perfil actualizado con éxito!");
+
+        } catch (err) {
+            console.error("Error actualizando perfil:", err);
+            showAlert("❌ Error al guardar los cambios: " + err.message);
+        } finally {
+            btnGuardar.innerText = btnTextoOriginal;
+            btnGuardar.disabled = false;
+        }
+    };
 
     window.handleLogout = async () => {
         await supabase.auth.signOut();
@@ -984,5 +1321,7 @@ if (notificar) {
     // --- INICIAR APLICACIÓN ---
     init();
 </script>
+<!-- Motor PWA -->
+    <script src="../assets/js/core/pwa.js"></script>
 </body>
 </html>

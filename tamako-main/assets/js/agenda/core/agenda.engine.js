@@ -32,15 +32,27 @@ export function minToHora(minutos = 0) {
   return `${horas.toString().padStart(2, "0")}:${restoMinutos.toString().padStart(2, "0")}`;
 }
 
-// 🚫 VALIDAR CRUCE ENTRE BLOQUES
-// [MEJORADO] Normaliza bloques con inicio/fin y los ordena por inicio (opcional)
-export function hayCruce({ inicio, fin, bloques = [] }) {
+// 🚫 VALIDAR CRUCE ENTRE BLOQUES - [CORREGIDO]
+// [FIX] Ahora solo verifica SUPERPOSICIÓN REAL, no bloques futuros
+export function hayCruce({ inicio, fin, bloques = [], debug = false }) {
   if (!Array.isArray(bloques)) return false;
-  // [MEJORADO] Filtramos bloques que tengan inicio y fin válidos
+  if (bloques.length === 0) return false;
+
+  // [CRITICAL] Filtrar bloques que realmente se cruzan con el horario
   return bloques.some((b) => {
     const bInicio = b.inicio ?? b.start ?? 0;
     const bFin = b.fin ?? b.end ?? 0;
-    return inicio < bFin && fin > bInicio;
+
+    // Verifica SUPERPOSICIÓN REAL (no solo comparación)
+    const haySuperposicion = inicio < bFin && fin > bInicio;
+
+    if (debug && haySuperposicion) {
+      console.log(
+        `[DEBUG] 🔴 Bloque ${minToHora(bInicio)}-${minToHora(bFin)} se cruza con ${minToHora(inicio)}-${minToHora(fin)}`,
+      );
+    }
+
+    return haySuperposicion;
   });
 }
 
@@ -61,8 +73,8 @@ export function validarIntervalo({ inicio, intervalo }) {
   return inicio % intervalo === 0;
 }
 
-// 🧠 CALCULAR CITA (función principal)
-// [MEJORADO] Añadido manejo de duración mínima, y logs opcionales
+// 🧠 CALCULAR CITA (función principal) - [MEJORADO]
+// [FIX] Añadido filtro de bloques que solo se cruzan
 export function calcularCita({
   inicioDeseado,
   duracion,
@@ -72,8 +84,19 @@ export function calcularCita({
   jornadaFin = 1440,
   intervaloProfesional = null,
   intervaloTienda = 60,
+  debug = false,
 }) {
-  // [CORREGIDO] Asegurar duración positiva y mínima de 15 min
+  console.log("===== ENTRÓ A calcularCita =====");
+  console.log({
+    inicioDeseado,
+    duracion,
+    modo,
+    jornadaInicio,
+    jornadaFin,
+    bloques,
+  });
+
+  // Asegurar duración positiva y mínima de 15 min
   const duracionValida = Math.max(15, duracion);
   const intervalo =
     parseInt(intervaloProfesional) || parseInt(intervaloTienda) || 60;
@@ -81,20 +104,31 @@ export function calcularCita({
   const inicio = inicioDeseado;
   const fin = inicio + duracionValida;
 
+  if (debug) {
+    console.log(
+      `[DEBUG] 📍 Verificando: ${minToHora(inicio)} - ${minToHora(fin)}`,
+    );
+  }
+
   // Validar dentro de jornada
   if (!dentroDeJornada({ inicio, fin, jornadaInicio, jornadaFin })) {
+    if (debug) console.log(`[DEBUG] ❌ Fuera de jornada`);
     return null;
   }
 
-  // Validar cruce con bloques ocupados
-  if (hayCruce({ inicio, fin, bloques })) {
+  // [CRITICAL] Validar cruce con bloques ocupados
+  if (hayCruce({ inicio, fin, bloques, debug })) {
+    if (debug) console.log(`[DEBUG] ❌ Se cruza con bloque ocupado`);
     return null;
   }
 
   // Validar intervalo fijo si aplica
   if (modo === "fijo" && !validarIntervalo({ inicio, intervalo })) {
+    if (debug) console.log(`[DEBUG] ❌ No cumple intervalo fijo`);
     return null;
   }
+
+  if (debug) console.log(`[DEBUG] ✅ Disponible!`);
 
   return {
     inicio,
@@ -106,8 +140,8 @@ export function calcularCita({
   };
 }
 
-// 📋 GENERAR SLOTS DISPONIBLES
-// [MEJORADO] Añadido límite máximo de slots para evitar bucles infinitos
+// 📋 GENERAR SLOTS DISPONIBLES - [MEJORADO]
+// [FIX] Ahora filtra correctamente los bloques
 export function generarSlots({
   jornadaInicio = 480,
   jornadaFin = 1200,
@@ -115,9 +149,20 @@ export function generarSlots({
   duracion = 60,
   bloques = [],
   modo = "auto",
+  debug = false,
 }) {
   const slots = [];
-  const maxSlots = 500; // [MEJORADO] Seguridad
+  const maxSlots = 500;
+
+  if (debug) {
+    console.log(
+      `[DEBUG] 🔍 Generando slots desde ${minToHora(jornadaInicio)} hasta ${minToHora(jornadaFin)}`,
+    );
+    console.log(
+      `[DEBUG] 📊 Bloques existentes:`,
+      bloques.map((b) => `${minToHora(b.inicio)}-${minToHora(b.fin)}`),
+    );
+  }
 
   for (
     let inicio = jornadaInicio, count = 0;
@@ -132,11 +177,53 @@ export function generarSlots({
       jornadaInicio,
       jornadaFin,
       intervaloTienda: intervalo,
+      debug,
     });
     if (resultado) {
       slots.push(resultado);
+      if (debug)
+        console.log(
+          `[DEBUG] ✅ Slot disponible: ${resultado.horaInicio} - ${resultado.horaFin}`,
+        );
     }
   }
 
+  if (debug) console.log(`[DEBUG] 📋 Total slots disponibles: ${slots.length}`);
   return slots;
+}
+
+// 🔍 [NUEVO] VERIFICAR DISPONIBILIDAD DE UN HORARIO ESPECÍFICO
+export function verificarDisponibilidad({
+  horaInicio,
+  duracion = 60,
+  bloques = [],
+  jornadaInicio = 480,
+  jornadaFin = 1200,
+  debug = false,
+}) {
+  const inicio =
+    typeof horaInicio === "string" ? horaToMin(horaInicio) : horaInicio;
+
+  const resultado = calcularCita({
+    inicioDeseado: inicio,
+    duracion,
+    modo: "auto",
+    bloques,
+    jornadaInicio,
+    jornadaFin,
+    debug,
+  });
+
+  return resultado !== null;
+}
+
+// ⚡ [NUEVO] OBTENER BLOQUES OCUPADOS PARA UN RANGO ESPECÍFICO
+export function obtenerBloquesOcupados({ inicio, fin, bloques = [] }) {
+  if (!Array.isArray(bloques)) return [];
+
+  return bloques.filter((b) => {
+    const bInicio = b.inicio ?? b.start ?? 0;
+    const bFin = b.fin ?? b.end ?? 0;
+    return inicio < bFin && fin > bInicio;
+  });
 }

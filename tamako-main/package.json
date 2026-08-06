@@ -2,6 +2,9 @@
   "name": "tamako-main",
   "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "dev": "node dev-server.js"
+  },
   "dependencies": {
     "nodemailer": "^6.9.16"
   }

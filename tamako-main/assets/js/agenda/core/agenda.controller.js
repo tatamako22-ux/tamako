@@ -16,6 +16,11 @@ import {
   horaToMin,
   normalizarHora,
 } from "../utils/agenda.utils.js";
+import { crearMensajeReserva } from "../utils/agenda.whatsapp.js";
+// 🔔 Mostrar mensajes tipo Toast
+function mostrarToast(mensaje, tipo = "success") {
+  window.TamakuUI?.notify(mensaje, tipo);
+}
 
 // 🚀 INICIAR AGENDA
 export function iniciarAgenda({
@@ -149,7 +154,7 @@ export function iniciarAgenda({
 
     if (!idCita) return;
 
-    const ok = await cancelarCita(idCita);
+    const ok = await cancelarCita(idCita, tiendaInfo.id);
 
     if (!ok) {
       alert("❌ Error al cancelar");
@@ -164,25 +169,59 @@ export function iniciarAgenda({
     await cargarCitasDelDia();
   }
 
-  // ➕ ABRIR MODAL
-  window.abrirModalReserva = (idBarbero, hora, nombreBarbero) => {
+  // ➕ ABRIR MODAL (CON SERVICIOS REALES)
+  window.abrirModalReserva = async (idBarbero, horaInicio, horaFin) => {
+    const profesional = getState("listaBarberos").find(
+      (b) => String(b.id_barbero) === String(idBarbero),
+    );
+
+    const nombreBarbero = profesional?.nombre_empleado || "PROFESIONAL";
     setState("datosNuevaReserva", {
       idBarbero,
-      hora,
-      nombreBarbero,
+      horaInicio,
+      horaFin,
     });
 
     document.getElementById("infoReserva").innerHTML = `
-
             📅 Agendando con
             <strong>
                 ${nombreBarbero}
             </strong>
-
             <br>
-
-            ⏰ ${hora}
+            ⏰ ${horaInicio} - ${horaFin}
         `;
+
+    // Cargar selector de servicios dinámico
+    const selectServicio = document.getElementById("res_servicio");
+    if (selectServicio) {
+      selectServicio.innerHTML =
+        '<option value="">Cargando servicios...</option>';
+
+      try {
+        const { data: servicios, error } = await supabase
+          .from("servicios")
+          .select("id_servicio, nombre_servicio, precio, duracion_minutos")
+          .eq("id_barbero", idBarbero)
+          .eq("id_tienda", tiendaInfo.id)
+          .order("nombre_servicio", { ascending: true });
+
+        if (error || !servicios || servicios.length === 0) {
+          selectServicio.innerHTML =
+            '<option value="">Servicio general</option>';
+        } else {
+          let html = '<option value="">-- Selecciona el Servicio --</option>';
+          servicios.forEach((s) => {
+            html += `<option value="${s.id_servicio}" data-nombre="${s.nombre_servicio}" data-precio="${s.precio}" data-duracion="${s.duracion_minutos}">
+              ${s.nombre_servicio} - $${s.precio.toLocaleString("es-CO")}
+            </option>`;
+          });
+          selectServicio.innerHTML = html;
+        }
+      } catch (err) {
+        console.error("Error al cargar servicios:", err);
+        selectServicio.innerHTML = '<option value="">Servicio General</option>';
+      }
+    }
 
     document.getElementById("reservaModal").style.display = "flex";
   };
@@ -197,8 +236,16 @@ export function iniciarAgenda({
 
     const telefono = telInput.value.replace(/\D/g, "");
 
-    if (!nombre || !telefono) {
-      alert("⚠️ Completa todos los campos");
+    if (!nombre) {
+      alert("⚠️ Ingresa el nombre del cliente");
+
+      return;
+    }
+
+    if (telefono.length !== 10) {
+      alert("⚠️ El teléfono debe tener exactamente 10 números.");
+
+      telInput.focus();
 
       return;
     }
@@ -211,25 +258,38 @@ export function iniciarAgenda({
 
     const fecha = getState("fechaSeleccionada").toLocaleDateString("sv-SE");
 
-    const hora24 = normalizarHora(reserva.hora);
+    const hora24 = normalizarHora(reserva.horaInicio);
+    console.group("=== RESERVA ===");
 
+    console.log("Hora inicio:", reserva.horaInicio);
+    console.log("Hora fin:", reserva.horaFin);
+    console.log("Hora normalizada:", hora24);
+
+    console.log("Profesional:", profesional);
+    console.log("Modo:", profesional?.modo_agenda);
+    console.log("Intervalo profesional:", profesional?.intervalo_citas);
+    console.log("Intervalo tienda:", tiendaInfo.intervalo_minutos);
+    const bloques = getState("citasDelDia")
+      .filter((c) => String(c.id_barbero) === String(reserva.idBarbero))
+      .map((c) => ({
+        inicio: horaToMin(normalizarHora(c.hora_inicio)),
+        fin: horaToMin(normalizarHora(c.hora_fin)),
+        tipo: "ocupado",
+      }));
+
+    console.table(bloques);
+
+    console.groupEnd();
     const resultado = calcularCita({
       inicioDeseado: horaToMin(hora24),
 
-      duracion: parseInt(profesional?.intervalo_citas) || 60,
+      duracion:
+        horaToMin(normalizarHora(reserva.horaFin)) -
+        horaToMin(normalizarHora(reserva.horaInicio)),
 
       modo: profesional?.modo_agenda || "auto",
 
-      bloques: getState("citasDelDia")
-        .filter((c) => String(c.id_barbero) === String(reserva.idBarbero))
-
-        .map((c) => ({
-          inicio: horaToMin(normalizarHora(c.hora_inicio)),
-
-          fin: horaToMin(normalizarHora(c.hora_fin)),
-
-          tipo: "ocupado",
-        })),
+      bloques,
 
       profesional,
 
@@ -237,6 +297,8 @@ export function iniciarAgenda({
 
       intervaloTienda: tiendaInfo.intervalo_minutos,
     });
+
+    console.log("RESULTADO calcularCita:", resultado);
 
     if (!resultado) {
       alert("⚠️ Horario inválido");
@@ -247,25 +309,32 @@ export function iniciarAgenda({
     const hhFin = String(Math.floor(resultado.fin / 60)).padStart(2, "0");
 
     const mmFin = String(resultado.fin % 60).padStart(2, "0");
+    const horaFinGuardar = reserva.horaFin
+      ? `${reserva.horaFin}:00`
+      : `${hhFin}:${mmFin}:00`;
+
+    // Capturar servicio seleccionado
+    const selectServicio = document.getElementById("res_servicio");
+    const opcionSel = selectServicio?.options[selectServicio.selectedIndex];
+
+    const servicioId = selectServicio?.value || null;
+    const servicioNombre =
+      opcionSel?.getAttribute("data-nombre") || "Servicio General";
+    const valorServicio = Number(opcionSel?.getAttribute("data-precio")) || 0;
 
     const { error } = await supabase.from("citas").insert([
       {
         id_tienda: tiendaInfo.id,
-
         id_barbero: reserva.idBarbero,
-
+        servicio: servicioId,
+        servicio_nombre: servicioNombre,
+        valor_servicio: valorServicio,
         nombre_cliente: nombre.toUpperCase(),
-
         telefono_cliente: telefono,
-
         fecha,
-
         hora_inicio: `${hora24}:00`,
-
-        hora_fin: `${hhFin}:${mmFin}:00`,
-
+        hora_fin: horaFinGuardar,
         duracion_minutos: resultado.fin - resultado.inicio,
-
         estado: "PENDIENTE",
       },
     ]);
@@ -280,7 +349,40 @@ export function iniciarAgenda({
 
     document.getElementById("reservaModal").style.display = "none";
 
+    const mensaje = crearMensajeReserva({
+      cliente: nombre.toUpperCase(),
+
+      profesional: profesional.nombre_empleado,
+
+      tienda: tiendaInfo.nombre,
+
+      fecha,
+
+      hora: hora24,
+
+      url: "https://TU-PAGINA.COM",
+    });
+
+    setState("whatsappReserva", {
+      telefono,
+
+      mensaje,
+    });
+
+    document.getElementById("textoWhatsapp").innerHTML = `
+
+<strong>${nombre.toUpperCase()}</strong>
+
+<br><br>
+
+¿Deseas enviar la confirmación por WhatsApp?
+
+`;
+
+    document.getElementById("modalWhatsapp").style.display = "flex";
+
     nombreInput.value = "";
+
     telInput.value = "";
 
     await cargarCitasDelDia();
@@ -330,6 +432,42 @@ export function iniciarAgenda({
 
       resetReserva();
     });
+    // ❌ Cerrar modal Nueva Reserva
+    document.getElementById("closeReserva")?.addEventListener("click", () => {
+      // ❌ Cerrar haciendo clic fuera del modal
+      document
+        .getElementById("reservaModal")
+        ?.addEventListener("click", (e) => {
+          if (e.target.id === "reservaModal") {
+            document.getElementById("reservaModal").style.display = "none";
+
+            document.getElementById("res_nombre").value = "";
+
+            document.getElementById("res_tel").value = "";
+
+            resetReserva();
+          }
+        });
+      document.getElementById("reservaModal").style.display = "none";
+
+      document.getElementById("res_nombre").value = "";
+
+      document.getElementById("res_tel").value = "";
+
+      resetReserva();
+    });
+    // ❌ Cerrar con la tecla ESC
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        document.getElementById("reservaModal").style.display = "none";
+
+        document.getElementById("res_nombre").value = "";
+
+        document.getElementById("res_tel").value = "";
+
+        resetReserva();
+      }
+    });
 
     document.getElementById("prevDay")?.addEventListener("click", async () => {
       const fecha = getState("fechaSeleccionada");
@@ -350,6 +488,38 @@ export function iniciarAgenda({
 
       await actualizarFecha();
     });
+    // ✍️ Nombre siempre en MAYÚSCULAS
+    document.getElementById("res_nombre")?.addEventListener("input", (e) => {
+      e.target.value = e.target.value.toUpperCase();
+    });
+    // 📱 Solo números y máximo 10 dígitos
+    document.getElementById("res_tel")?.addEventListener("input", (e) => {
+      e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    });
+    // 🟢 Enviar WhatsApp
+    document
+      .getElementById("btnEnviarWhatsapp")
+      ?.addEventListener("click", () => {
+        console.log("CLICK WHATSAPP");
+        const datos = getState("whatsappReserva");
+        console.log("DATOS WHATSAPP:", datos);
+
+        if (!datos) return;
+
+        const url = `https://wa.me/57${datos.telefono}?text=${encodeURIComponent(datos.mensaje)}`;
+        console.log(url);
+
+        window.open(url, "_blank");
+
+        document.getElementById("modalWhatsapp").style.display = "none";
+      });
+
+    // ❌ Cerrar modal WhatsApp
+    document
+      .getElementById("btnCerrarWhatsapp")
+      ?.addEventListener("click", () => {
+        document.getElementById("modalWhatsapp").style.display = "none";
+      });
   }
 
   // 🚀 INIT

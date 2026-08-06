@@ -48,10 +48,23 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
                 id_barbero,
                 nombre_cliente,
                 telefono_cliente,
+                email_cliente,
                 hora_inicio,
                 hora_fin,
                 estado,
-                servicio_nombre
+                servicio,
+                servicio_id,
+                servicio_nombre,
+                valor_servicio,
+                user_id,
+                id_tienda,
+                facturas (
+                  id_factura,
+                  estado,
+                  total,
+                  fecha_emision,
+                  metodo_pago
+                )
             `,
       )
 
@@ -81,7 +94,7 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
 }
 
 // ❌ CANCELAR CITA
-export async function cancelarCita(idCita) {
+export async function cancelarCita(idCita, idTienda) {
   try {
     const { error } = await supabase
 
@@ -91,7 +104,8 @@ export async function cancelarCita(idCita) {
         estado: "CANCELADA",
       })
 
-      .eq("id_cita", idCita);
+      .eq("id_cita", idCita)
+      .eq("id_tienda", idTienda);
 
     if (error) {
       throw error;

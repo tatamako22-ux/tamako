@@ -1,0 +1,229 @@
+/* PROFESIONALES V3 — COMPACTO Y COHERENTE CON TAMAKU */
+.module-eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--gold);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+}
+
+body > .main-content {
+  min-width: 0;
+  width: auto;
+  height: auto;
+  min-height: 100vh;
+  padding: 42px clamp(28px, 4vw, 68px) 90px;
+  overflow: visible;
+  background: radial-gradient(circle at 94% 0%, rgba(191,149,63,.065), transparent 28%), #050505;
+}
+
+body > .main-content > * {
+  width: min(100%, 1280px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.professionals-header-v3 {
+  gap: 24px;
+  margin-bottom: 17px;
+  padding-bottom: 25px;
+  border-bottom-color: rgba(255,255,255,.07);
+}
+
+.professionals-header-v3 h1 {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  font-size: clamp(2rem,3vw,2.8rem);
+  line-height: 1.05;
+  letter-spacing: -.045em;
+  text-transform: uppercase;
+}
+
+.professionals-header-v3 p {
+  margin-top: 9px;
+  color: #777;
+  font-size: .76rem;
+}
+
+.btn-add {
+  min-height: 48px;
+  padding: 0 19px;
+  color: #111;
+  background: linear-gradient(135deg,var(--gold-light),var(--gold));
+  border-color: rgba(245,212,135,.5);
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(191,149,63,.14);
+}
+
+.btn-add i { margin-right: 7px; }
+.btn-add:hover { transform: translateY(-2px); box-shadow: 0 16px 35px rgba(191,149,63,.24); }
+
+.sede-info {
+  margin-bottom: 19px;
+  padding: 10px 13px;
+  color: #898989;
+  background: rgba(255,255,255,.018);
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 12px;
+  font-family: "Montserrat",sans-serif;
+  font-size: .61rem;
+  letter-spacing: .13em;
+}
+
+.sede-info::before {
+  content: "\f3c5";
+  margin-right: 8px;
+  color: var(--gold);
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+
+.barbers-grid {
+  grid-template-columns: repeat(auto-fill,minmax(265px,1fr));
+  gap: 14px;
+}
+
+.barber-card {
+  min-width: 0;
+  padding: 24px 17px 17px;
+  background: linear-gradient(145deg,#111,#090909);
+  border-radius: 20px;
+  box-shadow: 0 18px 45px rgba(0,0,0,.28);
+  overflow: hidden;
+}
+
+.barber-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 55px rgba(0,0,0,.4);
+}
+
+.barber-card::after { content:""; position:absolute; left:0; top:22px; bottom:22px; width:3px; border-radius:0 4px 4px 0; background:#777; }
+.barber-card.status-available::after { background:#49ce83; }
+.barber-card.status-break::after { background:#e6ae4d; }
+.barber-card.status-unavailable::after { background:#dd6969; }
+
+.card-actions {
+  top: 13px;
+  left: 13px;
+  right: 13px;
+}
+
+.action-icon {
+  width: 31px;
+  height: 31px;
+  display: inline-grid;
+  place-items: center;
+  color: #8c8c8c;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 9px;
+  font-size: .7rem;
+  opacity: 1;
+}
+
+.action-icon:hover { color: var(--gold-light); background: rgba(191,149,63,.1); transform: translateY(-2px); }
+.delete-btn:hover { color: #ff7777; background: rgba(255,77,77,.09); border-color: rgba(255,77,77,.18); }
+
+.barber-avatar {
+  width: 82px;
+  height: 82px;
+  margin: 16px auto 13px;
+  padding: 2px;
+  box-shadow: 0 0 0 5px rgba(191,149,63,.06),0 13px 28px rgba(0,0,0,.42);
+}
+
+.barber-name {
+  font-family: "Montserrat",sans-serif;
+  font-size: .92rem;
+  letter-spacing: .02em;
+}
+
+.puesto-tag {
+  margin-bottom: 12px;
+  padding: 5px 10px;
+  font-size: .53rem;
+  letter-spacing: .13em;
+  box-shadow: none;
+}
+
+.disponibilidad-box {
+  margin: 0;
+  padding: 11px;
+  background: rgba(255,255,255,.025);
+  border-color: rgba(255,255,255,.065);
+  border-radius: 12px;
+  line-height: 1.55;
+}
+
+.modal-card {
+  max-width: 570px;
+  padding: 27px;
+  border-radius: 23px;
+  background: radial-gradient(circle at 100% 0%,rgba(191,149,63,.09),transparent 34%),#101010;
+  box-shadow: 0 30px 100px rgba(0,0,0,.82);
+}
+
+.modal-card h2,
+.modal-card h3 {
+  font-family: "Montserrat",sans-serif !important;
+  color: #fff !important;
+  font-size: 1.15rem;
+  letter-spacing: -.02em;
+}
+
+.input-group { margin-bottom: 12px; }
+.input-group label { margin-bottom: 6px; font-size: .56rem; letter-spacing: .12em; }
+
+.modal-card input,
+.modal-card select {
+  min-height: 47px;
+  padding: 0 14px;
+  background: #0c0c0c;
+  border-color: rgba(255,255,255,.09);
+  border-radius: 12px;
+  font-size: .77rem;
+}
+
+.modal-card input:focus,
+.modal-card select:focus { border-color: rgba(245,212,135,.5); box-shadow: 0 0 0 3px rgba(191,149,63,.07); }
+
+.btn-gold {
+  min-height: 49px;
+  padding: 0 17px;
+  background: linear-gradient(135deg,var(--gold-light),var(--gold));
+  border-radius: 13px;
+  box-shadow: 0 12px 28px rgba(191,149,63,.13);
+}
+
+.tabs-horarios { gap: 4px; padding: 4px; border: 1px solid rgba(255,255,255,.07); border-radius: 12px; background: #0b0b0b; }
+.tab-horario { flex: 1; padding: 10px; border-radius: 9px; font-family: "Montserrat",sans-serif; }
+.tab-horario.active { color: #111; background: var(--gold); border: 0; }
+.serv-item-row, .dia-horario-row { padding: 11px; border-radius: 11px; }
+.confirm-box { border-radius: 20px; background: #101010; }
+
+@media(max-width:900px) {
+  body > .main-content { width:100% !important; padding:20px 14px 115px !important; }
+  .professionals-header-v3 { position:relative !important; inset:auto !important; padding:0 0 18px !important; background:transparent !important; backdrop-filter:none !important; }
+  .professionals-header-v3 h1 { font-size:1.55rem; }
+  .professionals-header-v3 p { display:none; }
+  .btn-add { width:45px; min-width:45px; height:45px; padding:0; font-size:0; }
+  .btn-add i { margin:0; font-size:.8rem; }
+  .sede-info { margin-bottom:14px; }
+  .barbers-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+}
+
+@media(max-width:620px) {
+  .barbers-grid { grid-template-columns:1fr; }
+  .barber-card { padding:22px 15px 15px; }
+  .modal-overlay { padding:10px; align-items:flex-end; }
+  .modal-card { width:100%; max-height:90vh; padding:22px 18px; border-radius:23px 23px 15px 15px; }
+}
+
+@media(max-width:350px) {
+  body > .main-content { padding-left:9px !important; padding-right:9px !important; }
+  .professionals-header-v3 { gap:9px; }
+  .professionals-header-v3 h1 { font-size:1.38rem; }
+  .card-actions { gap:4px; }
+  .action-icon { width:29px; height:29px; }
+}

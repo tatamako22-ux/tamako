@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TAMAKO | Registro Demo</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>TAMAKU | Crea tu tienda</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
 <style>
 :root{ --gold:#bf953f; }
@@ -13,7 +13,7 @@
 
 body{
     margin:0;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     background:
     radial-gradient(circle at 70% 30%, rgba(255,190,60,0.25), transparent 40%),
     radial-gradient(circle at 30% 70%, rgba(255,190,60,0.15), transparent 40%),
@@ -284,7 +284,10 @@ form {
 .layout {
     width: 100%;
     max-width: 1100px;
+    min-height: calc(100vh - 86px);
     height: auto;
+    margin: 0 auto;
+    padding: 45px 24px 65px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -463,20 +466,124 @@ form {
     opacity: 1;
     transform: translateY(0);
 }
+
+/* Registro comercial responsive */
+.register-card { overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(191,149,63,.35) transparent; }
+.form-group input { min-height:48px; padding:0 15px; border-radius:12px; }
+.btn-register { min-height:50px; border-radius:13px; }
+
+@media (max-width:900px) {
+  nav { padding:15px 18px; }
+  .layout { width:100%; padding:45px 18px 70px; flex-direction:column; gap:28px; }
+  .branding { flex:auto; align-items:center; text-align:center; }
+  .branding .logo { margin:0 0 8px; font-size:clamp(2.2rem,12vw,3.4rem); letter-spacing:.16em; }
+  .tagline { font-size:.8rem; line-height:1.55; }
+  .register-card { width:min(100%,580px); max-width:100%; max-height:none; padding:28px; border-radius:21px; }
+}
+
+@media (max-width:560px) {
+  .frame { display:none; }
+  .nav-links { gap:5px; }
+  .nav-links a { padding:9px 10px; font-size:.62rem; }
+  .layout { padding:32px 13px 55px; }
+  .branding .logo { font-size:2rem; }
+  .register-card { padding:23px 16px; border-radius:18px; }
+  #registerForm { grid-template-columns:1fr; gap:10px; }
+  #registerForm > * { grid-column:1 !important; }
+  .form-title { font-size:1.05rem; letter-spacing:.18em; }
+  .register-card p { font-size:.72rem; line-height:1.5; }
+  .form-group input { min-height:49px; font-size:.82rem; }
+  .login-link { line-height:1.6; }
+}
+
+/* =========================================================
+   REGISTRO V2 — MISMO SISTEMA VISUAL DE LA LANDING
+   ========================================================= */
+.registration-v2 { min-height:100vh; background:radial-gradient(circle at 8% 15%,rgba(191,149,63,.13),transparent 30%),#050505; }
+.registration-v2::after { opacity:.45; }
+.registration-v2 nav { min-height:76px; padding:16px max(24px,calc((100% - 1240px)/2)); border:0; background:transparent; backdrop-filter:none; }
+.registration-v2 nav .logo { margin:0; font-size:1.25rem; letter-spacing:.24em; filter:none; }
+.registration-v2 .nav-links { gap:9px; }
+.registration-v2 .nav-links a { padding:10px 14px; border-radius:10px; font-size:.65rem; font-weight:600; }
+.registration-v2 .layout { max-width:1240px; min-height:calc(100vh - 76px); grid-template-columns:minmax(0,.82fr) minmax(520px,1fr); display:grid; gap:clamp(55px,8vw,115px); padding:70px 24px 85px; }
+.registration-v2 .branding { display:block; padding:20px 0; }
+.registration-v2 .registration-eyebrow,
+.registration-v2 .form-eyebrow { display:block; margin-bottom:17px; color:var(--gold); font-size:.62rem; font-weight:700; letter-spacing:.22em; }
+.registration-v2 .branding h1 { max-width:570px; margin:0; color:#fff; font-family:'Playfair Display',serif; font-size:clamp(2.7rem,4.7vw,4.7rem); line-height:1.02; letter-spacing:-.045em; }
+.registration-v2 .branding h1 span { color:#ffd277; }
+.registration-v2 .tagline { max-width:560px; margin-top:24px; color:#969696; font-size:.94rem; line-height:1.75; letter-spacing:0; }
+.registration-v2 .registration-benefits { display:grid; gap:13px; margin-top:35px; }
+.registration-v2 .registration-benefits > div { display:grid; grid-template-columns:35px 1fr; align-items:center; gap:12px; }
+.registration-v2 .registration-benefits i { display:grid; width:32px; height:32px; place-items:center; border:1px solid rgba(191,149,63,.24); border-radius:10px; background:rgba(191,149,63,.1); color:#e7bd5d; font-size:.7rem; font-style:normal; }
+.registration-v2 .registration-benefits span { display:grid; gap:3px; }
+.registration-v2 .registration-benefits strong { font-size:.74rem; }
+.registration-v2 .registration-benefits small { color:#747474; font-size:.65rem; }
+.registration-v2 .register-card { width:100%; max-width:620px; max-height:none; padding:clamp(25px,3.5vw,42px); overflow:visible; border:1px solid rgba(255,210,119,.2); border-radius:24px; background:linear-gradient(145deg,rgba(20,20,20,.97),rgba(8,8,8,.98)); box-shadow:0 30px 80px rgba(0,0,0,.48); transform:none; }
+.registration-v2 .register-card:hover { transform:none; }
+.registration-v2 #registerForm { grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px 12px; margin:0; }
+.registration-v2 .form-eyebrow,
+.registration-v2 .form-title,
+.registration-v2 #registerForm > p { grid-column:1/-1 !important; text-align:left; }
+.registration-v2 .form-eyebrow { margin-bottom:-7px; }
+.registration-v2 .form-title { margin:0; color:#fff; font-family:'Playfair Display',serif; font-size:clamp(1.65rem,2.8vw,2.35rem); letter-spacing:-.025em; }
+.registration-v2 #registerForm > p { margin:0 0 9px !important; color:#858585; font-size:.75rem; line-height:1.6; letter-spacing:0; }
+.registration-v2 .form-group { min-width:0; }
+.registration-v2 .form-group label { display:block; margin:0 0 7px; color:#8a8a8e; font-size:.56rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+.registration-v2 .form-group input { width:100%; min-height:50px; padding:0 14px; border:1px solid rgba(255,255,255,.1); border-radius:12px; background:#101010; box-shadow:none; color:#fff; font-family:'Montserrat',sans-serif; font-size:.78rem; }
+.registration-v2 .form-group input:hover { border-color:rgba(255,210,119,.24); }
+.registration-v2 .form-group input:focus { border-color:rgba(255,210,119,.72); background:#121212; box-shadow:0 0 0 3px rgba(191,149,63,.1); }
+.registration-v2 .form-group input::placeholder { color:#555; }
+.registration-v2 #passwordError,
+.registration-v2 #phoneError { grid-column:1/-1 !important; margin:-7px 0 0; }
+.registration-v2 .btn-register { grid-column:1/-1 !important; min-height:53px; margin-top:5px; border-radius:13px; background:linear-gradient(135deg,#f1ca6c,#bf953f); box-shadow:0 14px 32px rgba(191,149,63,.15); font-family:'Montserrat',sans-serif; font-size:.7rem; letter-spacing:.1em; }
+.registration-v2 .login-link { grid-column:1/-1 !important; margin-top:4px !important; color:#747474; }
+
+@media (max-width:1000px) {
+  .registration-v2 .layout { grid-template-columns:1fr; gap:38px; }
+  .registration-v2 .branding { max-width:700px; padding-bottom:0; }
+  .registration-v2 .branding h1 { font-size:clamp(2.5rem,8vw,4.2rem); }
+  .registration-v2 .register-card { max-width:760px; margin:0; }
+}
+
+@media (max-width:700px) {
+  .registration-v2 nav { min-height:64px; padding:12px 14px; }
+  .registration-v2 nav .logo { font-size:1rem; }
+  .registration-v2 .nav-links { display:flex; position:static; width:auto; padding:0; flex-direction:row; background:none; }
+  .registration-v2 .nav-links a:not(.btn-login) { display:none; }
+  .registration-v2 .menu-toggle { display:none; }
+  .registration-v2 .layout { min-height:calc(100vh - 64px); padding:38px 14px 60px; gap:30px; }
+  .registration-v2 .branding { align-items:flex-start; text-align:left; }
+  .registration-v2 .branding h1 { font-size:clamp(2.15rem,11vw,3.2rem); }
+  .registration-v2 .tagline { margin-top:18px; font-size:.82rem; }
+  .registration-v2 .registration-benefits { grid-template-columns:1fr; margin-top:25px; }
+  .registration-v2 .register-card { padding:25px 18px; border-radius:19px; }
+  .registration-v2 #registerForm { grid-template-columns:1fr; gap:13px; }
+  .registration-v2 #registerForm > * { grid-column:1 !important; }
+  .registration-v2 .form-title { font-size:1.55rem; }
+}
+
+@media (max-width:380px) {
+  .registration-v2 .layout { padding-inline:10px; }
+  .registration-v2 .branding h1 { font-size:2rem; }
+  .registration-v2 .registration-benefits small { font-size:.6rem; }
+  .registration-v2 .register-card { padding:22px 14px; }
+}
 </style>
+<link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<script src="../assets/js/core/notifications.js?v=1" defer></script>
 </head>
-<body>
+<body class="registration-v2">
 
 <div class="background"></div>
 <div class="frame"></div>
 <!-- NAVBAR TAMAKO -->
 <nav>
-    <div class="logo">✦ TAMAKO</div>
+    <div class="logo">✦ TAMAKU</div>
 
     <div class="nav-links" id="navLinks">
-        <a href="index.html">Inicio</a>
+        <a href="../index.html">Inicio</a>
         <a href="servicios.html">Servicios</a>
-        <a href="index.html?login=true" class="btn-login">Iniciar sesión</a>
+        <a href="../index.html?login=true" class="btn-login">Iniciar sesión</a>
     </div>
 
     <div class="menu-toggle" id="menuToggle">
@@ -486,49 +593,64 @@ form {
 <div class="layout">
 
     <div class="branding">
-        <h1 class="logo">TAMAKO</h1>
-        <p class="tagline">Sistema inteligente para negocios premium</p>
+        <span class="registration-eyebrow">PRUEBA GRATUITA · 7 DÍAS</span>
+        <h1>Convierte tu negocio de belleza en una <span>operación digital.</span></h1>
+        <p class="tagline">Crea tu tienda y empieza a organizar clientes, agenda, profesionales, ventas y caja desde un solo lugar.</p>
+        <div class="registration-benefits">
+            <div><i>✓</i><span><strong>Sin tarjeta</strong><small>Empieza sin compromisos.</small></span></div>
+            <div><i>✓</i><span><strong>Configuración guiada</strong><small>Tu negocio listo en pocos minutos.</small></span></div>
+            <div><i>✓</i><span><strong>Diseñado para belleza</strong><small>Salones, uñas, estética y bienestar.</small></span></div>
+        </div>
     </div>
 
     <div class="register-card">
 
     <form id="registerForm">
-        <h1 class="form-title">PRUEBA DEMO</h1>
-        <p style="grid-column:span 2; margin-bottom:20px;">Crea tu cuenta gratuita por 7 días</p>
+        <span class="form-eyebrow">COMIENZA AHORA</span>
+        <h1 class="form-title">CREA TU TIENDA</h1>
+        <p style="grid-column:span 2; margin-bottom:20px;">Prueba TAMAKU gratis durante 7 días. No necesitas tarjeta.</p>
 
         <div class="form-group">
+            <label for="nombre_tienda">Nombre del negocio</label>
             <input type="text" id="nombre_tienda" placeholder="Nombre del Negocio" required>
         </div>
 
         <div class="form-group">
+            <label for="propietario">Nombre del propietario</label>
             <input type="text" id="propietario" placeholder="Propietario" required>
         </div>
 
         <div class="form-group">
-            <input type="tel" id="telefono" placeholder="Teléfono" required maxlength="10" pattern="[0-9]{10}">
+            <label for="telefono">Teléfono</label>
+            <input type="tel" id="telefono" placeholder="300 000 0000" required maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
             <small id="phoneError" style="color:#ff4d4d; display:none; grid-column:span 2; font-size:.75rem; text-align:left;">
                 El teléfono debe tener exactamente 10 dígitos
             </small>
         </div>
 
         <div class="form-group">
+            <label for="direccion">Dirección</label>
             <input type="text" id="direccion" placeholder="Dirección" required>
         </div>
 
         <div class="form-group">
-            <input type="number" id="cantidad_puestos" placeholder="Cantidad de Puestos" required>
+            <label for="cantidad_puestos">Puestos de trabajo</label>
+            <input type="number" id="cantidad_puestos" placeholder="Ej. 3" min="1" required>
         </div>
 
         <div class="form-group">
+            <label for="email">Correo electrónico</label>
             <input type="email" id="email" placeholder="Correo Electrónico" required>
         </div>
 
         <div class="form-group">
-            <input type="password" id="password" placeholder="Contraseña" required>
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" placeholder="Mínimo 6 caracteres" minlength="6" autocomplete="new-password" required>
         </div>
         
         <div class="form-group">
-            <input type="password" id="confirmPassword" placeholder="Confirmar Contraseña" required>
+            <label for="confirmPassword">Confirmar contraseña</label>
+            <input type="password" id="confirmPassword" placeholder="Repite tu contraseña" minlength="6" autocomplete="new-password" required>
         </div>
 
         <small id="passwordError" style="color:#ff4d4d; display:none; grid-column:span 2; font-size:.75rem; text-align:left;">
@@ -536,10 +658,10 @@ form {
         </small>
 
         <button type="submit" class="btn-register" id="createBtn" style="grid-column:span 2;">
-            <span id="btnText">CREAR DEMO</span>
+            <span id="btnText">CREAR MI TIENDA</span>
         </button>
         <div class="login-link" style="grid-column: span 2; text-align:center; margin-top:15px;">
-    ¿Ya tienes cuenta? <a href="login.html">Iniciar sesión</a>
+    ¿Ya tienes cuenta? <a href="../index.html?login=true">Iniciar sesión</a>
 </div>
 
     </form>
@@ -575,6 +697,7 @@ form {
             </button>
         </div>
     </div>
+</div>
 </div>
 
 <!-- 1️⃣ Cargar Supabase -->
@@ -857,21 +980,7 @@ document.getElementById("goDashboard").addEventListener("click", function(){
 // TOAST FLOTANTE TAMAKO
 // ==========================
 function showToast(message){
-
-    const toast = document.createElement("div");
-    toast.className = "tamako-toast";
-    toast.innerText = message;
-
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-        toast.classList.add("show");
-    }, 100);
-
-    setTimeout(() => {
-        toast.classList.remove("show");
-        setTimeout(() => toast.remove(), 400);
-    }, 4000);
+    TamakuUI.success(message);
 }
 // MENU HAMBURGUESA
 const toggle = document.getElementById("menuToggle");

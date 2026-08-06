@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>TAMAKU | Usuarios y permisos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/menu.css?v=5">
+  <link rel="stylesheet" href="../assets/css/usuarios.css?v=1">
+  <link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+  <script src="../assets/js/core/menu.js?v=5" defer></script>
+  <script src="../assets/js/core/notifications.js?v=1" defer></script>
+</head>
+<body>
+  <aside class="sidebar"></aside>
+  <nav class="mobile-tab-bar"></nav>
+
+  <main class="main-content users-page">
+    <header class="users-header tamaku-module-header">
+      <div><span class="eyebrow">CONTROL DE ACCESO</span><h1>USUARIOS Y PERMISOS</h1><p>Decide quién puede entrar y qué puede consultar o administrar.</p></div>
+      <button id="btnNuevoUsuario" class="primary-action" type="button"><i class="fa-solid fa-user-plus"></i> Nuevo usuario</button>
+    </header>
+
+    <section class="access-summary">
+      <article><span class="summary-icon"><i class="fa-solid fa-crown"></i></span><div><small>PROPIETARIO</small><strong id="ownerName">Cargando...</strong><p>Acceso total protegido</p></div><span class="status-pill active">Principal</span></article>
+      <article><span class="summary-icon"><i class="fa-solid fa-users-gear"></i></span><div><small>CUENTAS DEL EQUIPO</small><strong id="usersCount">0</strong><p id="usersDetail">Sin accesos creados</p></div></article>
+    </section>
+
+    <section class="users-panel">
+      <div class="panel-heading"><div><span>ACCESOS DE LA TIENDA</span><h2>Tu equipo</h2></div><label class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input id="usersSearch" type="search" placeholder="Buscar usuario"></label></div>
+      <div id="usersList" class="users-list"><div class="users-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Cargando accesos...</p></div></div>
+    </section>
+  </main>
+
+  <div id="userModal" class="user-modal" aria-hidden="true">
+    <form id="userForm" class="user-dialog">
+      <div class="dialog-heading"><div><span>ACCESO DEL EQUIPO</span><h2 id="userModalTitle">Nuevo usuario</h2></div><button id="closeUserModal" type="button" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></div>
+      <input id="profileId" type="hidden">
+      <div class="form-grid">
+        <label><span>Nombre</span><input id="userName" required maxlength="80" autocomplete="off"></label>
+        <label><span>Correo de acceso</span><input id="userEmail" type="email" required autocomplete="off"></label>
+        <label><span>Rol</span><select id="userRole"><option value="EMPLEADO">Empleado</option><option value="ADMINISTRADOR">Administrador</option></select></label>
+        <label><span>Profesional vinculado</span><select id="userProfessional"><option value="">Sin vincular</option></select></label>
+        <label id="passwordGroup" class="full"><span>Contraseña temporal</span><input id="userPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres"></label>
+      </div>
+      <div class="permissions-heading"><div><span>PERMISOS</span><h3>¿Qué podrá hacer?</h3></div><button id="toggleAllPermissions" type="button">Marcar todos</button></div>
+      <div id="permissionsGrid" class="permissions-grid"></div>
+      <div class="dialog-actions"><button id="cancelUser" class="secondary-action" type="button">Cancelar</button><button id="saveUser" class="primary-action" type="submit"><i class="fa-solid fa-shield-check"></i> Guardar acceso</button></div>
+    </form>
+  </div>
+
+  <script type="module" src="../assets/js/usuarios/usuarios.js?v=1"></script>
+</body>
+</html>

@@ -33,7 +33,7 @@ function generarYMostrarQR() {
   container.innerHTML = "";
 
   if (!linkFinal) {
-    alert("No hay link generado");
+    window.TamakuUI?.toast?.("No fue posible generar el link de clientes.", "error");
     return;
   }
 
@@ -49,11 +49,15 @@ function generarYMostrarQR() {
 /* =========================
    COPIAR LINK
 ========================= */
-function copiarAlPortapapeles() {
+async function copiarAlPortapapeles() {
   if (!linkFinal) return;
-
-  navigator.clipboard.writeText(linkFinal);
-  alert("Link copiado");
+  try {
+    await navigator.clipboard.writeText(linkFinal);
+    window.TamakuUI?.toast?.("Link de clientes copiado.", "success");
+  } catch (error) {
+    console.error("No se pudo copiar el link:", error);
+    window.TamakuUI?.toast?.("No se pudo copiar el link.", "error");
+  }
 }
 
 /* =========================
@@ -76,6 +80,6 @@ function descargarQR() {
 function toggleModal(id, estado) {
   const modal = document.getElementById(id);
   if (!modal) return;
-
-  modal.style.display = estado ? "flex" : "none";
+  modal.style.display = "";
+  modal.classList.toggle("is-visible", estado);
 }

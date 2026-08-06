@@ -15,8 +15,15 @@ export default async function handler(req, res) {
     fecha,
     hora,
     valor,
+    citaId,
   } = req.body;
 
+  console.log("===== VARIABLES DE ENTORNO =====");
+  console.log("GMAIL_USER:", process.env.GMAIL_USER);
+  console.log(
+    "GMAIL_APP_PASS:",
+    process.env.GMAIL_APP_PASS ? "EXISTE" : "NO EXISTE",
+  );
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
@@ -32,38 +39,323 @@ export default async function handler(req, res) {
     to: email,
     subject: `✨ ${tiendaNombre} - Tu reserva ha sido confirmada ✨`,
     html: `
-            <!DOCTYPE html>
-            <html>
-            <head><meta charset="UTF-8"></head>
-            <body style="font-family: Arial, sans-serif; background: #121212; padding: 40px;">
-                <div style="max-width: 500px; margin: 0 auto; background: #1a1a1a; border-radius: 20px; padding: 30px; border: 1px solid #bf953f;">
-                    <h1 style="color: #bf953f; text-align: center;">${tiendaNombre}</h1>
-                    <h2 style="color: white; text-align: center;">✨ ¡Reserva Confirmada! ✨</h2>
-                    
-                    <div style="background: #0a0a0a; border-radius: 15px; padding: 20px; margin: 20px 0;">
-                        <p style="color: #bf953f;"><strong>Cliente:</strong></p>
-                        <p style="color: white;">${nombre}</p>
-                        
-                        <p style="color: #bf953f; margin-top: 15px;"><strong>Servicio:</strong></p>
-                        <p style="color: white;">${servicio}</p>
-                        
-                        <p style="color: #bf953f; margin-top: 15px;"><strong>Profesional:</strong></p>
-                        <p style="color: white;">${profesional}</p>
-                        
-                        <p style="color: #bf953f; margin-top: 15px;"><strong>Fecha y Hora:</strong></p>
-                        <p style="color: white;">${fecha} - ${hora}</p>
-                        
-                        <p style="color: #bf953f; margin-top: 15px;"><strong>Valor:</strong></p>
-                        <p style="color: #bf953f; font-size: 1.3rem;">${valor}</p>
-                    </div>
-                    
-                    <div style="text-align: center; border-top: 1px solid #bf953f; padding-top: 20px;">
-                        <p style="color: #888; font-size: 12px;">${tiendaNombre} - Experiencia Élite</p>
-                    </div>
-                </div>
-            </body>
-            </html>
-        `,
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Reserva Confirmada</title>
+</head>
+
+<body style="
+margin:0;
+padding:40px;
+background:#0d0d0d;
+background-image:linear-gradient(180deg,#0d0d0d 0%,#181818 100%);
+font-family:Arial,Helvetica,sans-serif;
+">
+
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td align="center">
+
+<table width="620" cellpadding="0" cellspacing="0"
+style="
+background:#181818;
+border:1px solid #BF953F;
+border-radius:24px;
+overflow:hidden;
+box-shadow:
+0 0 40px rgba(191,149,63,.15),
+0 20px 50px rgba(0,0,0,.45);
+">
+
+<tr>
+
+<td
+style="
+background:linear-gradient(135deg,#8a6a1f,#BF953F,#d8b86b);
+padding:45px;
+text-align:center;
+">
+
+<h1
+style="
+margin:0;
+font-size:40px;
+font-weight:700;
+letter-spacing:8px;
+color:#111;
+text-transform:uppercase;
+">
+TAMAKÚ
+</h1>
+
+<p
+style="
+margin:8px 0 0;
+font-size:14px;
+font-weight:bold;
+letter-spacing:4px;
+color:#111;
+">
+EXPERIENCIA ÉLITE
+</p>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td style="padding:40px;">
+
+<h2
+style="
+text-align:center;
+color:#BF953F;
+margin-top:0;
+">
+✨ RESERVA CONFIRMADA ✨
+</h2>
+
+<p
+style="
+text-align:center;
+color:#cccccc;
+font-size:16px;
+line-height:28px;
+">
+Hola <strong>${nombre}</strong>.
+
+<br><br>
+
+Tu experiencia ha sido reservada exitosamente.
+
+</p>
+
+<div style="margin-top:35px;">
+
+<div style="
+background:#111;
+border:1px solid #2a2a2a;
+border-left:4px solid #BF953F;
+border-radius:16px;
+padding:18px 22px;
+margin-bottom:14px;
+">
+
+<div style="font-size:12px;color:#888;letter-spacing:2px;">
+CLIENTE
+</div>
+
+<div style="font-size:20px;color:#fff;font-weight:bold;margin-top:6px;">
+${nombre}
+</div>
+
+</div>
+
+<div style="
+background:#111;
+border:1px solid #2a2a2a;
+border-left:4px solid #BF953F;
+border-radius:16px;
+padding:18px 22px;
+margin-bottom:14px;
+">
+
+<div style="font-size:12px;color:#888;letter-spacing:2px;">
+SERVICIO
+</div>
+
+<div style="font-size:20px;color:#fff;font-weight:bold;margin-top:6px;">
+${servicio}
+</div>
+
+</div>
+
+<div style="
+background:#111;
+border:1px solid #2a2a2a;
+border-left:4px solid #BF953F;
+border-radius:16px;
+padding:18px 22px;
+margin-bottom:14px;
+">
+
+<div style="font-size:12px;color:#888;letter-spacing:2px;">
+PROFESIONAL
+</div>
+
+<div style="font-size:20px;color:#fff;font-weight:bold;margin-top:6px;">
+${profesional}
+</div>
+
+</div>
+
+<div style="
+background:#111;
+border:1px solid #2a2a2a;
+border-left:4px solid #BF953F;
+border-radius:16px;
+padding:18px 22px;
+margin-bottom:14px;
+">
+
+<div style="font-size:12px;color:#888;letter-spacing:2px;">
+FECHA Y HORA
+</div>
+
+<div style="font-size:20px;color:#fff;font-weight:bold;margin-top:6px;">
+${fecha}
+</div>
+
+<div style="color:#BF953F;font-size:16px;margin-top:4px;">
+${hora}
+</div>
+
+</div>
+
+<div style="
+background:linear-gradient(135deg,#2b220f,#111);
+border:1px solid #BF953F;
+border-radius:18px;
+padding:28px;
+text-align:center;
+margin-top:20px;
+">
+
+<div style="
+font-size:13px;
+letter-spacing:3px;
+color:#999;
+">
+VALOR DE TU EXPERIENCIA
+</div>
+
+<div style="
+font-size:38px;
+font-weight:bold;
+color:#BF953F;
+margin-top:12px;
+">
+${valor}
+</div>
+
+</div>
+
+</div>
+
+<div
+style="
+margin-top:35px;
+background:#181818;
+padding:25px;
+border-left:5px solid #BF953F;
+">
+
+<h3
+style="
+margin-top:0;
+color:#BF953F;
+">
+Información importante
+</h3>
+
+<p
+style="
+color:#CCCCCC;
+line-height:28px;
+margin-bottom:0;
+">
+
+✔ Llega 10 minutos antes.
+
+<br>
+
+✔ Presenta este correo al llegar.
+
+<br>
+
+✔ Si necesitas ayuda puedes escribirnos por WhatsApp.
+
+</p>
+
+</div>
+
+<div
+style="
+text-align:center;
+margin-top:40px;
+">
+
+<a
+href="https://wa.me/573145038202"
+style="
+display:inline-block;
+padding:18px 42px;
+background:#25D366;
+color:#fff;
+text-decoration:none;
+border-radius:60px;
+font-weight:bold;
+font-size:17px;
+letter-spacing:1px;
+box-shadow:0 8px 20px rgba(37,211,102,.35);
+">
+
+Hablar por WhatsApp
+
+</a>
+
+</div>
+
+<hr
+style="
+margin:45px 0;
+border:none;
+border-top:1px solid #333;
+">
+
+<p
+style="
+text-align:center;
+color:#888;
+font-size:13px;
+line-height:24px;
+">
+
+<strong style="color:#BF953F;">
+${tiendaNombre}
+</strong>
+
+<br>
+
+Gracias por confiar en TAMAKÚ.
+
+<br>
+
+Te esperamos.
+
+</p>
+
+</td>
+
+</tr>
+
+</table>
+
+</td>
+
+</tr>
+
+</table>
+
+</body>
+
+</html>
+`,
   };
 
   try {

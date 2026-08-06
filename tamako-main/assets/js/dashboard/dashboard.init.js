@@ -1,14 +1,24 @@
 import { initQR } from "./dashboard.qr.js";
-import { initCitas } from "./dashboard.citas.js";
+import { initOverview } from "./dashboard.overview.js";
 
 export function initDashboard(tiendaInfo) {
-  console.log("🚀 Dashboard iniciado");
+  const nombre = tiendaInfo.nombre || tiendaInfo.nombre_tienda || "MASTER";
+  const bienvenida = document.getElementById("nombreBienvenida");
+  if (bienvenida) bienvenida.textContent = nombre.toUpperCase();
 
-  console.log("🏪 Tienda:", tiendaInfo);
-
-  // QR
   initQR(tiendaInfo);
+  initOverview(tiendaInfo);
 
-  // Citas
-  initCitas(tiendaInfo);
+  document.querySelectorAll(".dashboard-modal").forEach((modal) => {
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) modal.classList.remove("is-visible");
+    });
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      document.querySelectorAll(".dashboard-modal.is-visible").forEach((modal) =>
+        modal.classList.remove("is-visible"),
+      );
+    }
+  });
 }

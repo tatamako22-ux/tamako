@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
     <title>TAMAKU | Agenda Maestra</title>
 
@@ -14,134 +14,58 @@
     >
 
     <link rel="stylesheet" href="../assets/css/menu.css">
-    <link rel="stylesheet" href="../assets/css/agenda.css">
+    <link rel="stylesheet" href="../assets/css/agenda.css?v=3">
+<link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<script src="../assets/js/core/notifications.js?v=1" defer></script>
 </head>
 
 <body>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-        <div class="sidebar-logo">
-            ✦ TAMAKU
-        </div>
-
-        <nav class="nav-menu">
-
-            <a href="dashboard.html" class="nav-item">
-                <i class="fa-solid fa-house"></i>
-                Dashboard
-            </a>
-
-            <a href="agenda.html" class="nav-item active">
-                <i class="fa-solid fa-calendar-alt"></i>
-                Agenda
-            </a>
-
-            <a href="clientes.html" class="nav-item">
-                <i class="fa-solid fa-star"></i>
-                Clientes
-            </a>
-
-            <a href="profesionales.html" class="nav-item">
-                <i class="fa-solid fa-user-tie"></i>
-                Profesionales
-            </a>
-
-            <a href="ajustes.html" class="nav-item">
-                <i class="fa-solid fa-gear"></i>
-                Ajustes
-            </a>
-
-        </nav>
-
-        <a
-            href="#"
-            onclick="cerrarSesion()"
-            style="
-                text-decoration:none;
-                color:#ff4d4d;
-                text-align:center;
-                padding:15px;
-                border:1px solid rgba(255,77,77,0.1);
-                border-radius:50px;
-                margin-top:auto;
-                font-size:0.7rem;
-                letter-spacing:2px;
-                text-transform:uppercase;
-            "
-        >
-            CERRAR SESIÓN
-        </a>
-
-    </aside>
+    <aside class="sidebar"></aside>
 
     <!-- MOBILE NAV -->
-    <nav class="mobile-tab-bar">
-
-        <a href="dashboard.html" class="tab-item">
-            <i class="fa-solid fa-house"></i>
-            <span>Inicio</span>
-        </a>
-
-        <a href="agenda.html" class="tab-item active">
-            <i class="fa-solid fa-calendar"></i>
-            <span>Agenda</span>
-        </a>
-
-        <a href="profesionales.html" class="tab-item">
-            <i class="fa-solid fa-user-tie"></i>
-            <span>Staff</span>
-        </a>
-
-        <a href="clientes.html" class="tab-item">
-            <i class="fa-solid fa-users"></i>
-            <span>VIP</span>
-        </a>
-
-        <a href="ajustes.html" class="tab-item">
-            <i class="fa-solid fa-gear"></i>
-            <span>Ajustes</span>
-        </a>
-
-    </nav>
-
+    <nav class="mobile-tab-bar"></nav>
     <!-- MAIN -->
     <main class="main-content">
 
-        <header class="agenda-header">
-
-            <h1>Agenda Maestra</h1>
-            <!-- MINI CALENDARIO -->
-<div class="calendar-strip" id="miniCalendarStrip"></div>
-</div>
-
-            <div class="controls-row">
-
-                <div class="date-selector">
-
-                    <button class="date-btn" id="prevDay">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-
-                    <span id="fechaActual">
-                        Cargando...
-                    </span>
-
-                    <button class="date-btn" id="nextDay">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-
+        <header class="agenda-header agenda-header-v3 tamaku-module-header">
+            <div class="agenda-title-row">
+                <div>
+                    <span class="agenda-eyebrow">CONTROL DE CITAS</span>
+                    <h1>Agenda Maestra</h1>
+                    <p>Organiza el día de tu equipo y mantén cada cita bajo control.</p>
                 </div>
-
-                <div style="width:100%; position:relative;">
-
-                    <select id="mobileBarberSelector"></select>
-
-                </div>
-
+                <a class="agenda-new-booking" href="#agendaGrid">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>Ver disponibilidad</span>
+                </a>
             </div>
 
+            <div class="calendar-strip-shell">
+                <div class="calendar-strip" id="miniCalendarStrip"></div>
+            </div>
+
+            <div class="controls-row agenda-toolbar">
+                <div class="date-selector">
+                    <button class="date-btn" id="prevDay" type="button" aria-label="Día anterior">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div class="current-date-block">
+                        <small>FECHA SELECCIONADA</small>
+                        <span id="fechaActual">Cargando...</span>
+                    </div>
+                    <button class="date-btn" id="nextDay" type="button" aria-label="Día siguiente">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="professional-selector-wrap">
+                    <label for="mobileBarberSelector">
+                        <i class="fa-solid fa-user-tie"></i>
+                        PROFESIONAL
+                    </label>
+                    <select id="mobileBarberSelector"></select>
+                </div>
+            </div>
         </header>
 
         <div class="agenda-wrapper">
@@ -173,6 +97,14 @@
 
             <div id="infoReserva"></div>
 
+            <!-- NUEVO SELECTOR DE SERVICIO -->
+            <select 
+                id="res_servicio" 
+                style="width:100%; padding:12px; margin-bottom:15px; background:#111; border:1px solid rgba(191,149,63,0.3); color:white; border-radius:12px; outline:none;"
+            >
+                <option value="">Cargando servicios...</option>
+            </select>
+
             <input
                 type="text"
                 id="res_nombre"
@@ -197,7 +129,38 @@
         </div>
 
     </div>
+    <div id="modalWhatsapp" class="modal">
 
+    <div class="modal-content">
+
+        <h2>✅ Cita creada</h2>
+
+        <p id="textoWhatsapp"></p>
+
+        <button
+            id="btnEnviarWhatsapp"
+            class="btn-gold"
+        >
+            🟢 Enviar WhatsApp
+        </button>
+
+        <button
+            id="btnCerrarWhatsapp"
+            style="
+                margin-top:10px;
+                width:100%;
+                padding:12px;
+                border:none;
+                border-radius:40px;
+                cursor:pointer;
+            "
+        >
+            Cerrar
+        </button>
+
+    </div>
+
+</div>
     <!-- MODAL CANCELAR -->
     <div id="confirmCancelModal" class="modal">
 
@@ -262,19 +225,105 @@
 
     </div>
 
+    <!-- MODAL EDITAR CLIENTE (DESDE AGENDA) -->
+    <div id="modalEditarAgendaCliente" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close-modal" id="closeAgendaEdit">&times;</span>
+            <h2 style="color: var(--gold-light, #ffd277); margin-bottom: 20px; font-size: 1.2rem; text-align:center;">✦ Editar Cliente ✦</h2>
+            <input type="hidden" id="agendaEditIdCita">
+            <input type="hidden" id="agendaEditTelOriginal">
+            
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label style="font-size: 0.65rem; color: #888; text-transform: uppercase; display: block; margin-bottom: 5px;">Nombre del Cliente</label>
+                <input type="text" id="agendaEditNombre" placeholder="Nombre completo" style="width:100%; padding:12px; background:#111; border:1px solid rgba(191,149,63,0.3); color:white; border-radius:12px; outline:none;">
+            </div>
+
+            <div style="margin-bottom: 20px; text-align: left;">
+                <label style="font-size: 0.65rem; color: #888; text-transform: uppercase; display: block; margin-bottom: 5px;">Teléfono / WhatsApp</label>
+                <input type="tel" id="agendaEditTel" placeholder="3001234567" style="width:100%; padding:12px; background:#111; border:1px solid rgba(191,149,63,0.3); color:white; border-radius:12px; outline:none;">
+            </div>
+
+            <button class="btn-gold" id="btnGuardarAgendaEdit" style="width:100%; padding:14px; background:linear-gradient(145deg, #bf953f, #f5d487); border:none; border-radius:50px; color:#111; font-weight:800; cursor:pointer;">
+                Actualizar Datos
+            </button>
+        </div>
+    </div>
+    <!-- TOAST -->
+    <div id="toastAgenda" class="toast-agenda"></div>
     <!-- MENU -->
-    <script src="../assets/js/core/menu.js"></script>
+    <script src="../assets/js/core/menu.js?v=5" defer></script>
 
     <!-- AGENDA -->
     <script type="module">
+        import { initAgenda } from "../assets/js/agenda/index.js";
+        import { requireTiendaInfo } from "../assets/js/core/session.js";
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-import {
-    initAgenda
-} from "../assets/js/agenda/index.js";
+        const supabaseUrl = "https://smibbddmwgdmqpwsuaqr.supabase.co";
+        const supabaseKey = "sb_publishable_kQQ7ldmjql3V5Jbn9jvxYw_IAoSz1Uj";
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        const tiendaValidada = await requireTiendaInfo();
+        if (!tiendaValidada) throw new Error("No existe una tienda válida para esta sesión");
 
-initAgenda();
+        // Exposición global estricta para eventos onclick
+        window.abrirModalEditarAgenda = function(idCita, nombreActual, telActual) {
+            console.log("✏️ Abriendo modal con:", idCita, nombreActual, telActual);
+            document.getElementById("agendaEditIdCita").value = idCita || "";
+            document.getElementById("agendaEditTelOriginal").value = telActual || "";
+            document.getElementById("agendaEditNombre").value = nombreActual || "";
+            document.getElementById("agendaEditTel").value = telActual || "";
+            document.getElementById("modalEditarAgendaCliente").style.display = "flex";
+        };
 
-</script>
+        window.cerrarModalAgendaEdit = function() {
+            document.getElementById("modalEditarAgendaCliente").style.display = "none";
+        };
+
+        document.getElementById("closeAgendaEdit").onclick = window.cerrarModalAgendaEdit;
+
+        document.getElementById("btnGuardarAgendaEdit").onclick = async () => {
+            const idCita = document.getElementById("agendaEditIdCita").value;
+            const telOriginal = document.getElementById("agendaEditTelOriginal").value;
+            const nuevoNombre = document.getElementById("agendaEditNombre").value.trim();
+            const nuevoTel = document.getElementById("agendaEditTel").value.replace(/\D/g, "").trim();
+
+            if (!nuevoNombre || !nuevoTel) {
+                alert("Por favor completa el nombre y el teléfono.");
+                return;
+            }
+
+            const tiendaInfo = tiendaValidada;
+
+            const btn = document.getElementById("btnGuardarAgendaEdit");
+            btn.innerText = "ACTUALIZANDO...";
+
+            // Actualizamos en Supabase buscando por ID de cita o por el teléfono original
+            let query = supabase.from("citas").update({
+                nombre_cliente: nuevoNombre,
+                telefono_cliente: nuevoTel
+            }).eq("id_tienda", tiendaInfo.id);
+
+            if (idCita && idCita !== "undefined" && idCita !== "null") {
+                query = query.eq("id_cita", idCita);
+            } else {
+                query = query.eq("telefono_cliente", telOriginal);
+            }
+
+            const { error } = await query;
+
+            if (error) {
+                console.error("Error al actualizar la cita:", error);
+                alert("Hubo un error al actualizar los datos.");
+            } else {
+                alert("¡Datos del cliente actualizados con éxito!");
+                window.cerrarModalAgendaEdit();
+                window.location.reload();
+            }
+            btn.innerText = "Actualizar Datos";
+        };
+
+        initAgenda();
+    </script>
 
 </body>
 </html>

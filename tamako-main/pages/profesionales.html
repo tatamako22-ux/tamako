@@ -2,11 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>TAMAKU | Staff de Élite</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/menu.css">
+    <script src="../assets/js/core/menu.js?v=5" defer></script>
     <style>
         /* --- CONTENIDO --- */
         .main-content { flex-grow: 1; padding: 40px 5% 150px; height: 100vh; overflow-y: auto; }
@@ -229,6 +230,9 @@
             to { transform: rotate(360deg); }
         }
     </style>
+<link rel="stylesheet" href="../assets/css/profesionales.css?v=3">
+<link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<script src="../assets/js/core/notifications.js?v=1" defer></script>
 </head>
 <body>
 
@@ -422,30 +426,18 @@
         </div>
     </div>
 
-    <aside class="sidebar">
-        <div class="sidebar-logo">✦ TAMAKU</div>
-        <nav class="nav-menu">
-            <a href="dashboard.html" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <a href="agenda.html" class="nav-item"><i class="fa-solid fa-calendar-alt"></i> Agenda</a>
-            <a href="clientes.html" class="nav-item"><i class="fa-solid fa-users"></i> Clientes</a>
-            <a href="profesionales.html" class="nav-item active"><i class="fa-solid fa-user-tie"></i> Profesionales</a>
-            <a href="ajustes.html" class="nav-item"><i class="fa-solid fa-gear"></i> Ajustes</a>
-        </nav>
-        <a href="#" onclick="cerrarSesion()" class="logout-btn">Cerrar Sesión</a>
-    </aside>
-
-    <nav class="mobile-tab-bar">
-        <a href="dashboard.html" class="tab-item"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
-        <a href="agenda.html" class="tab-item"><i class="fa-solid fa-calendar"></i><span>Agenda</span></a>
-        <a href="profesionales.html" class="tab-item active"><i class="fa-solid fa-user-tie"></i><span>Staff</span></a>
-        <a href="clientes.html" class="tab-item"><i class="fa-solid fa-users"></i><span>VIP</span></a>
-        <a href="ajustes.html" class="tab-item"><i class="fa-solid fa-gear"></i><span>Ajustes</span></a>
-    </nav>
+    <aside class="sidebar"></aside>
+    
+    <nav class="mobile-tab-bar"></nav>
 
     <main class="main-content">
-        <div class="header-flex">
-            <h1>Staff de Élite</h1>
-            <button class="btn-add" onclick="abrirModal()">+ Agregar Staff</button>
+        <div class="header-flex professionals-header-v3 tamaku-module-header">
+            <div>
+                <span class="module-eyebrow">EQUIPO PROFESIONAL</span>
+                <h1>Staff de Élite</h1>
+                <p>Administra disponibilidad, servicios y configuración de tu equipo.</p>
+            </div>
+            <button class="btn-add" onclick="abrirModal()"><i class="fa-solid fa-user-plus"></i> Agregar Staff</button>
         </div>
         <div id="sedeNombre" class="sede-info">Cargando Sede...</div>
         <div id="profesionales-grid" class="barbers-grid"></div>
@@ -472,17 +464,15 @@
     </div>
 
     <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+    import { supabase } from "../assets/js/config/supabaseClient.js";
+    import { requireTiendaInfo } from "../assets/js/core/session.js";
 
     // Configuración de Supabase
-    const supabaseUrl = "https://smibbddmwgdmqpwsuaqr.supabase.co";
-    const supabaseKey = "sb_publishable_kQQ7ldmjql3V5Jbn9jvxYw_IAoSz1Uj";
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // ============================================
     // === OBTENER TIENDA REAL DEL LOCALSTORAGE ===
     // ============================================
-    let tiendaInfo = null;
+    let tiendaInfo = await requireTiendaInfo();
     
     function cargarTiendaDeSesion() {
         const stored = localStorage.getItem("tamaku_tienda");
@@ -497,9 +487,7 @@
     }
     
     // Cargar la tienda al inicio
-    if (!cargarTiendaDeSesion()) {
-        window.location.href = "../index.html";
-    }
+    if (!tiendaInfo) throw new Error("No existe una tienda válida para esta sesión");
     
     // Variables globales
     let horarioTienda = {};
@@ -521,17 +509,11 @@
     }
     
     function showToast(msj) { 
-        const t = document.getElementById("toast"); 
-        t.innerText = msj; 
-        t.classList.add("show"); 
-        setTimeout(() => t.classList.remove("show"), 3000); 
+        TamakuUI.success(msj);
     }
 
     function showError(msj) {
-        const modal = document.getElementById("errorModal");
-        const errorMsg = document.getElementById("errorMensaje");
-        if (errorMsg) errorMsg.innerText = msj;
-        if (modal) modal.style.display = "flex";
+        TamakuUI.error(msj);
     }
     
     function showLoading(show) {
@@ -561,11 +543,6 @@
         }
     };
 
-    window.cerrarSesion = () => {
-        localStorage.removeItem("tienda");
-        window.location.href = "../index.html";
-    };
-    
     window.cambiarTabHorario = (tab) => {
         document.querySelectorAll('.tab-horario').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.panel-horario').forEach(p => p.classList.remove('active'));
@@ -651,6 +628,7 @@
             .from("tiendas")
             .select("horario_general")
             .eq("id", tiendaInfo.id)
+            .eq("user_id", tiendaInfo.user_id)
             .single();
         if (data) {
             horarioTienda = data.horario_general || {};
@@ -738,15 +716,15 @@
         const cardsHTML = data.map(p => {
             const disponibilidadHTML = generarDisponibilidad(p);
             
-            let colorBorde = "#ff4d4d";
+            let claseDisponibilidad = "status-unavailable";
             if (disponibilidadHTML.includes("Disponible")) {
-                colorBorde = "#00ff9c";
+                claseDisponibilidad = "status-available";
             } else if (disponibilidadHTML.includes("almuerzo") || disponibilidadHTML.includes("descanso")) {
-                colorBorde = "#ffaa00";
+                claseDisponibilidad = "status-break";
             }
 
             return `
-                <div class="barber-card" data-id="${p.id_barbero}" style="border: 1px solid ${colorBorde}">
+                <div class="barber-card ${claseDisponibilidad}" data-id="${p.id_barbero}">
                     <div class="card-actions">
                         <i class="fa-solid fa-gear action-icon gear-btn" data-id="${p.id_barbero}" data-nombre="${p.nombre_empleado}"></i>
                         <div style="display:flex; gap:12px;">
@@ -820,7 +798,8 @@
         const { error } = await supabase
             .from("profesionales")
             .update(payload)
-            .eq("id_barbero", barberoActivoID);
+            .eq("id_barbero", barberoActivoID)
+            .eq("id_tienda", tiendaInfo.id);
         showLoading(false);
 
         if (error) {
@@ -876,7 +855,8 @@
 
             let res;
             if (editID) {
-                res = await supabase.from("profesionales").update(payload).eq("id_barbero", editID);
+                res = await supabase.from("profesionales").update(payload)
+                    .eq("id_barbero", editID).eq("id_tienda", tiendaInfo.id);
             } else {
                 res = await supabase.from("profesionales").insert([payload]);
             }
@@ -974,9 +954,15 @@
     };
     
     window.eliminarServicio = async (id) => { 
-        if(!confirm("¿Eliminar este servicio?")) return; 
+        if (!(await TamakuUI.confirm({
+            titulo: "¿Eliminar servicio?",
+            mensaje: "El servicio dejará de estar disponible para nuevas reservas.",
+            textoConfirmar: "Eliminar",
+            peligro: true
+        }))) return;
         showLoading(true);
-        await supabase.from("servicios").delete().eq("id_servicio", id); 
+        await supabase.from("servicios").delete()
+            .eq("id_servicio", id).eq("id_tienda", tiendaInfo.id); 
         showLoading(false);
         await abrirModalServicios(); 
     };
@@ -994,7 +980,8 @@
         const { data, error } = await supabase
             .from("servicios")
             .select("*")
-            .eq("id_barbero", barberoActivoID);
+            .eq("id_barbero", barberoActivoID)
+            .eq("id_tienda", tiendaInfo.id);
         showLoading(false);
 
         if (error) {
@@ -1052,7 +1039,8 @@
                 precio: parseFloat(precio), 
                 duracion_minutos: parseInt(duracion) 
             })
-            .eq("id_servicio", id);
+            .eq("id_servicio", id)
+            .eq("id_tienda", tiendaInfo.id);
         showLoading(false);
 
         if (!error) {
@@ -1091,7 +1079,8 @@
         }
         
         showLoading(true);
-        const { error } = await supabase.from("profesionales").delete().eq("id_barbero", window.idParaBorrar);
+        const { error } = await supabase.from("profesionales").delete()
+            .eq("id_barbero", window.idParaBorrar).eq("id_tienda", tiendaInfo.id);
         showLoading(false);
         
         if (!error) { 

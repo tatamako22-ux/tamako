@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>TAMAKU | Facturación</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="../assets/css/menu.css">
+<link rel="stylesheet" href="../assets/css/facturacion.css">
+<script src="../assets/js/core/menu.js?v=5" defer></script>
+<link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<script src="../assets/js/core/notifications.js?v=1" defer></script>
+</head>
+<body>
+<aside class="sidebar"></aside>
+<nav class="mobile-tab-bar"></nav>
+<main class="main-content">
+<header class="header-dash facturacion-header-v3 tamaku-module-header">
+<div>
+<span class="module-eyebrow">GESTIÓN FINANCIERA</span>
+<h1>
+FACTURACIÓN
+</h1>
+
+<p>
+Control de ingresos y ventas
+</p>
+</div>
+<button class="btn-primary" id="btnNuevaFactura" type="button">
+<i class="fa-solid fa-plus"></i>
+Nueva Factura
+</button>
+
+</header>
+<section class="stats-grid">
+<div class="stat-card">
+
+<h3>
+Ventas Hoy
+</h3>
+
+<div id="ventasHoy">
+$0
+</div>
+
+</div>
+<div class="stat-card">
+
+<h3>
+Facturas
+</h3>
+
+<div id="cantidadFacturas">
+0
+</div>
+</div>
+<div class="stat-card">
+
+<h3>
+Pendientes
+</h3>
+
+<div id="facturasPendientes">
+0
+</div>
+
+</div>
+<div class="stat-card">
+
+<h3>
+Total Mes
+</h3>
+
+<div id="totalMes">
+$0
+</div>
+
+</div>
+</section>
+<!-- ========================= -->
+<!-- NAVEGACIÓN DEL MÓDULO -->
+<!-- ========================= -->
+
+<section class="facturacion-tabs">
+
+    <button class="tab-btn active" data-tab="facturas">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        Facturas
+    </button>
+
+    <button class="tab-btn" data-tab="cuentas">
+        <i class="fa-solid fa-wallet"></i>
+        Cuentas
+    </button>
+
+    <button class="tab-btn" data-tab="caja">
+        <i class="fa-solid fa-cash-register"></i>
+        Caja
+    </button>
+
+    <button class="tab-btn" data-tab="reportes">
+        <i class="fa-solid fa-chart-line"></i>
+        Reportes
+    </button>
+
+</section>
+
+<!-- ========================= -->
+<!-- CONTENIDO FACTURAS -->
+<!-- ========================= -->
+
+<section
+class="tab-content active"
+id="tab-facturas">
+
+<div class="facturacion-panel">
+
+<div class="panel-header">
+
+<h2>Últimas Facturas</h2>
+
+<button class="btn-secondary" id="btnFiltrosFacturas" type="button" aria-expanded="false">
+
+<i class="fa-solid fa-filter"></i>
+
+Filtros
+
+</button>
+
+</div>
+
+<div id="filtrosFacturas" class="filtros-facturas hidden">
+    <label class="filtro-busqueda"><i class="fa-solid fa-magnifying-glass"></i><input id="buscarFactura" type="search" placeholder="Buscar cliente, profesional o método"></label>
+    <select id="filtrarEstadoFactura" aria-label="Filtrar por estado"><option value="">Todos los estados</option><option value="PAGADA">Pagadas</option><option value="PENDIENTE">Pendientes</option><option value="ERROR">Con error</option></select>
+    <select id="filtrarMetodoFactura" aria-label="Filtrar por método de pago"><option value="">Todos los métodos</option></select>
+    <button id="limpiarFiltrosFacturas" type="button">Limpiar</button>
+</div>
+
+<div id="listaFacturas">
+
+<!-- Aquí aparecerán las facturas -->
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ========================= -->
+<!-- CUENTAS -->
+<!-- ========================= -->
+
+<section
+class="tab-content"
+id="tab-cuentas">
+
+<div class="facturacion-panel">
+
+<div class="panel-header">
+
+<h2>Cuentas Financieras</h2>
+
+<button
+class="btn-primary"
+id="btnNuevaCuenta">
+
+<i class="fa-solid fa-plus"></i>
+
+Nueva Cuenta
+
+</button>
+
+</div>
+
+<div id="listaCuentas">
+
+</div>
+
+</div>
+
+</section>
+
+<!-- MODAL GESTIÓN DE CUENTA -->
+<div id="modalGestionCuenta" class="modal-overlay hidden">
+    <div class="modal-content modal-cuenta-gestion">
+        <div class="modal-header">
+            <div>
+                <span class="modal-eyebrow">CUENTA FINANCIERA</span>
+                <h2 id="gestionCuentaTitulo">Gestionar cuenta</h2>
+            </div>
+            <button class="btn-close" id="cerrarGestionCuenta" type="button" aria-label="Cerrar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="gestion-cuenta-saldo">
+                <span>Saldo actual</span>
+                <strong id="gestionCuentaSaldo">$0</strong>
+            </div>
+
+            <div class="form-grid">
+                <div class="input-group">
+                    <label for="gestionCuentaNombre">Nombre</label>
+                    <input id="gestionCuentaNombre" type="text" maxlength="60">
+                </div>
+
+                <div class="input-group">
+                    <label for="gestionCuentaTipo">Tipo</label>
+                    <select id="gestionCuentaTipo">
+                        <option value="EFECTIVO">Efectivo</option>
+                        <option value="DIGITAL">Digital</option>
+                        <option value="BANCO">Banco</option>
+                        <option value="TARJETA">Tarjeta</option>
+                        <option value="OTRO">Otro</option>
+                    </select>
+                </div>
+            </div>
+
+            <section class="movimientos-cuenta">
+                <div class="movimientos-header">
+                    <h3>Últimos movimientos</h3>
+                    <span id="gestionCuentaCantidad">0 movimientos</span>
+                </div>
+                <div id="listaMovimientosCuenta" class="lista-movimientos"></div>
+            </section>
+        </div>
+
+        <div class="modal-footer gestion-cuenta-footer">
+            <button type="button" class="btn-danger-outline" id="desactivarCuenta">
+                <i class="fa-solid fa-ban"></i> Desactivar
+            </button>
+            <button type="button" class="btn-primary" id="guardarCambiosCuenta">
+                Guardar cambios
+            </button>
+        </div>
+    </div>
+</div>
+<!-- ========================= -->
+<!-- MODAL NUEVA CUENTA -->
+<!-- ========================= -->
+
+<div id="modalCuenta" class="modal-overlay hidden">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>Nueva Cuenta Financiera</h2>
+
+            <button
+                class="btn-close"
+                id="cerrarModalCuenta">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <div class="input-group">
+
+                <label>Nombre</label>
+
+                <input
+                    id="cuentaNombre"
+                    type="text"
+                    placeholder="Caja Principal">
+
+            </div>
+
+            <div class="input-group">
+
+                <label>Tipo</label>
+
+                <select id="cuentaTipo">
+
+                    <option value="EFECTIVO">Efectivo</option>
+
+                    <option value="DIGITAL">Digital</option>
+
+                    <option value="BANCO">Banco</option>
+
+                    <option value="TARJETA">Tarjeta</option>
+
+                    <option value="OTRO">Otro</option>
+
+                </select>
+
+            </div>
+
+            <div class="input-group">
+
+                <label>Saldo Inicial</label>
+
+                <input
+                    id="cuentaSaldo"
+                    type="number"
+                    value="0">
+
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                class="btn-secondary"
+                id="cancelarCuenta">
+
+                Cancelar
+
+            </button>
+
+            <button
+                class="btn-primary"
+                id="guardarCuenta">
+
+                Crear Cuenta
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- ========================= -->
+<!-- CAJA -->
+<!-- ========================= -->
+
+<section
+class="tab-content"
+id="tab-caja">
+
+<div id="cajaModulo">
+    <div class="facturacion-panel caja-panel-principal">
+        <div class="panel-header caja-panel-header">
+            <div>
+                <span class="caja-eyebrow">CONTROL DE EFECTIVO</span>
+                <h2>Caja diaria</h2>
+                <p id="cajaEstadoTexto">Comprobando estado de caja...</p>
+            </div>
+            <button type="button" class="btn-primary" id="btnAbrirCaja">
+                <i class="fa-solid fa-lock-open"></i> Abrir caja
+            </button>
+            <button type="button" class="btn-cerrar-caja hidden" id="btnCerrarCaja">
+                <i class="fa-solid fa-lock"></i> Cerrar caja
+            </button>
+        </div>
+
+        <div id="cajaSinAbrir" class="caja-vacia">
+            <div class="caja-vacia-icono"><i class="fa-solid fa-cash-register"></i></div>
+            <h3>No hay una caja abierta</h3>
+            <p>Abre una cuenta de efectivo para controlar las ventas y el cierre del turno.</p>
+        </div>
+
+        <div id="cajaAbiertaContenido" class="hidden">
+            <div class="caja-resumen-grid">
+                <article class="caja-resumen-card">
+                    <span>Base inicial</span>
+                    <strong id="cajaBaseInicial">$0</strong>
+                    <small id="cajaCuentaNombre">Caja</small>
+                </article>
+                <article class="caja-resumen-card ingreso">
+                    <span>Ingresos del turno</span>
+                    <strong id="cajaIngresos">$0</strong>
+                    <small>Movimientos registrados</small>
+                </article>
+                <article class="caja-resumen-card egreso">
+                    <span>Egresos del turno</span>
+                    <strong id="cajaEgresos">$0</strong>
+                    <small>Salidas de efectivo</small>
+                </article>
+                <article class="caja-resumen-card esperado">
+                    <span>Efectivo esperado</span>
+                    <strong id="cajaEsperado">$0</strong>
+                    <small>Base + ingresos − egresos</small>
+                </article>
+            </div>
+
+            <div class="caja-operacion-grid">
+                <section class="caja-movimientos-panel">
+                    <div class="movimientos-header">
+                        <div>
+                            <h3>Movimientos del turno</h3>
+                            <span id="cajaHoraApertura"></span>
+                        </div>
+                        <div class="caja-acciones-rapidas">
+                            <button type="button" class="btn-movimiento ingreso" data-tipo="INGRESO">
+                                <i class="fa-solid fa-plus"></i> Ingreso
+                            </button>
+                            <button type="button" class="btn-movimiento egreso" data-tipo="EGRESO">
+                                <i class="fa-solid fa-minus"></i> Egreso
+                            </button>
+                        </div>
+                    </div>
+                    <div id="listaMovimientosCaja" class="lista-movimientos"></div>
+                </section>
+
+                <aside class="caja-info-turno">
+                    <span>ESTADO DEL TURNO</span>
+                    <strong><i class="fa-solid fa-circle"></i> CAJA ABIERTA</strong>
+                    <p>Todos los pagos en efectivo asociados a esta cuenta se reflejan automáticamente.</p>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <div class="facturacion-panel">
+        <div class="panel-header">
+            <h2>Historial de cierres</h2>
+        </div>
+        <div id="historialCajas" class="historial-cajas"></div>
+    </div>
+</div>
+
+<!-- MODAL MOVIMIENTO DE CAJA -->
+<div id="modalMovimientoCaja" class="modal-overlay hidden">
+    <div class="modal-content modal-caja">
+        <div class="modal-header">
+            <div>
+                <span class="modal-eyebrow">MOVIMIENTO MANUAL</span>
+                <h2 id="movimientoCajaTitulo">Registrar movimiento</h2>
+            </div>
+            <button type="button" class="btn-close" id="cerrarModalMovimientoCaja"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <div id="movimientoTipoVisual" class="movimiento-tipo-visual ingreso">
+                <i class="fa-solid fa-arrow-down"></i>
+                <div><span>TIPO DE MOVIMIENTO</span><strong>INGRESO</strong></div>
+            </div>
+            <div class="input-group">
+                <label for="movimientoConcepto">Concepto</label>
+                <input id="movimientoConcepto" type="text" maxlength="120" placeholder="Ej. Compra de insumos">
+            </div>
+            <div class="input-group">
+                <label for="movimientoMonto">Monto</label>
+                <input id="movimientoMonto" type="number" min="1" step="100" value="0">
+            </div>
+            <div class="movimiento-impacto">
+                <span>Saldo actual de la cuenta</span>
+                <strong id="movimientoSaldoActual">$0</strong>
+                <small id="movimientoResultadoTexto">El saldo se actualizará al confirmar.</small>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" id="cancelarMovimientoCaja">Cancelar</button>
+            <button type="button" class="btn-primary" id="confirmarMovimientoCaja">Registrar movimiento</button>
+        </div>
+    </div>
+</div>
+
+</section>
+
+<!-- MODAL ABRIR CAJA -->
+<div id="modalAbrirCaja" class="modal-overlay hidden">
+    <div class="modal-content modal-caja">
+        <div class="modal-header">
+            <div>
+                <span class="modal-eyebrow">INICIO DE TURNO</span>
+                <h2>Abrir caja</h2>
+            </div>
+            <button type="button" class="btn-close" id="cerrarModalAbrirCaja"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="caja-aviso">
+                <i class="fa-solid fa-circle-info"></i>
+                Cuenta el efectivo disponible antes de iniciar el turno.
+            </div>
+            <div class="input-group">
+                <label for="cajaCuenta">Cuenta de efectivo</label>
+                <select id="cajaCuenta"></select>
+            </div>
+            <div class="input-group">
+                <label for="cajaBase">Base inicial</label>
+                <input id="cajaBase" type="number" min="0" step="100" value="0">
+            </div>
+            <div class="input-group">
+                <label for="cajaNotasApertura">Nota opcional</label>
+                <input id="cajaNotasApertura" type="text" maxlength="180" placeholder="Ej. Turno de la mañana">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" id="cancelarAbrirCaja">Cancelar</button>
+            <button type="button" class="btn-primary" id="confirmarAbrirCaja">Confirmar apertura</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CERRAR CAJA -->
+<div id="modalCerrarCaja" class="modal-overlay hidden">
+    <div class="modal-content modal-caja">
+        <div class="modal-header">
+            <div>
+                <span class="modal-eyebrow">CIERRE DE TURNO</span>
+                <h2>Cerrar caja</h2>
+            </div>
+            <button type="button" class="btn-close" id="cerrarModalCerrarCaja"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="cierre-comparacion">
+                <div><span>Esperado</span><strong id="cierreEsperado">$0</strong></div>
+                <div><span>Contado</span><strong id="cierreContadoVista">$0</strong></div>
+                <div class="cierre-diferencia"><span>Diferencia</span><strong id="cierreDiferencia">$0</strong></div>
+            </div>
+            <div class="input-group">
+                <label for="cajaSaldoContado">Efectivo contado</label>
+                <input id="cajaSaldoContado" type="number" min="0" step="100" value="0">
+            </div>
+            <div class="input-group">
+                <label for="cajaNotasCierre">Observaciones</label>
+                <input id="cajaNotasCierre" type="text" maxlength="180" placeholder="Explica cualquier diferencia">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" id="cancelarCerrarCaja">Cancelar</button>
+            <button type="button" class="btn-cerrar-caja" id="confirmarCerrarCaja">Cerrar turno</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================= -->
+<!-- REPORTES -->
+<!-- ========================= -->
+
+<section
+class="tab-content"
+id="tab-reportes">
+
+<div class="facturacion-panel reportes-panel">
+    <div class="panel-header reportes-encabezado">
+        <div><span class="reportes-eyebrow">ANÁLISIS FINANCIERO</span><h2>Reportes</h2><p id="reportePeriodoTexto">Resumen del periodo seleccionado</p></div>
+        <button type="button" class="btn-secondary" id="exportarReporte"><i class="fa-solid fa-file-arrow-down"></i> Exportar CSV</button>
+    </div>
+    <div class="reportes-filtros" aria-label="Filtros del reporte">
+        <div class="reportes-atajos">
+            <button type="button" class="reporte-atajo" data-periodo="hoy">Hoy</button>
+            <button type="button" class="reporte-atajo" data-periodo="7">7 días</button>
+            <button type="button" class="reporte-atajo" data-periodo="30">30 días</button>
+            <button type="button" class="reporte-atajo active" data-periodo="mes">Este mes</button>
+        </div>
+        <div class="reportes-fechas">
+            <label>Desde <input type="date" id="reporteDesde"></label>
+            <label>Hasta <input type="date" id="reporteHasta"></label>
+            <button type="button" class="btn-primary" id="aplicarReporte">Aplicar</button>
+        </div>
+    </div>
+    <div id="reporteEstado" class="reporte-estado">Preparando reporte...</div>
+    <div id="reporteContenido" class="hidden">
+        <div class="reportes-kpis">
+            <article class="reporte-kpi destacado"><span>Ventas facturadas</span><strong id="reporteVentas">$0</strong><small id="reporteFacturas">0 facturas pagadas</small></article>
+            <article class="reporte-kpi"><span>Flujo neto</span><strong id="reporteFlujo">$0</strong><small>Ingresos menos egresos</small></article>
+            <article class="reporte-kpi"><span>Egresos</span><strong id="reporteEgresos">$0</strong><small>Salidas registradas</small></article>
+            <article class="reporte-kpi"><span>Ticket promedio</span><strong id="reporteTicket">$0</strong><small>Promedio por factura pagada</small></article>
+        </div>
+        <div class="reportes-grid">
+            <section class="reporte-card reporte-tendencia-card"><div class="reporte-card-header"><div><h3>Ventas por día</h3><p>Facturas pagadas en el periodo</p></div><span id="reporteDiasActivos">0 días con ventas</span></div><div id="reporteTendencia" class="reporte-tendencia"></div></section>
+            <section class="reporte-card"><div class="reporte-card-header"><div><h3>Métodos de pago</h3><p>Participación sobre ventas pagadas</p></div></div><div id="reporteMetodos" class="reporte-ranking"></div></section>
+            <section class="reporte-card"><div class="reporte-card-header"><div><h3>Rendimiento profesional</h3><p>Ventas facturadas por profesional</p></div></div><div id="reporteProfesionales" class="reporte-ranking"></div></section>
+            <section class="reporte-card reporte-cuentas-card"><div class="reporte-card-header"><div><h3>Saldos por cuenta</h3><p>Saldo actual, fuera del filtro de fechas</p></div><strong id="reporteSaldoTotal">$0</strong></div><div id="reporteCuentas" class="reporte-cuentas"></div></section>
+        </div>
+        <section class="reporte-card reporte-actividad-card"><div class="reporte-card-header"><div><h3>Actividad financiera reciente</h3><p>Últimos movimientos dentro del periodo</p></div></div><div id="reporteMovimientos" class="reporte-actividad"></div></section>
+    </div>
+</div>
+
+</section>
+<!-- MODAL NUEVA FACTURA -->
+<div id="modalNuevaFactura" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Crear Nueva Factura</h2>
+            <button class="btn-close" id="btnCerrarModal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div class="modal-body">
+            <form id="formFactura">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Cliente</label>
+                        <select id="facturaCliente">
+                            <option value="">Seleccione un cliente...</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Profesional</label>
+                        <select id="facturaBarbero" required>
+                            <option value="">Seleccione un profesional...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="detalles-section">
+                    <h3>Servicios / Productos</h3>
+                    <div id="contenedorDetalles">
+                        <!-- Aquí se inyectarán los servicios -->
+                    </div>
+                    <button type="button" class="btn-secondary btn-sm" id="btnAgregarDetalle">
+                        <i class="fa-solid fa-plus"></i> Agregar Ítem
+                    </button>
+                </div>
+
+                <div class="form-grid totales-grid">
+                    <div class="input-group">
+                        <label>Método de Pago</label>
+                        <select id="facturaMetodo" required>
+                            <option value="">Cargando métodos de pago...</option>
+                        </select>
+                    </div>
+                    <div class="totales-display">
+                        <div class="total-row"><span>Subtotal:</span> <span id="facturaSubtotal">$0</span></div>
+                        <div class="total-row gran-total"><span>Total:</span> <span id="facturaTotal">$0</span></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" id="btnCancelarFactura">Cancelar</button>
+            <button type="submit" form="formFactura" class="btn-primary">Guardar Factura</button>
+        </div>
+    </div>
+</div>
+</main>
+<script type="module">
+import { initFacturacion } 
+from "../assets/js/facturacion/facturacion.init.js";
+initFacturacion();
+</script>
+</body>
+</html>

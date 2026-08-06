@@ -96,7 +96,7 @@
 
                 <div class="vip-info-card">
                     <p style="margin-bottom: 10px; font-size: 0.9rem; font-weight: 800; letter-spacing: 1px;">CREA TU PERFIL VIP</p>
-                    <p style="font-weight: 400; opacity: 0.9;">Para asegurar tu reserva, por favor crea tu Llave Élite. Esto te dará acceso a nuestro Club: no volverás a llenar formularios en el futuro y desbloquearás acceso exclusivo a beneficios.</p>
+                    <p style="font-weight: 400; opacity: 0.9;">Para asegurar tu reserva, crea una contraseña. Con ella podrás ingresar a tu perfil, consultar tus citas y reservar nuevamente sin repetir tus datos.</p>
                 </div>
                     <div class="field-3d">
                     <label>Nombre Completo</label>
@@ -114,8 +114,8 @@
                     
                     <div class="field-3d">
                     <!-- SE CAMBIÓ LA ETIQUETA PARA QUE SEA OBLIGATORIO -->
-                    <label>CREAR LLAVE ÉLITE (MÍN. 6 CARACTERES)</label>
-                    <input type="password" id="res-password-step4" placeholder="Crea tu clave de acceso" required>
+                    <label>CREAR CONTRASEÑA (MÍN. 6 CARACTERES)</label>
+                    <input type="password" id="res-password-step4" placeholder="Crea tu contraseña" autocomplete="new-password" required>
                     <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('res-password-step4', this)"></i>
                 </div>
                 </section>
@@ -132,14 +132,14 @@
             <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:40px;">ACCESO PRIVADO</h2>
             <div class="field-3d"><label>EMAIL</label><input type="email" id="auth-email"></div>
             <div class="field-3d">
-                <label>LLAVE VIP</label>
-                <input type="password" id="auth-pass">
+                <label>CONTRASEÑA</label>
+                <input type="password" id="auth-pass" placeholder="Ingresa tu contraseña" autocomplete="current-password">
                 <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('auth-pass', this)"></i>
             </div>
             <button class="btn-main" onclick="executeAuth()">INGRESAR</button>
             
             <!-- NUEVO: Botón de recuperar contraseña -->
-            <p onclick="recuperarClave()" style="text-align:center; margin-top:20px; cursor:pointer; font-size: 0.75rem; font-weight:600; color:var(--gold); text-decoration: underline; letter-spacing: 1px;">¿Olvidaste tu Llave VIP?</p>
+            <p onclick="recuperarClave()" style="text-align:center; margin-top:20px; cursor:pointer; font-size: 0.75rem; font-weight:600; color:var(--gold); text-decoration: underline; letter-spacing: 1px;">¿Olvidaste tu contraseña?</p>
         </div>
 
         <div id="auth-profile-view" style="display:none; text-align:center;">
@@ -165,14 +165,14 @@
 
         <!-- NUEVO: Vista para ingresar la nueva contraseña -->
         <div id="auth-update-pass-view" style="display:none; text-align:center;">
-            <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom:10px;">NUEVA LLAVE ÉLITE</h2>
-            <p style="font-size:0.8rem; margin-bottom:20px; opacity: 0.8;">Crea tu nueva llave de acceso.</p>
+            <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom:10px;">NUEVA CONTRASEÑA</h2>
+            <p style="font-size:0.8rem; margin-bottom:20px; opacity: 0.8;">Crea una nueva contraseña para ingresar a tu cuenta.</p>
             <div class="field-3d">
-                <label>NUEVA LLAVE VIP</label>
-                <input type="password" id="auth-new-pass">
+                <label>NUEVA CONTRASEÑA</label>
+                <input type="password" id="auth-new-pass" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
                 <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('auth-new-pass', this)"></i>
             </div>
-            <button class="btn-main" onclick="guardarNuevaClave()">GUARDAR LLAVE</button>
+            <button class="btn-main" onclick="guardarNuevaClave()">GUARDAR CONTRASEÑA</button>
         </div>
 
         <p onclick="toggleAuthModal(false)" style="text-align:center; margin-top:40px; cursor:pointer; font-weight:800; opacity:0.5;">REGRESAR</p>
@@ -727,7 +727,7 @@ if (resDate) {
 
             // 1. VALIDAMOS QUE LA CLAVE NO ESTÉ VACÍA
             if (name === "" || phone === "" || email === "" || pass === "") {
-                showAlert("⚠️ TODOS LOS CAMPOS SON OBLIGATORIOS: Nombre, WhatsApp, Email y tu Llave Élite (Clave).");
+                showAlert("⚠️ TODOS LOS CAMPOS SON OBLIGATORIOS: Nombre, WhatsApp, email y contraseña.");
                 btn.disabled = false;
                 btn.innerText = "Finalizar y Unirme";
                 return;
@@ -746,7 +746,7 @@ if (resDate) {
             }
             // 2. VALIDAMOS QUE LA CLAVE TENGA MÍNIMO 6 CARACTERES
             if (pass.length < 6) {
-                showAlert("⚠️ Tu Llave Élite debe tener al menos 6 caracteres.");
+                showAlert("⚠️ Tu contraseña debe tener al menos 6 caracteres.");
                 btn.disabled = false;
                 btn.innerText = "Finalizar y Unirme";
                 return;
@@ -1195,7 +1195,7 @@ if (notificar) {
         const newPass = document.getElementById("auth-new-pass").value;
         
         if (newPass.length < 6) {
-            showAlert("⚠️ La Llave VIP debe tener al menos 6 caracteres.");
+            showAlert("⚠️ La contraseña debe tener al menos 6 caracteres.");
             return;
         }
 
@@ -1204,7 +1204,7 @@ if (notificar) {
         if (error) {
             showAlert("❌ Error al actualizar: " + error.message);
         } else {
-            showAlert("✅ ¡Tu Llave VIP ha sido actualizada con éxito!");
+            showAlert("✅ ¡Tu contraseña ha sido actualizada con éxito!");
             
             // Limpiamos la URL (quitamos el token largo) pero mantenemos la tienda base
             const urlLimpia = window.location.origin + window.location.pathname + window.location.search;

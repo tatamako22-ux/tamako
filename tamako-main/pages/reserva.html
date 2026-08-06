@@ -139,7 +139,7 @@
             <button class="btn-main" onclick="executeAuth()">INGRESAR</button>
             
             <!-- NUEVO: Botón de recuperar contraseña -->
-            <p onclick="recuperarClave()" style="text-align:center; margin-top:20px; cursor:pointer; font-size: 0.75rem; font-weight:600; color:var(--gold); text-decoration: underline; letter-spacing: 1px;">¿Olvidaste tu contraseña?</p>
+            <button type="button" onclick="recuperarClave()" style="width:100%; margin-top:20px; padding:8px; cursor:pointer; color:var(--gold); background:transparent; border:0; font-size:0.75rem; font-weight:600; text-decoration:underline; letter-spacing:1px;">¿Olvidaste tu contraseña?</button>
         </div>
 
         <div id="auth-profile-view" style="display:none; text-align:center;">
@@ -166,13 +166,22 @@
         <!-- NUEVO: Vista para ingresar la nueva contraseña -->
         <div id="auth-update-pass-view" style="display:none; text-align:center;">
             <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom:10px;">NUEVA CONTRASEÑA</h2>
-            <p style="font-size:0.8rem; margin-bottom:20px; opacity: 0.8;">Crea una nueva contraseña para ingresar a tu cuenta.</p>
+            <p id="recovery-instructions" style="font-size:0.8rem; margin-bottom:20px; opacity: 0.8;">Ingresa el código enviado a tu correo y crea una nueva contraseña.</p>
+            <div class="field-3d" id="recovery-code-field">
+                <label>CÓDIGO DE RECUPERACIÓN</label>
+                <input type="text" id="auth-recovery-code" placeholder="Código recibido" inputmode="numeric" autocomplete="one-time-code" maxlength="8">
+            </div>
             <div class="field-3d">
                 <label>NUEVA CONTRASEÑA</label>
                 <input type="password" id="auth-new-pass" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
                 <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('auth-new-pass', this)"></i>
             </div>
-            <button class="btn-main" onclick="guardarNuevaClave()">GUARDAR CONTRASEÑA</button>
+            <div class="field-3d">
+                <label>CONFIRMAR CONTRASEÑA</label>
+                <input type="password" id="auth-confirm-pass" placeholder="Repite tu contraseña" autocomplete="new-password">
+                <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('auth-confirm-pass', this)"></i>
+            </div>
+            <button class="btn-main" id="btn-save-recovery" onclick="guardarNuevaClave()">VALIDAR Y CAMBIAR CONTRASEÑA</button>
         </div>
 
         <p onclick="toggleAuthModal(false)" style="text-align:center; margin-top:40px; cursor:pointer; font-weight:800; opacity:0.5;">REGRESAR</p>
@@ -209,6 +218,7 @@
 
     // --- VARIABLES GLOBALES ---
     let currentStep = 1, tiendaId, barberId, serviceId, user, tiendaData, horaSeleccionada = null, precioSeleccionado = 0, nombreServicioSel = "";
+    let recoveryEmail = "", recoveryMode = "codigo";
     
     const params = new URLSearchParams(window.location.search);
     const tiendaRef = params.get("v");
@@ -1152,65 +1162,113 @@ if (notificar) {
         } else {
             document.getElementById("auth-login-view").style.display = "block";
             document.getElementById("auth-profile-view").style.display = "none";
+            document.getElementById("auth-update-pass-view").style.display = "none";
         }
     };
     // --- RECUPERACIÓN DE CONTRASEÑA ---
 
+    function mostrarVistaRecuperacion(modo = "codigo") {
+        recoveryMode = modo;
+        document.getElementById("modal-auth").style.display = "flex";
+        document.getElementById("auth-login-view").style.display = "none";
+        document.getElementById("auth-profile-view").style.display = "none";
+        document.getElementById("auth-update-pass-view").style.display = "block";
+
+        const usaCodigo = modo === "codigo";
+        document.getElementById("recovery-code-field").style.display = usaCodigo ? "block" : "none";
+        document.getElementById("recovery-instructions").textContent = usaCodigo
+            ? `Escribe el código enviado a ${recoveryEmail} y crea tu nueva contraseña.`
+            : "Crea una nueva contraseña para ingresar a tu cuenta.";
+        document.getElementById("btn-save-recovery").textContent = usaCodigo
+            ? "VALIDAR Y CAMBIAR CONTRASEÑA"
+            : "GUARDAR CONTRASEÑA";
+    }
+
     // 1. Detectar retorno desde el correo electrónico
     supabase.auth.onAuthStateChange(async (event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
-            document.getElementById("modal-auth").style.display = "flex";
-            document.getElementById("auth-login-view").style.display = "none";
-            document.getElementById("auth-profile-view").style.display = "none";
-            document.getElementById("auth-update-pass-view").style.display = "block";
+            mostrarVistaRecuperacion("enlace");
         }
     });
 
-    // 2. Enviar el correo de recuperación
+    // 2. Enviar el código de recuperación
     window.recuperarClave = async () => {
-        const email = document.getElementById("auth-email").value.trim();
+        const email = document.getElementById("auth-email").value.trim().toLowerCase();
         
         if (!email) {
-            showAlert("⚠️ Ingresa tu EMAIL en la casilla de arriba para enviarte el enlace.");
+            showAlert("⚠️ Ingresa tu email en la casilla de arriba para enviarte el código.");
             return;
         }
 
-        // Capturamos la URL exacta de la tienda para no perder la trazabilidad
-        const urlTiendaExacta = window.location.href;
-
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: urlTiendaExacta
-        });
+        const { error } = await supabase.auth.resetPasswordForEmail(email);
 
         if (error) {
             showAlert("❌ Error: " + error.message);
         } else {
-            // AVISO NUEVO INCLUYENDO LA ALERTA DE SPAM
-            showAlert("📩 ¡Listo! Te enviamos un enlace. Por favor revisa tu bandeja principal y también la carpeta de SPAM o Correo no deseado.");
+            recoveryEmail = email;
+            document.getElementById("auth-recovery-code").value = "";
+            document.getElementById("auth-new-pass").value = "";
+            document.getElementById("auth-confirm-pass").value = "";
+            mostrarVistaRecuperacion("codigo");
+            showAlert("📩 Te enviamos un código. Revisa tu bandeja de entrada y la carpeta de correo no deseado.");
         }
     };
 
-    // 3. Guardar la nueva llave
+    // 3. Validar el código y guardar la nueva contraseña
     window.guardarNuevaClave = async () => {
+        const code = document.getElementById("auth-recovery-code").value.trim();
         const newPass = document.getElementById("auth-new-pass").value;
+        const confirmPass = document.getElementById("auth-confirm-pass").value;
+        const button = document.getElementById("btn-save-recovery");
+
+        if (recoveryMode === "codigo" && (!recoveryEmail || !code)) {
+            showAlert("⚠️ Ingresa el código que recibiste en tu correo.");
+            return;
+        }
         
         if (newPass.length < 6) {
             showAlert("⚠️ La contraseña debe tener al menos 6 caracteres.");
             return;
         }
 
+        if (newPass !== confirmPass) {
+            showAlert("⚠️ Las contraseñas no coinciden.");
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "VALIDANDO...";
+
+        if (recoveryMode === "codigo") {
+            const { error: verifyError } = await supabase.auth.verifyOtp({
+                email: recoveryEmail,
+                token: code,
+                type: "recovery"
+            });
+
+            if (verifyError) {
+                button.disabled = false;
+                button.textContent = "VALIDAR Y CAMBIAR CONTRASEÑA";
+                showAlert("❌ El código no es válido o ya venció. Solicita uno nuevo.");
+                return;
+            }
+        }
+
         const { error } = await supabase.auth.updateUser({ password: newPass });
 
         if (error) {
+            button.disabled = false;
+            button.textContent = recoveryMode === "codigo" ? "VALIDAR Y CAMBIAR CONTRASEÑA" : "GUARDAR CONTRASEÑA";
             showAlert("❌ Error al actualizar: " + error.message);
         } else {
+            await supabase.auth.signOut();
             showAlert("✅ ¡Tu contraseña ha sido actualizada con éxito!");
-            
-            // Limpiamos la URL (quitamos el token largo) pero mantenemos la tienda base
-            const urlLimpia = window.location.origin + window.location.pathname + window.location.search;
-            
-            // Recargamos la tienda limpia para continuar la reserva normal
-            window.location.href = urlLimpia;
+            document.getElementById("auth-update-pass-view").style.display = "none";
+            document.getElementById("auth-login-view").style.display = "block";
+            document.getElementById("auth-email").value = recoveryEmail;
+            document.getElementById("auth-pass").value = "";
+            recoveryEmail = "";
+            recoveryMode = "codigo";
         }
     };
     // --- LOGIN ---

@@ -1,5 +1,5 @@
 // Cambiamos la versión de la caché para forzar la actualización en los celulares
-const CACHE_NAME = "tamaku-v5-users-permissions";
+const CACHE_NAME = "tamaku-v6-marketplace";
 
 const urlsToCache = [
   "/",
@@ -14,6 +14,7 @@ const urlsToCache = [
   "/pages/facturacion.html",
   "/pages/usuarios.html",
   "/pages/ajustes.html",
+  "/pages/tienda.html",
   "/pages/servicios.html",
   "/pages/registro.html",
   "/pages/reserva.html",

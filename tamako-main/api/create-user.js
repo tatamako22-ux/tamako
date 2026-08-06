@@ -3,7 +3,7 @@ const PERMISOS_VALIDOS = new Set([
   "clientes_ver", "clientes_gestionar", "profesionales_ver",
   "profesionales_gestionar", "facturacion_ver", "facturas_crear",
   "cuentas_gestionar", "caja_gestionar", "reportes_ver", "ajustes_ver",
-  "usuarios_gestionar",
+  "usuarios_gestionar", "tienda_ver",
 ]);
 
 function responder(res, estado, contenido) {

@@ -70,6 +70,7 @@ const PERMISOS_RUTA = {
   "clientes.html": "clientes_ver",
   "profesionales.html": "profesionales_ver",
   "facturacion.html": "facturacion_ver",
+  "tienda.html": "tienda_ver",
   "usuarios.html": "usuarios_gestionar",
   "ajustes.html": "ajustes_ver",
 };
@@ -108,6 +109,7 @@ function renderMenuGlobal(tienda) {
         ${enlace(tienda, "clientes_ver", "clientes.html", pagina, "fa-users", "Clientes")}
         ${enlace(tienda, "profesionales_ver", "profesionales.html", pagina, "fa-user-tie", "Profesionales")}
         ${enlace(tienda, "facturacion_ver", "facturacion.html", pagina, "fa-file-invoice-dollar", "Facturación")}
+        ${enlace(tienda, "tienda_ver", "tienda.html", pagina, "fa-bag-shopping", "Tienda")}
         ${enlace(tienda, "usuarios_gestionar", "usuarios.html", pagina, "fa-user-shield", "Usuarios")}
         ${enlace(tienda, "ajustes_ver", "ajustes.html", pagina, "fa-gear", "Ajustes")}
       </nav>
@@ -124,7 +126,7 @@ function renderMenuGlobal(tienda) {
     ].filter(([permiso]) => puede(tienda, permiso));
     mobile.innerHTML = tabs.map(([, href, icono, texto]) =>
       `<a href="${href}" class="tab-item ${pagina === href ? "active" : ""}"><i class="fa-solid ${icono}"></i><span>${texto}</span></a>`,
-    ).join("") + `<button type="button" class="tab-item tab-more ${["profesionales.html", "usuarios.html", "ajustes.html"].includes(pagina) ? "active" : ""}" onclick="toggleMobileMore(true)"><i class="fa-solid fa-ellipsis"></i><span>Más</span></button>`;
+    ).join("") + `<button type="button" class="tab-item tab-more ${["profesionales.html", "usuarios.html", "ajustes.html", "tienda.html"].includes(pagina) ? "active" : ""}" onclick="toggleMobileMore(true)"><i class="fa-solid fa-ellipsis"></i><span>Más</span></button>`;
   }
 
   crearModalLogoutGlobal();
@@ -145,6 +147,7 @@ function crearMenuMasMobile(pagina, tienda) {
     <div class="mobile-more-handle"></div>
     <div class="mobile-more-heading"><div><small>TAMAKU</small><h2 id="mobileMoreTitle">Más opciones</h2></div><button type="button" onclick="toggleMobileMore(false)" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></div>
     <nav class="mobile-more-links">
+      ${opcionMas(tienda, "tienda_ver", "tienda.html", pagina, "fa-bag-shopping", "Tienda", "Productos e insumos a domicilio")}
       ${opcionMas(tienda, "profesionales_ver", "profesionales.html", pagina, "fa-user-tie", "Profesionales", "Equipo, servicios y horarios")}
       ${opcionMas(tienda, "usuarios_gestionar", "usuarios.html", pagina, "fa-user-shield", "Usuarios", "Accesos, roles y permisos")}
       ${opcionMas(tienda, "ajustes_ver", "ajustes.html", pagina, "fa-sliders", "Ajustes", "Identidad y reglas del negocio")}

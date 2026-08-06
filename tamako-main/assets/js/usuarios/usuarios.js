@@ -17,6 +17,7 @@ const DEFINICIONES = [
   ["reportes_ver", "Ver reportes", "Consultar resultados financieros"],
   ["ajustes_ver", "Ver ajustes", "Consultar configuración del negocio"],
   ["usuarios_gestionar", "Gestionar usuarios", "Crear accesos y cambiar permisos"],
+  ["tienda_ver", "Acceso a Tienda", "Comprar productos y consultar pedidos"],
 ];
 
 let tienda;

@@ -36,6 +36,7 @@ const PERMISOS_PROPIETARIO = {
   reportes_ver: true,
   ajustes_ver: true,
   usuarios_gestionar: true,
+  tienda_ver: true,
 };
 
 async function obtenerContextoUsuario() {

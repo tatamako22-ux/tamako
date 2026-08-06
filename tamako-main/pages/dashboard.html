@@ -12,6 +12,7 @@
   <script src="../assets/js/core/menu.js?v=8" defer></script>
   <script src="../assets/js/core/notifications.js?v=1" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 </head>
 <body>
   <aside class="sidebar"></aside>
@@ -184,7 +185,7 @@
       <p>Comparte este código para que tus clientes reserven directamente.</p>
       <div class="qr-frame"><div id="qrcode"></div></div>
       <div class="modal-actions">
-        <button class="secondary-button" type="button" onclick="descargarQR()"><i class="fa-solid fa-download"></i> Descargar</button>
+        <button class="secondary-button" type="button" onclick="descargarQR()"><i class="fa-solid fa-file-pdf"></i> Descargar PDF</button>
         <button class="primary-button" type="button" onclick="copiarAlPortapapeles()"><i class="fa-regular fa-copy"></i> Copiar link</button>
       </div>
     </div>
@@ -192,7 +193,7 @@
 
   <script type="module">
     import { requireTiendaInfo } from "../assets/js/core/session.js";
-    import { initDashboard } from "../assets/js/dashboard/dashboard.init.js?v=2";
+    import { initDashboard } from "../assets/js/dashboard/dashboard.init.js?v=3";
 
     const tiendaInfo = await requireTiendaInfo();
     if (tiendaInfo) initDashboard(tiendaInfo);

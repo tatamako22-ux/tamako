@@ -56,6 +56,16 @@ async function buscarTiendaDelContexto(contexto) {
   return data || null;
 }
 
+async function validarSuscripcion(idTienda) {
+  const { data, error } = await supabase.rpc("obtener_estado_suscripcion", {
+    p_id_tienda: idTienda,
+  });
+  // Permite preproducción antes de ejecutar el módulo SQL de suscripciones.
+  if (error && /function|schema cache|could not find/i.test(error.message || "")) return null;
+  if (error) throw error;
+  return Array.isArray(data) ? data[0] || null : data;
+}
+
 export async function requireTiendaInfo({ redirect = true } = {}) {
   try {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -63,6 +73,12 @@ export async function requireTiendaInfo({ redirect = true } = {}) {
 
     const contexto = await obtenerContextoUsuario();
     const tiendaBase = await buscarTiendaDelContexto(contexto);
+    const suscripcion = tiendaBase ? await validarSuscripcion(tiendaBase.id) : null;
+    if (suscripcion && !suscripcion.acceso) {
+      sessionStorage.setItem("tamaku_suscripcion", JSON.stringify(suscripcion));
+      window.location.replace(new URL("../../../pages/suscripcion.html", import.meta.url).href);
+      return null;
+    }
     const permisos = contexto?.es_propietario
       ? PERMISOS_PROPIETARIO
       : { ...(contexto?.permisos || {}) };
@@ -76,6 +92,7 @@ export async function requireTiendaInfo({ redirect = true } = {}) {
             es_propietario: Boolean(contexto.es_propietario),
             permisos,
           },
+          suscripcion,
         }
       : null;
     if (!tienda) throw new Error("El usuario no tiene una tienda asociada");

@@ -1724,6 +1724,18 @@ html{
             return;
         }
 
+        // El Superadmin TAMAKU no pertenece a una tienda y entra a su panel central.
+        const { data: superadmin } = await supabaseClient
+            .from("tamaku_superadmins")
+            .select("user_id")
+            .eq("user_id", data.user.id)
+            .eq("activo", true)
+            .maybeSingle();
+        if (superadmin) {
+            window.location.href = "pages/superadmin.html";
+            return;
+        }
+
         const { requireTiendaInfo } = await import('./assets/js/core/session.js');
         const tienda = await requireTiendaInfo({ redirect: false });
         const tiendaError = !tienda;

@@ -708,6 +708,7 @@ const supabaseUrl = "https://smibbddmwgdmqpwsuaqr.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtaWJiZGRtd2dkbXFwd3N1YXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzODc1NzYsImV4cCI6MjA4NTk2MzU3Nn0.S3Z4m8s_nHa_reulKMFH1RtqoUgh9Cqzj69H0WTbghk";
 
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
+const planSeleccionado = (new URLSearchParams(window.location.search).get("plan") || "prueba").toUpperCase();
 // ==========================
 // GENERAR SLUG AUTOMÁTICO
 // ==========================
@@ -879,6 +880,16 @@ if (!user) {
     return;
 }
 
+// El OTP autentica el correo; ahora asignamos la contraseña elegida en el formulario.
+const { error: passwordError } = await supabaseClient.auth.updateUser({
+    password: document.getElementById("password").value
+});
+if (passwordError) {
+    alert("No fue posible configurar la contraseña: " + passwordError.message);
+    verifyBtn.disabled = false;
+    return;
+}
+
 // ==========================
 // 2️⃣ GENERAR SLUG
 // ==========================
@@ -918,7 +929,8 @@ const { error: perfilError } = await supabaseClient
     .insert([{
         user_id: user.id,
         tienda_id: tiendaInsertada.id,
-        rol: "admin"
+        rol: "admin",
+        activo: true
     }]);
 
 if (perfilError) {
@@ -927,6 +939,15 @@ if (perfilError) {
     verifyBtn.innerText = "VERIFICAR CÓDIGO";
     verifyBtn.style.opacity = "1";
     return;
+}
+
+// Si el sistema de suscripciones ya fue activado, conserva el plan elegido.
+const { error: planError } = await supabaseClient.rpc("seleccionar_plan_tamaku", {
+    p_tienda: tiendaInsertada.id,
+    p_plan: planSeleccionado
+});
+if (planError && !/function|schema cache/i.test(planError.message || "")) {
+    console.warn("No se pudo guardar el plan seleccionado:", planError);
 }
 document.getElementById("otpModal").classList.remove("show");
 document.getElementById("registerForm").style.opacity = "1";

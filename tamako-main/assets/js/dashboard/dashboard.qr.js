@@ -90,9 +90,35 @@ function obtenerImagenQR() {
   return img?.src || "";
 }
 
+async function cargarJsPDF() {
+  if (window.jspdf?.jsPDF) return window.jspdf.jsPDF;
+
+  const fuentes = [
+    "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+    "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js",
+  ];
+
+  for (const fuente of fuentes) {
+    try {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = fuente;
+        script.onload = resolve;
+        script.onerror = () => reject(new Error(`No cargó ${fuente}`));
+        document.head.appendChild(script);
+      });
+      if (window.jspdf?.jsPDF) return window.jspdf.jsPDF;
+    } catch (error) {
+      console.warn("Proveedor de PDF no disponible:", error);
+    }
+  }
+
+  return null;
+}
+
 async function descargarQR() {
   const imagenQR = obtenerImagenQR();
-  const JsPDF = window.jspdf?.jsPDF;
+  const JsPDF = await cargarJsPDF();
 
   if (!imagenQR || !JsPDF) {
     window.TamakuUI?.error?.(

@@ -12,7 +12,7 @@
   <script src="../assets/js/core/menu.js?v=8" defer></script>
   <script src="../assets/js/core/notifications.js?v=1" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'"></script>
 </head>
 <body>
   <aside class="sidebar"></aside>
@@ -193,7 +193,7 @@
 
   <script type="module">
     import { requireTiendaInfo } from "../assets/js/core/session.js";
-    import { initDashboard } from "../assets/js/dashboard/dashboard.init.js?v=3";
+    import { initDashboard } from "../assets/js/dashboard/dashboard.init.js?v=4";
 
     const tiendaInfo = await requireTiendaInfo();
     if (tiendaInfo) initDashboard(tiendaInfo);

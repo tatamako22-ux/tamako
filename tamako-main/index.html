@@ -1873,11 +1873,7 @@ html{
     }
     
     // 🔥 URL CORREGIDA - Usa tu dominio real
-    const redirectUrl = `${window.location.origin}${window.location.pathname}?recovery=1`;
-    
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl
-    });
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
     
     if (error) {
         mostrarError("Error: " + error.message);
@@ -1904,7 +1900,11 @@ html{
             `;
             modal.insertBefore(successDiv, modal.firstChild);
         }
-        successDiv.innerHTML = "✅ Te hemos enviado un correo con instrucciones para restablecer tu contraseña.<br><small>Revisa tu bandeja de entrada y spam.</small>";
+        successDiv.innerHTML = "✅ Enviamos un código de recuperación a tu correo.<br><small>Revisa tu bandeja de entrada y spam.</small>";
+        setTimeout(() => {
+            cerrarLogin();
+            mostrarModalCodigoRecuperacion(email);
+        }, 350);
         
         if(boton) {
             boton.innerHTML = "RECUPERAR";
@@ -1916,6 +1916,71 @@ html{
             if(successDiv) successDiv.remove();
         }, 6000);
     }
+}
+
+function mostrarModalCodigoRecuperacion(email) {
+    document.getElementById("recoveryCodeModal")?.remove();
+    const modalHTML = `
+      <div id="recoveryCodeModal" class="modal-overlay" style="display:flex;z-index:100000">
+        <div class="modal-content" style="max-width:430px">
+          <span class="close-btn" onclick="cerrarCodigoRecuperacion()">&times;</span>
+          <h2 style="color:#111;margin-bottom:8px;font-family:'Cinzel',serif">RECUPERAR ACCESO</h2>
+          <p style="color:#666;margin-bottom:22px;font-size:.8rem">Escribe el código enviado a <strong>${email}</strong></p>
+          <div class="field"><input id="recoveryCode" class="input-field" inputmode="numeric" maxlength="8" placeholder="CÓDIGO DE RECUPERACIÓN" autocomplete="one-time-code"></div>
+          <div class="field"><input id="recoveryNewPassword" type="password" class="input-field" minlength="8" placeholder="NUEVA CONTRASEÑA" autocomplete="new-password"></div>
+          <div class="field"><input id="recoveryConfirmPassword" type="password" class="input-field" minlength="8" placeholder="CONFIRMAR CONTRASEÑA" autocomplete="new-password"></div>
+          <div id="recoveryCodeError" style="display:none;margin:10px 0;padding:9px;color:#d93636;background:rgba(217,54,54,.08);border-radius:8px;font-size:.7rem"></div>
+          <button id="verifyRecoveryCode" class="btn-acceder-premium" onclick="confirmarCodigoRecuperacion('${email}')">VALIDAR Y CAMBIAR CONTRASEÑA</button>
+          <button type="button" onclick="reenviarCodigoRecuperacion('${email}')" style="margin-top:12px;color:#9b772c;background:none;border:0;cursor:pointer">Reenviar código</button>
+        </div>
+      </div>`;
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+    document.getElementById("recoveryCode")?.focus();
+}
+
+function errorCodigoRecuperacion(mensaje) {
+    const error = document.getElementById("recoveryCodeError");
+    if (!error) return;
+    error.textContent = mensaje;
+    error.style.display = "block";
+}
+
+async function confirmarCodigoRecuperacion(email) {
+    const token = document.getElementById("recoveryCode")?.value.trim();
+    const password = document.getElementById("recoveryNewPassword")?.value || "";
+    const confirmacion = document.getElementById("recoveryConfirmPassword")?.value || "";
+    if (!/^\d{6,8}$/.test(token || "")) return errorCodigoRecuperacion("Ingresa el código numérico recibido por correo.");
+    if (password.length < 8) return errorCodigoRecuperacion("La contraseña debe tener mínimo 8 caracteres.");
+    if (password !== confirmacion) return errorCodigoRecuperacion("Las contraseñas no coinciden.");
+    const boton = document.getElementById("verifyRecoveryCode");
+    boton.disabled = true;
+    boton.textContent = "VALIDANDO...";
+    try {
+        const { error: otpError } = await supabase.auth.verifyOtp({ email, token, type: "recovery" });
+        if (otpError) throw otpError;
+        const { error: updateError } = await supabase.auth.updateUser({ password });
+        if (updateError) throw updateError;
+        await supabase.auth.signOut();
+        cerrarCodigoRecuperacion();
+        abrirLogin();
+        document.querySelector('#loginModal input[type="email"]').value = email;
+        alert("Contraseña actualizada correctamente. Ya puedes iniciar sesión.");
+    } catch (error) {
+        errorCodigoRecuperacion(error.message || "El código es inválido o expiró.");
+    } finally {
+        boton.disabled = false;
+        boton.textContent = "VALIDAR Y CAMBIAR CONTRASEÑA";
+    }
+}
+
+async function reenviarCodigoRecuperacion(email) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) return errorCodigoRecuperacion(error.message);
+    errorCodigoRecuperacion("Enviamos un código nuevo. Revisa tu correo.");
+}
+
+function cerrarCodigoRecuperacion() {
+    document.getElementById("recoveryCodeModal")?.remove();
 }
     // Procesar recuperación de contraseña al cargar la página
 async function procesarRecuperacionPassword() {

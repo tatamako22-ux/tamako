@@ -1873,9 +1873,7 @@ html{
     }
     
     // 🔥 URL CORREGIDA - Usa tu dominio real
-    const redirectUrl = window.location.href.includes('localhost') 
-    ? 'http://localhost:5500/index.html'  // Desarrollo local
-    : 'https://tamaku.co/index.html';     // 🔥 TU DOMINIO REAL
+    const redirectUrl = `${window.location.origin}${window.location.pathname}?recovery=1`;
     
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl
@@ -1924,18 +1922,26 @@ async function procesarRecuperacionPassword() {
     // Obtener el hash de la URL (ej: #access_token=xxx&type=recovery)
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const accessToken = hashParams.get('access_token');
+    const refreshToken = hashParams.get('refresh_token');
     const type = hashParams.get('type');
     
     if (type === 'recovery' && accessToken) {
-        // Limpiar la URL para que no se vea fea
+        const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || accessToken
+        });
+        if (error) {
+            mostrarError("El enlace de recuperación expiró. Solicita uno nuevo.");
+            return;
+        }
         window.history.replaceState({}, document.title, window.location.pathname);
         
         // Mostrar modal para nueva contraseña
-        mostrarModalResetPassword(accessToken);
+        mostrarModalResetPassword();
     }
 }
 
-function mostrarModalResetPassword(accessToken) {
+function mostrarModalResetPassword() {
     // Crear modal personalizado para resetear password con estilo mejorado
     const modalHTML = `
         <div id="resetModal" class="modal-overlay" style="display: flex; z-index: 100000;">
@@ -1964,7 +1970,7 @@ function mostrarModalResetPassword(accessToken) {
                     ⚠️ Mínimo 6 caracteres
                 </div>
                 
-                <button class="btn-acceder-premium" onclick="actualizarPassword('${accessToken}')" style="margin-top: 15px;">
+                <button class="btn-acceder-premium" onclick="actualizarPassword()" style="margin-top: 15px;">
                     ACTUALIZAR CONTRASEÑA
                 </button>
             </div>
@@ -2008,7 +2014,7 @@ function mostrarModalResetPassword(accessToken) {
     if (newPassInput) newPassInput.addEventListener('input', validarPassword);
     if (confirmInput) confirmInput.addEventListener('input', validarPassword);
 }
-async function actualizarPassword(accessToken) {
+async function actualizarPassword() {
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     
@@ -2035,19 +2041,6 @@ async function actualizarPassword(accessToken) {
     }
     
     try {
-        // Obtener el refresh_token también del hash
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const refreshToken = hashParams.get('refresh_token') || accessToken;
-        
-        // Establecer la sesión con el token de recuperación
-        const { error: sessionError } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken
-        });
-        
-        if (sessionError) throw sessionError;
-        
-        // Actualizar la contraseña
         const { error: updateError } = await supabase.auth.updateUser({
             password: newPassword
         });

@@ -81,7 +81,14 @@ function crearHeaderBarbero(barbero) {
   `;
   return header;
 }
-
+// 🕒 Formato hora 12 horas AM / PM
+function formatoHora12(hora) {
+  if (!hora) return "";
+  const [h, m] = hora.split(":").map(Number);
+  const periodo = h >= 12 ? "PM" : "AM";
+  const hora12 = h % 12 || 12;
+  return `${hora12}:${String(m).padStart(2, "0")} ${periodo}`;
+}
 // 🎨 CREAR TARJETA DE CITA (Adaptada para citas y bloques disponibles)
 function crearTarjetaCita(cita, esMovil = false) {
   const evento = document.createElement("div");
@@ -130,7 +137,7 @@ function crearTarjetaCita(cita, esMovil = false) {
     <div class="event-glow"></div>
     <div class="event-top-row">
       <div class="event-hour">
-        ${normalizarHora(cita.hora_inicio)} — ${normalizarHora(cita.hora_fin)}
+        ${formatoHora12(normalizarHora(cita.hora_inicio))} — ${formatoHora12(normalizarHora(cita.hora_fin))}
       </div>
       ${
         esDisponible

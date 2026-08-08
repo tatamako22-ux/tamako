@@ -474,124 +474,31 @@
 
   body > .sidebar .logout-btn {
     width: 100% !important;
-    min-height: 68px !important;
+    min-height: 48px !important;
     margin: auto 0 0 !important;
-    padding: 10px 14px !important;
-    position: relative !important;
-    isolation: isolate !important;
-    overflow: hidden !important;
-    display: grid !important;
-    grid-template-columns: 42px minmax(0, 1fr) 14px !important;
-    align-items: center !important;
-    gap: 11px !important;
-    color: #fff3dc !important;
-    background: linear-gradient(145deg, #3a1715 0%, #1d0c0b 46%, #0b0908 100%) !important;
-    border: 1px solid rgba(234, 182, 72, 0.58) !important;
-    border-radius: 18px !important;
+    padding: 15px !important;
+    display: block !important;
+    color: #ff4d4d !important;
+    background: rgba(255, 77, 77, 0.08) !important;
+    border: 1px solid rgba(255, 77, 77, 0.35) !important;
+    border-radius: 50px !important;
     font-family: "Montserrat", sans-serif !important;
-    font-size: 11px !important;
-    font-weight: 700 !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
     line-height: 1 !important;
-    letter-spacing: 1.3px !important;
-    text-align: left !important;
+    letter-spacing: 2px !important;
+    text-align: center !important;
     text-decoration: none !important;
     text-transform: uppercase !important;
     cursor: pointer !important;
-    box-shadow:
-      0 7px 0 #100504,
-      0 13px 24px rgba(0, 0, 0, 0.52),
-      inset 0 1px 0 rgba(255, 239, 196, 0.24),
-      inset 0 -9px 18px rgba(0, 0, 0, 0.3) !important;
-    transform: translateY(0) !important;
-    transition: transform .24s ease, border-color .24s ease, box-shadow .24s ease, filter .24s ease !important;
-  }
-
-  body > .sidebar .logout-btn::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    inset: 0;
-    background: radial-gradient(circle at 18% 0%, rgba(255, 207, 100, 0.2), transparent 38%);
-    pointer-events: none;
-  }
-
-  body > .sidebar .logout-btn-icon {
-    width: 40px;
-    height: 40px;
-    display: grid;
-    place-items: center;
-    color: #ffd66e;
-    background: linear-gradient(145deg, #5b2923, #24100e);
-    border: 1px solid rgba(255, 207, 100, 0.5);
-    border-radius: 13px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.48), inset 0 1px 1px rgba(255, 239, 196, 0.22);
-    transition: transform .24s ease, color .24s ease, box-shadow .24s ease;
-  }
-
-  body > .sidebar .logout-btn-copy {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  body > .sidebar .logout-btn-copy strong {
-    color: #fff3dc;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1.25px;
-    white-space: nowrap;
-  }
-
-  body > .sidebar .logout-btn-copy small {
-    color: rgba(255, 215, 126, 0.58);
-    font-size: 8px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    text-transform: none;
-  }
-
-  body > .sidebar .logout-btn-arrow {
-    color: rgba(255, 215, 126, 0.55);
-    font-size: 10px;
-    transition: transform .24s ease, color .24s ease;
+    box-shadow: none !important;
   }
 
   body > .sidebar .logout-btn:hover {
-    color: #fff !important;
-    border-color: rgba(255, 214, 112, 0.9) !important;
-    filter: brightness(1.13) !important;
-    box-shadow:
-      0 9px 0 #100504,
-      0 18px 32px rgba(136, 42, 30, 0.34),
-      0 0 22px rgba(234, 182, 72, 0.14),
-      inset 0 1px 0 rgba(255, 239, 196, 0.34),
-      inset 0 -9px 18px rgba(0, 0, 0, 0.25) !important;
-    transform: translateY(-3px) !important;
-  }
-
-  body > .sidebar .logout-btn:hover .logout-btn-icon {
-    color: #fff0bd;
-    transform: rotate(-6deg) scale(1.07);
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 196, 68, 0.18), inset 0 1px 1px rgba(255, 239, 196, 0.3);
-  }
-
-  body > .sidebar .logout-btn:hover .logout-btn-arrow {
-    color: #ffd66e;
-    transform: translateX(3px);
-  }
-
-  body > .sidebar .logout-btn:active {
-    box-shadow:
-      0 2px 0 #100504,
-      0 6px 12px rgba(0, 0, 0, 0.45),
-      inset 0 4px 10px rgba(0, 0, 0, 0.45) !important;
-    transform: translateY(4px) !important;
-  }
-
-  body > .sidebar .logout-btn:focus-visible {
-    outline: 2px solid #ffd66e !important;
-    outline-offset: 4px !important;
+    color: #ff6969 !important;
+    background: rgba(255, 77, 77, 0.18) !important;
+    box-shadow: 0 0 20px rgba(255, 77, 77, 0.25) !important;
+    transform: scale(1.03) !important;
   }
 }
 

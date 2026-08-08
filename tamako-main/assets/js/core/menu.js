@@ -113,11 +113,7 @@ function renderMenuGlobal(tienda) {
         ${enlace(tienda, "usuarios_gestionar", "usuarios.html", pagina, "fa-user-shield", "Usuarios")}
         ${enlace(tienda, "ajustes_ver", "ajustes.html", pagina, "fa-gear", "Ajustes")}
       </nav>
-      <button class="logout-btn" type="button" onclick="toggleLogout(true)" aria-label="Cerrar sesión">
-        <span class="logout-btn-icon" aria-hidden="true"><i class="fa-solid fa-power-off"></i></span>
-        <span class="logout-btn-copy"><strong>Cerrar sesión</strong><small>Salir de TAMAKU</small></span>
-        <i class="fa-solid fa-chevron-right logout-btn-arrow" aria-hidden="true"></i>
-      </button>`;
+      <button class="logout-btn" type="button" onclick="toggleLogout(true)">Cerrar sesión</button>`;
   }
 
   const mobile = document.querySelector(".mobile-tab-bar");

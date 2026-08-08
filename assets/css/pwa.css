@@ -1,0 +1,102 @@
+/* ==========================================
+   TAMAKU PWA - WIDGET FLOTANTE PREMIUM
+   ========================================== */
+.tamaku-pwa-widget {
+    position: fixed;
+    bottom: -100px; /* Oculto por defecto */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(191, 149, 63, 0.3);
+    border-radius: 16px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(191, 149, 63, 0.15);
+    z-index: 999999;
+    transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.tamaku-pwa-widget.show {
+    bottom: 30px; /* Sube con efecto rebote */
+}
+
+.pwa-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(191, 149, 63, 0.3);
+}
+
+.pwa-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.pwa-title {
+    color: #ffd277;
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0 0 2px 0;
+}
+
+.pwa-desc {
+    color: #cfcfcf;
+    font-size: 0.75rem;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.pwa-btn {
+    background: linear-gradient(90deg, #bf953f, #ffd277, #bf953f);
+    background-size: 200%;
+    color: #000;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.pwa-btn:hover {
+    background-position: right;
+    box-shadow: 0 0 15px rgba(255, 210, 120, 0.5);
+    transform: translateY(-2px);
+}
+
+.pwa-close {
+    background: transparent;
+    border: none;
+    color: #666;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    margin-left: -5px;
+    transition: color 0.2s;
+}
+
+.pwa-close:hover { color: #fff; }
+
+/* Instrucción específica para iOS */
+.ios-instruction {
+    display: none;
+    text-align: center;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 10px;
+    border-top: 1px solid rgba(191, 149, 63, 0.2);
+    margin-top: 10px;
+    width: 100%;
+}

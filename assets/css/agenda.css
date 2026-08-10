@@ -310,6 +310,10 @@ body{
     background:rgba(46,204,113,.12);
     border-color:rgba(46,204,113,.28);
 }
+.calendar-event.no-show{border-color:rgba(255,143,64,.5);background:linear-gradient(145deg,rgba(70,35,18,.92),rgba(16,14,12,.98))}
+.chip-no-show{color:#ffad70!important;background:rgba(255,125,55,.13)!important;border-color:rgba(255,143,64,.32)!important}
+.event-btn.no-show{color:#ffad70;background:rgba(255,125,55,.12);border:1px solid rgba(255,143,64,.28)}
+.event-btn.no-show:hover{transform:translateY(-3px);background:rgba(255,125,55,.22)}
 
 .event-invoice-status {
     display:flex;

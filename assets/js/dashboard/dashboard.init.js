@@ -1,5 +1,5 @@
 import { initQR } from "./dashboard.qr.js?v=4";
-import { initOverview } from "./dashboard.overview.js?v=2";
+import { initOverview } from "./dashboard.overview.js?v=3";
 
 export function initDashboard(tiendaInfo) {
   const nombre = tiendaInfo.nombre || tiendaInfo.nombre_tienda || "MASTER";

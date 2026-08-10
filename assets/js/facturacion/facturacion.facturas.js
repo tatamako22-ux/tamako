@@ -162,6 +162,7 @@ export const FacturacionFacturas = {
         </div>
         <div class="factura-metodo">
           <span>${factura.metodo_pago || "Sin método"}</span>
+          <small>${String(factura.destino_pago).toUpperCase() === "PROFESIONAL" ? "Recibió el profesional" : "Ingresó a la tienda"}</small>
         </div>
         <span class="factura-badge estado-${estado.toLowerCase()}">${estado}</span>
         <strong class="factura-valor">${moneda.format(Number(factura.total) || 0)}</strong>

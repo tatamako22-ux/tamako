@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TAMAKU | Liquidaciones</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/global.css"><link rel="stylesheet" href="../assets/css/menu.css?v=11"><link rel="stylesheet" href="../assets/css/liquidaciones.css?v=3"><link rel="stylesheet" href="../assets/css/brand-theme.css?v=4">
+  <script src="../assets/js/core/menu.js?v=11" defer></script>
+</head>
+<body>
+  <aside class="sidebar"></aside>
+  <main class="liquidaciones-main">
+    <header class="liq-header"><div><span>GESTIÓN DEL EQUIPO</span><h1 id="tituloLiquidaciones">Liquidaciones</h1><p id="subtituloLiquidaciones">Producción, ganancias y pagos del equipo.</p></div><div class="liq-filtros"><label>Desde<input id="periodoDesde" type="date"></label><label>Hasta<input id="periodoHasta" type="date"></label><button id="actualizarLiquidaciones"><i class="fa-solid fa-rotate"></i> Actualizar</button></div></header>
+    <section class="liq-kpis"><article><span>Citas facturadas</span><strong id="kpiCitasFacturadas">0</strong></article><article class="liq-warning"><span>Sin facturar</span><strong id="kpiCitasSinFacturar">0</strong></article><article class="liq-cancelled"><span>Canceladas</span><strong id="kpiCitasCanceladas">0</strong></article><article class="liq-no-show"><span>No asistieron</span><strong id="kpiNoAsistieron">0</strong><small id="kpiValorNoAsistieron">$0 no facturados</small></article><article><span>Producción pagada</span><strong id="kpiProduccion">$0</strong></article><article><span id="labelGananciaProfesional">Pago del equipo</span><strong id="kpiProfesionales">$0</strong></article><article class="solo-admin"><span>Ganancia bruta tienda</span><strong id="kpiTienda">$0</strong></article><article><span>Saldo por liquidar</span><strong id="kpiPendiente">$0</strong></article></section>
+    <section class="liq-panel solo-admin"><div class="liq-panel-head"><div><span>RESUMEN</span><h2>Equipo profesional</h2></div><small>Selecciona un profesional para ver el detalle o registrar un pago.</small></div><div class="liq-table-head"><span>Profesional</span><span>Modalidad</span><span>Control de citas</span><span>Producción</span><span>Le corresponde</span><span>Saldo</span></div><div id="listaProfesionales"></div></section>
+    <section class="liq-panel"><div class="liq-panel-head"><div><span>TRAZABILIDAD</span><h2 id="tituloDetalle">Mi actividad</h2></div><strong id="estadoLiquidacion"></strong></div><div id="detalleLiquidacion" class="liq-detalle"></div></section>
+    <section class="liq-panel"><div class="liq-panel-head"><div><span>PAGOS REGISTRADOS</span><h2>Historial</h2></div></div><div id="historialPagos" class="liq-historial"></div></section>
+  </main>
+  <nav class="mobile-tab-bar"></nav>
+  <div id="modalPagoProfesional" class="liq-modal" hidden><form id="formPagoProfesional"><header><div><span>REGISTRAR EGRESO</span><h2 id="pagoProfesionalNombre">Pago al profesional</h2></div><button id="cerrarPagoProfesional" type="button" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></header><div class="liq-form-grid"><label>Periodo desde<input id="pagoDesde" type="date" required></label><label>Periodo hasta<input id="pagoHasta" type="date" required></label></div><label>Monto<input id="pagoMontoProfesional" type="number" min="1" required></label><label>Cuenta de salida<select id="pagoCuenta" required></select></label><label>Referencia<input id="pagoReferencia" maxlength="100" placeholder="Transferencia, comprobante..."></label><label>Notas<textarea id="pagoNotas" rows="2"></textarea></label><button class="liq-primary" type="submit">Registrar pago</button></form></div>
+  <div id="liqToast" class="liq-toast" role="status" aria-live="polite"></div>
+  <script type="module" src="../assets/js/liquidaciones/liquidaciones.js?v=6"></script>
+</body>
+</html>

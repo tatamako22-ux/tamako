@@ -166,3 +166,22 @@ export async function cancelarCita(idCita, idTienda) {
     return false;
   }
 }
+
+// Marca una cita atendible como inasistencia. Se conserva el cliente y el
+// servicio para que la tienda pueda medir el ingreso que dejó de percibir.
+export async function marcarCitaNoAsistida(idCita, idTienda) {
+  try {
+    const { error } = await supabase
+      .from("citas")
+      .update({ estado: "NO_ASISTIO" })
+      .eq("id_cita", idCita)
+      .eq("id_tienda", idTienda)
+      .neq("estado", "CANCELADA");
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error("Error marcando la inasistencia:", error);
+    return false;
+  }
+}

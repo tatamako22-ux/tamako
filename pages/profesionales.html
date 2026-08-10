@@ -6,8 +6,8 @@
     <title>TAMAKU | Staff de Élite</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/menu.css?v=10">
-    <script src="../assets/js/core/menu.js?v=10" defer></script>
+    <link rel="stylesheet" href="../assets/css/menu.css?v=11">
+    <script src="../assets/js/core/menu.js?v=11" defer></script>
     <style>
         /* --- CONTENIDO --- */
         .main-content { flex-grow: 1; padding: 40px 5% 150px; height: 100vh; overflow-y: auto; }
@@ -230,7 +230,7 @@
             to { transform: rotate(360deg); }
         }
     </style>
-<link rel="stylesheet" href="../assets/css/profesionales.css?v=3">
+<link rel="stylesheet" href="../assets/css/profesionales.css?v=4">
 <link rel="stylesheet" href="../assets/css/notifications.css?v=1">
 <script src="../assets/js/core/notifications.js?v=1" defer></script>
 </head>
@@ -452,6 +452,13 @@
             <div class="input-group"><label>Dirección</label><input type="text" id="dirProf" placeholder="Ej. Calle 10 #20-30"></div>
             <div class="input-group"><label>Urgencia: Llamar a</label><input type="text" id="urgProf" placeholder="Ej. Esposa: 3001234567"></div>
             <div class="input-group"><label>Puesto #</label><input type="number" id="puestoProf" value="1"></div>
+            <section id="compensacionProfesional" class="compensacion-profesional">
+                <span class="compensacion-eyebrow">ACUERDO DE PAGO · SOLO ADMINISTRADOR</span>
+                <div class="input-group"><label>Modalidad de pago</label><select id="modalidadPago"><option value="PORCENTAJE">Porcentaje por servicios</option><option value="MENSUALIDAD">Mensualidad fija</option></select></div>
+                <div class="input-group" id="grupoPorcentaje"><label>Porcentaje del profesional (%)</label><input type="number" id="porcentajeComision" min="0" max="100" step="0.01" value="0"></div>
+                <div class="input-group" id="grupoMensualidad" hidden><label>Mensualidad</label><input type="number" id="mensualidadProf" min="0" step="1" value="0"></div>
+                <div class="input-group"><label>Aplica desde</label><input type="date" id="contratoDesde"></div>
+            </section>
             <div class="input-group"><label>Foto Profesional</label><input type="file" id="fotoProf" accept="image/*"></div>
             <button class="btn-gold" id="btnGuardar" onclick="guardar()">Vincular Staff</button>
             <button onclick="cerrarModales()" style="background:transparent; border:none; color:#444; margin-top:15px; cursor:pointer; font-weight:700;">CANCELAR</button>
@@ -493,6 +500,14 @@
     let horarioTienda = {};
     let staffLocal = []; 
     let barberoActivoID = null;
+
+    function actualizarCamposCompensacion() {
+        const mensual = document.getElementById("modalidadPago")?.value === "MENSUALIDAD";
+        document.getElementById("grupoPorcentaje").hidden = mensual;
+        document.getElementById("grupoMensualidad").hidden = !mensual;
+    }
+    document.getElementById("modalidadPago")?.addEventListener("change", actualizarCamposCompensacion);
+    document.getElementById("compensacionProfesional").hidden = !tiendaInfo.sesion?.es_propietario;
 
     const DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
@@ -824,6 +839,13 @@
             showError("⚠️ Nombre y Celular requeridos (7-10 dígitos)");
             return;
         }
+        if (tiendaInfo.sesion?.es_propietario) {
+            const modalidad = document.getElementById("modalidadPago").value;
+            const porcentaje = Number(document.getElementById("porcentajeComision").value || 0);
+            const mensualidad = Number(document.getElementById("mensualidadProf").value || 0);
+            if (modalidad === "PORCENTAJE" && (porcentaje < 0 || porcentaje > 100)) return showError("El porcentaje debe estar entre 0 y 100.");
+            if (modalidad === "MENSUALIDAD" && mensualidad <= 0) return showError("Ingresa una mensualidad mayor a cero.");
+        }
         
         const btn = document.getElementById("btnGuardar");
         btn.innerText = "PROCESANDO..."; 
@@ -851,6 +873,12 @@
                 horario_fin: "18:00",
                 horario_semanal: {}
             };
+            if (tiendaInfo.sesion?.es_propietario) {
+                payload.modalidad_pago = document.getElementById("modalidadPago").value;
+                payload.porcentaje_comision = payload.modalidad_pago === "PORCENTAJE" ? Number(document.getElementById("porcentajeComision").value || 0) : 0;
+                payload.mensualidad = payload.modalidad_pago === "MENSUALIDAD" ? Number(document.getElementById("mensualidadProf").value || 0) : 0;
+                payload.contrato_desde = document.getElementById("contratoDesde").value || new Date().toISOString().slice(0, 10);
+            }
             if(urlFoto) payload.foto_url = urlFoto;
 
             let res;
@@ -894,6 +922,13 @@
         document.getElementById("dirProf").value = p.direccion_empleado || "";
         document.getElementById("urgProf").value = p.contacto_urgencia || "";
         document.getElementById("puestoProf").value = p.puesto_asignado;
+        if (tiendaInfo.sesion?.es_propietario) {
+            document.getElementById("modalidadPago").value = p.modalidad_pago || "PORCENTAJE";
+            document.getElementById("porcentajeComision").value = Number(p.porcentaje_comision || 0);
+            document.getElementById("mensualidadProf").value = Number(p.mensualidad || 0);
+            document.getElementById("contratoDesde").value = p.contrato_desde || new Date().toISOString().slice(0, 10);
+            actualizarCamposCompensacion();
+        }
         document.getElementById("modalTitle").innerText = "Editar Profesional";
         document.getElementById("modalProf").style.display = "flex";
     };
@@ -906,6 +941,11 @@
         document.getElementById("dirProf").value = ""; 
         document.getElementById("urgProf").value = "";
         document.getElementById("puestoProf").value = staffLocal.length + 1;
+        document.getElementById("modalidadPago").value = "PORCENTAJE";
+        document.getElementById("porcentajeComision").value = 0;
+        document.getElementById("mensualidadProf").value = 0;
+        document.getElementById("contratoDesde").value = new Date().toISOString().slice(0, 10);
+        actualizarCamposCompensacion();
         document.getElementById("modalProf").style.display = "flex";
     };
 

@@ -2,7 +2,7 @@ import {
   obtenerDatosDashboard,
   suscribirDashboard,
   fechaLocal,
-} from "./dashboard.service.js";
+} from "./dashboard.service.js?v=2";
 import { renderModalCitas } from "./dashboard.modal.js";
 
 const dinero = new Intl.NumberFormat("es-CO", {
@@ -135,17 +135,15 @@ function renderKPIs(datos, resumen) {
   if (panelEmpleado) {
     panelEmpleado.hidden = !esEmpleado;
     if (esEmpleado) {
-      const comisionProfesional = resumen.facturasHoy.reduce(
+      const esMensual = datos.profesional?.modalidad_pago === "MENSUALIDAD";
+      const comisionProfesional = esMensual ? Number(datos.profesional?.mensualidad || 0) : resumen.facturasHoy.reduce(
         (total, factura) => total + calcularComisionFactura(factura, datos),
         0,
       );
       ponerTexto("valProduccionEmpleado", dinero.format(resumen.ventasHoy));
       ponerTexto("valComisionEmpleado", dinero.format(comisionProfesional));
-      ponerTexto(
-        "valParteTienda",
-        dinero.format(Math.max(0, resumen.ventasHoy - comisionProfesional)),
-      );
-      ponerTexto("porcentajeComisionEmpleado", `${datos.comisionGeneral}% base`);
+      ponerTexto("labelComisionEmpleado", esMensual ? "Mi mensualidad" : "Mi comisión de hoy");
+      ponerTexto("porcentajeComisionEmpleado", esMensual ? "Valor mensual acordado" : `${Number(datos.profesional?.porcentaje_comision ?? datos.comisionGeneral)}% base`);
     }
   }
 

@@ -75,6 +75,7 @@ const PERMISOS_RUTA = {
   "tienda.html": "tienda_ver",
   "usuarios.html": "usuarios_gestionar",
   "ajustes.html": "ajustes_ver",
+  "liquidaciones.html": "liquidaciones_personales",
 };
 
 const FUNCIONES_RUTA = {
@@ -100,6 +101,7 @@ function puede(tienda, permiso) {
 }
 
 function protegerRuta(tienda, pagina) {
+  if (pagina === "liquidaciones.html" && (tienda?.sesion?.es_propietario || tienda?.sesion?.id_profesional)) return true;
   const permiso = PERMISOS_RUTA[pagina];
   if ((!permiso || puede(tienda, permiso)) && permitePlan(tienda, pagina)) return true;
   const destinoPermitido = Object.entries(PERMISOS_RUTA).find(([ruta, clave]) =>
@@ -107,6 +109,12 @@ function protegerRuta(tienda, pagina) {
   )?.[0];
   window.location.replace(destinoPermitido || "../index.html");
   return false;
+}
+
+function enlaceLiquidaciones(tienda, pagina) {
+  if (!tienda?.sesion?.es_propietario && !tienda?.sesion?.id_profesional) return "";
+  const texto = tienda.sesion.es_propietario ? "Liquidaciones" : "Mis ganancias";
+  return `<a href="liquidaciones.html" class="nav-item ${pagina === "liquidaciones.html" ? "active" : ""}"><i class="fa-solid fa-hand-holding-dollar"></i>${texto}</a>`;
 }
 
 function enlace(tienda, permiso, href, pagina, icono, texto) {
@@ -129,6 +137,7 @@ function renderMenuGlobal(tienda) {
         ${enlace(tienda, "clientes_ver", "clientes.html", pagina, "fa-users", "Clientes")}
         ${enlace(tienda, "profesionales_ver", "profesionales.html", pagina, "fa-user-tie", "Profesionales")}
         ${enlace(tienda, "facturacion_ver", "facturacion.html", pagina, "fa-file-invoice-dollar", "Facturación")}
+        ${enlaceLiquidaciones(tienda, pagina)}
         ${enlace(tienda, "tienda_ver", "tienda.html", pagina, "fa-bag-shopping", "Tienda")}
         ${enlace(tienda, "usuarios_gestionar", "usuarios.html", pagina, "fa-user-shield", "Usuarios")}
         ${enlace(tienda, "ajustes_ver", "ajustes.html", pagina, "fa-gear", "Ajustes")}
@@ -147,7 +156,7 @@ function renderMenuGlobal(tienda) {
     ].filter(([permiso, href]) => puede(tienda, permiso) && permitePlan(tienda, href));
     mobile.innerHTML = tabs.map(([, href, icono, texto]) =>
       `<a href="${href}" class="tab-item ${pagina === href ? "active" : ""}"><i class="fa-solid ${icono}"></i><span>${texto}</span></a>`,
-    ).join("") + `<button type="button" class="tab-item tab-more ${["profesionales.html", "usuarios.html", "ajustes.html", "tienda.html", "mi-plan.html"].includes(pagina) ? "active" : ""}" onclick="toggleMobileMore(true)"><i class="fa-solid fa-ellipsis"></i><span>Más</span></button>`;
+    ).join("") + `<button type="button" class="tab-item tab-more ${["profesionales.html", "usuarios.html", "ajustes.html", "tienda.html", "mi-plan.html", "liquidaciones.html"].includes(pagina) ? "active" : ""}" onclick="toggleMobileMore(true)"><i class="fa-solid fa-ellipsis"></i><span>Más</span></button>`;
   }
 
   crearModalLogoutGlobal();
@@ -170,6 +179,7 @@ function crearMenuMasMobile(pagina, tienda) {
     <nav class="mobile-more-links">
       ${opcionMas(tienda, "tienda_ver", "tienda.html", pagina, "fa-bag-shopping", "Tienda", "Productos e insumos a domicilio")}
       ${opcionMas(tienda, "profesionales_ver", "profesionales.html", pagina, "fa-user-tie", "Profesionales", "Equipo, servicios y horarios")}
+      ${(tienda?.sesion?.es_propietario || tienda?.sesion?.id_profesional) ? `<a href="liquidaciones.html" class="${pagina === "liquidaciones.html" ? "active" : ""}"><i class="fa-solid fa-hand-holding-dollar"></i><div><strong>${tienda.sesion.es_propietario ? "Liquidaciones" : "Mis ganancias"}</strong><span>Producción, citas y pagos</span></div><i class="fa-solid fa-chevron-right"></i></a>` : ""}
       ${opcionMas(tienda, "usuarios_gestionar", "usuarios.html", pagina, "fa-user-shield", "Usuarios", "Accesos, roles y permisos")}
       ${opcionMas(tienda, "ajustes_ver", "ajustes.html", pagina, "fa-sliders", "Ajustes", "Identidad y reglas del negocio")}
       ${tienda?.sesion?.es_propietario ? `<a href="mi-plan.html" class="${pagina === "mi-plan.html" ? "active" : ""}"><i class="fa-solid fa-gem"></i><div><strong>Mi plan</strong><span>Suscripción, vencimiento y pagos</span></div><i class="fa-solid fa-chevron-right"></i></a>` : ""}

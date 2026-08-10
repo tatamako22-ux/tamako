@@ -99,10 +99,11 @@ function crearTarjetaCita(cita, esMovil = false) {
     ? cita.facturas[0]
     : cita.facturas;
   const esFacturada = Boolean(factura?.id_factura);
+  const esNoAsistio = String(cita.estado || "").toUpperCase() === "NO_ASISTIO";
 
   evento.className = esDisponible
     ? "calendar-event disponible"
-    : `calendar-event${esFacturada ? " facturada" : ""}`;
+    : `calendar-event${esFacturada ? " facturada" : ""}${esNoAsistio ? " no-show" : ""}`;
 
   if (esMovil) {
     evento.style.position = "relative";
@@ -135,6 +136,8 @@ function crearTarjetaCita(cita, esMovil = false) {
       ${
         esDisponible
           ? `<div class="event-chip chip-libre">Disponible</div>`
+          : esNoAsistio
+            ? `<div class="event-chip chip-no-show"><i class="fa-solid fa-user-xmark"></i> No asistió</div>`
           : esFacturada
             ? `<div class="event-chip chip-facturada"><i class="fa-solid fa-circle-check"></i> Facturada</div>`
             : `<div class="event-chip">Confirmada</div>`
@@ -174,9 +177,9 @@ function crearTarjetaCita(cita, esMovil = false) {
         : `
     <div class="event-actions">
       ${
-        esFacturada
-          ? `<button type="button" class="event-btn cobrada" title="Esta cita ya fue facturada" disabled>
-              <i class="fa-solid fa-receipt"></i>
+        esFacturada || esNoAsistio
+          ? `<button type="button" class="event-btn ${esNoAsistio ? "no-show" : "cobrada"}" title="${esNoAsistio ? "Cita marcada como no asistió" : "Esta cita ya fue facturada"}" disabled>
+              <i class="fa-solid ${esNoAsistio ? "fa-user-xmark" : "fa-receipt"}"></i>
             </button>`
           : `<button type="button" class="event-btn cobrar"
               onclick="event.stopPropagation(); window.abrirFacturacionDesdeCita(${JSON.stringify(cita).replace(/"/g, "&quot;")})"
@@ -195,9 +198,10 @@ style="background: rgba(191,149,63,0.15); border: 1px solid rgba(191,149,63,0.4)
 onclick="event.stopPropagation(); abrirWhatsappCita(${JSON.stringify(cita).replace(/"/g, "&quot;")})"
 title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
       ${
-        esFacturada
+        esFacturada || esNoAsistio
           ? ""
-          : `<button class="event-btn cancel" onclick="event.stopPropagation(); confirmarCancelacion('${cita.id_cita}')" title="Cancelar"><i class="fa-solid fa-xmark"></i></button>`
+          : `<button class="event-btn no-show" onclick="event.stopPropagation(); confirmarNoAsistencia('${cita.id_cita}', '${(cita.nombre_cliente || "el cliente").replace(/'/g, "\\'")}')" title="Marcar que no asistió"><i class="fa-solid fa-user-xmark"></i></button>
+             <button class="event-btn cancel" onclick="event.stopPropagation(); confirmarCancelacion('${cita.id_cita}')" title="Cancelar"><i class="fa-solid fa-xmark"></i></button>`
       }
     </div>
     `

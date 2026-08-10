@@ -227,3 +227,5 @@ body > .main-content > * {
   .card-actions { gap:4px; }
   .action-icon { width:29px; height:29px; }
 }
+/* Contratación del profesional */
+.compensacion-profesional{margin:18px 0;padding:16px;background:rgba(191,149,63,.06);border:1px solid rgba(191,149,63,.22);border-radius:16px}.compensacion-profesional[hidden],.compensacion-profesional .input-group[hidden]{display:none}.compensacion-eyebrow{display:block;margin-bottom:14px;color:var(--gold);font-size:.52rem;font-weight:800;letter-spacing:1.5px}.compensacion-profesional select{width:100%;padding:13px;color:#eee;background:#111;border:1px solid #242424;border-radius:10px}

@@ -329,6 +329,8 @@ button.kpi-card:hover { border-color: var(--dash-border); transform: translateY(
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 18px;
   background: rgba(7,7,7,.72);
+  color: inherit;
+  text-decoration: none;
 }
 .employee-money-card span { color: #999; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
 .employee-money-card strong { margin: 10px 0 5px; color: #f3c85c; font-size: clamp(24px, 2.4vw, 36px); }

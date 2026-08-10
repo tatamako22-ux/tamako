@@ -110,13 +110,18 @@ export async function obtenerDatosDashboard(tiendaInfo) {
         .or(`id_barbero.is.null,id_barbero.eq.${idProfesional}`)
     : Promise.resolve({ data: [], error: null });
 
-  const [citasResult, facturasResult, cajaResult, cierresResult, reglasResult] =
+  const profesionalQuery = !esPropietario && idProfesional
+    ? supabase.from("profesionales").select("id_barbero,modalidad_pago,porcentaje_comision,mensualidad").eq("id_tienda",idTienda).eq("id_barbero",idProfesional).maybeSingle()
+    : Promise.resolve({ data: null, error: null });
+
+  const [citasResult, facturasResult, cajaResult, cierresResult, reglasResult, profesionalResult] =
     await Promise.all([
       citasQuery,
       facturasQuery,
       cajaQuery,
       cierresQuery,
       reglasQuery,
+      profesionalQuery,
     ]);
 
   const error =
@@ -124,7 +129,8 @@ export async function obtenerDatosDashboard(tiendaInfo) {
     facturasResult.error ||
     cajaResult.error ||
     cierresResult.error ||
-    reglasResult.error;
+    reglasResult.error ||
+    profesionalResult.error;
 
   if (error) throw error;
 
@@ -149,6 +155,7 @@ export async function obtenerDatosDashboard(tiendaInfo) {
     ultimosCierres: cierresResult.data || [],
     movimientosCaja,
     reglasComision: reglasResult.data || [],
+    profesional: profesionalResult.data || null,
     sesion,
     comisionGeneral: Number(tiendaInfo.comision || 0),
     hoy: fechaLocal(hoy),

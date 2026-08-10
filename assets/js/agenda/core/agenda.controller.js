@@ -10,6 +10,7 @@ import {
   obtenerCitas,
   obtenerConteoCitasRango,
   cancelarCita,
+  marcarCitaNoAsistida,
 } from "../../services/agenda.service.js";
 
 import {
@@ -141,6 +142,21 @@ export function iniciarAgenda({
     setState("citaACancelar", idCita);
 
     document.getElementById("confirmCancelModal").style.display = "flex";
+  };
+
+  window.confirmarNoAsistencia = async (idCita, nombreCliente = "el cliente") => {
+    const confirmar = window.confirm(
+      `¿Confirmas que ${nombreCliente} no asistió? La cita aparecerá como ingreso no facturado en Liquidaciones.`,
+    );
+    if (!confirmar) return;
+
+    const ok = await marcarCitaNoAsistida(idCita, tiendaInfo.id);
+    if (!ok) {
+      mostrarToast("No se pudo registrar la inasistencia.", "error");
+      return;
+    }
+    mostrarToast(`${nombreCliente} quedó marcado como no asistió.`, "success");
+    await cargarCitasDelDia();
   };
 
   // ❌ EJECUTAR CANCELACIÓN

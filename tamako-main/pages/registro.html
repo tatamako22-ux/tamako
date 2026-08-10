@@ -339,6 +339,7 @@ form {
     opacity: 0;
     pointer-events: none;
     transition: .4s ease;
+    z-index: 2000;
 }
 .modal::before{
     content:"";
@@ -501,10 +502,13 @@ form {
    ========================================================= */
 .registration-v2 { min-height:100vh; background:radial-gradient(circle at 8% 15%,rgba(191,149,63,.13),transparent 30%),#050505; }
 .registration-v2::after { opacity:.45; }
-.registration-v2 nav { min-height:76px; padding:16px max(24px,calc((100% - 1240px)/2)); border:0; background:transparent; backdrop-filter:none; }
+.registration-v2 nav { min-height:76px; padding:14px max(24px,calc((100% - 1240px)/2)); border-bottom:1px solid rgba(255,255,255,.07); background:rgba(5,5,5,.82); backdrop-filter:blur(18px); box-shadow:0 12px 35px rgba(0,0,0,.22); }
 .registration-v2 nav .logo { margin:0; font-size:1.25rem; letter-spacing:.24em; filter:none; }
-.registration-v2 .nav-links { gap:9px; }
-.registration-v2 .nav-links a { padding:10px 14px; border-radius:10px; font-size:.65rem; font-weight:600; }
+.registration-v2 .nav-links { gap:5px; padding:5px; border:1px solid rgba(255,255,255,.075); border-radius:14px; background:rgba(255,255,255,.035); }
+.registration-v2 .nav-links a { display:inline-flex; min-height:38px; align-items:center; justify-content:center; padding:0 15px; border-radius:10px; color:#8f8f8f; font-size:.62rem; font-weight:700; letter-spacing:.08em; transition:color .2s ease,background .2s ease,border-color .2s ease; }
+.registration-v2 .nav-links a:hover { color:#fff; background:rgba(255,255,255,.055); }
+.registration-v2 .nav-links .btn-login { border:1px solid rgba(255,210,119,.38); background:rgba(191,149,63,.12); color:#f1ca6c; }
+.registration-v2 .nav-links .btn-login:hover { border-color:#f1ca6c; background:linear-gradient(135deg,#f1ca6c,#bf953f); color:#080808; }
 .registration-v2 .layout { max-width:1240px; min-height:calc(100vh - 76px); grid-template-columns:minmax(0,.82fr) minmax(520px,1fr); display:grid; gap:clamp(55px,8vw,115px); padding:70px 24px 85px; }
 .registration-v2 .branding { display:block; padding:20px 0; }
 .registration-v2 .registration-eyebrow,
@@ -520,6 +524,12 @@ form {
 .registration-v2 .registration-benefits small { color:#747474; font-size:.65rem; }
 .registration-v2 .register-card { width:100%; max-width:620px; max-height:none; padding:clamp(25px,3.5vw,42px); overflow:visible; border:1px solid rgba(255,210,119,.2); border-radius:24px; background:linear-gradient(145deg,rgba(20,20,20,.97),rgba(8,8,8,.98)); box-shadow:0 30px 80px rgba(0,0,0,.48); transform:none; }
 .registration-v2 .register-card:hover { transform:none; }
+.registration-v2 .register-card.otp-active { padding:0; border-color:transparent; background:transparent; box-shadow:none; }
+.registration-v2 .register-card.otp-active::before,
+.registration-v2 .register-card.otp-active::after { display:none; }
+.registration-v2 #otpModal { background:rgba(3,3,3,.72); backdrop-filter:blur(14px); }
+.registration-v2 #otpModal .modal-content { overflow:hidden; border:1px solid rgba(255,210,119,.32); background:linear-gradient(155deg,rgba(27,23,15,.98),rgba(9,9,9,.98)); box-shadow:0 28px 90px rgba(0,0,0,.72),0 0 55px rgba(191,149,63,.1); }
+.registration-v2 #otpModal .modal-content::before { content:""; position:absolute; inset:0 0 auto; height:1px; background:linear-gradient(90deg,transparent,#f1ca6c,transparent); opacity:.8; }
 .registration-v2 #registerForm { grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px 12px; margin:0; }
 .registration-v2 .form-eyebrow,
 .registration-v2 .form-title,
@@ -533,6 +543,30 @@ form {
 .registration-v2 .form-group input:hover { border-color:rgba(255,210,119,.24); }
 .registration-v2 .form-group input:focus { border-color:rgba(255,210,119,.72); background:#121212; box-shadow:0 0 0 3px rgba(191,149,63,.1); }
 .registration-v2 .form-group input::placeholder { color:#555; }
+.registration-v2 .password-field { position:relative; }
+.registration-v2 .password-field input { padding-right:48px; }
+.registration-v2 .password-toggle {
+  position:absolute;
+  top:50%;
+  right:6px;
+  display:grid;
+  width:40px;
+  height:40px;
+  padding:0;
+  place-items:center;
+  transform:translateY(-50%);
+  border:0;
+  border-radius:9px;
+  background:transparent;
+  color:#777;
+  cursor:pointer;
+  font-size:1rem;
+  line-height:1;
+}
+.registration-v2 .password-toggle:hover,
+.registration-v2 .password-toggle:focus-visible { background:rgba(191,149,63,.12); color:#f1ca6c; outline:none; }
+.registration-v2 .password-toggle svg { width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.8; }
+.registration-v2 .password-toggle.is-visible::after { content:""; position:absolute; width:21px; height:1.5px; border-radius:2px; background:currentColor; transform:rotate(-45deg); }
 .registration-v2 #passwordError,
 .registration-v2 #phoneError { grid-column:1/-1 !important; margin:-7px 0 0; }
 .registration-v2 .btn-register { grid-column:1/-1 !important; min-height:53px; margin-top:5px; border-radius:13px; background:linear-gradient(135deg,#f1ca6c,#bf953f); box-shadow:0 14px 32px rgba(191,149,63,.15); font-family:'Montserrat',sans-serif; font-size:.7rem; letter-spacing:.1em; }
@@ -546,10 +580,11 @@ form {
 }
 
 @media (max-width:700px) {
-  .registration-v2 nav { min-height:64px; padding:12px 14px; }
+  .registration-v2 nav { min-height:64px; padding:10px 14px; }
   .registration-v2 nav .logo { font-size:1rem; }
-  .registration-v2 .nav-links { display:flex; position:static; width:auto; padding:0; flex-direction:row; background:none; }
-  .registration-v2 .nav-links a:not(.btn-login) { display:none; }
+  .registration-v2 .nav-links { display:flex; position:static; width:auto; padding:3px; flex-direction:row; background:rgba(255,255,255,.035); }
+  .registration-v2 .nav-links a { min-height:34px; padding:0 11px; font-size:.56rem; }
+  .registration-v2 .nav-links a[href="servicios.html"] { display:none; }
   .registration-v2 .menu-toggle { display:none; }
   .registration-v2 .layout { min-height:calc(100vh - 64px); padding:38px 14px 60px; gap:30px; }
   .registration-v2 .branding { align-items:flex-start; text-align:left; }
@@ -563,6 +598,9 @@ form {
 }
 
 @media (max-width:380px) {
+  .registration-v2 nav { padding-inline:10px; }
+  .registration-v2 nav .logo { font-size:.88rem; letter-spacing:.16em; }
+  .registration-v2 .nav-links a { padding-inline:9px; letter-spacing:.04em; }
   .registration-v2 .layout { padding-inline:10px; }
   .registration-v2 .branding h1 { font-size:2rem; }
   .registration-v2 .registration-benefits small { font-size:.6rem; }
@@ -588,9 +626,6 @@ form {
         <a href="../index.html?login=true" class="btn-login">Iniciar sesión</a>
     </div>
 
-    <div class="menu-toggle" id="menuToggle">
-        ☰
-    </div>
 </nav>
 <div class="layout">
 
@@ -647,12 +682,18 @@ form {
 
         <div class="form-group">
             <label for="password">Contraseña</label>
-            <input type="password" id="password" placeholder="Mínimo 6 caracteres" minlength="6" autocomplete="new-password" required>
+            <div class="password-field">
+                <input type="password" id="password" placeholder="Mínimo 6 caracteres" minlength="6" autocomplete="new-password" required>
+                <button type="button" class="password-toggle" data-password-target="password" aria-label="Mostrar contraseña" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/></svg></button>
+            </div>
         </div>
         
         <div class="form-group">
             <label for="confirmPassword">Confirmar contraseña</label>
-            <input type="password" id="confirmPassword" placeholder="Repite tu contraseña" minlength="6" autocomplete="new-password" required>
+            <div class="password-field">
+                <input type="password" id="confirmPassword" placeholder="Repite tu contraseña" minlength="6" autocomplete="new-password" required>
+                <button type="button" class="password-toggle" data-password-target="confirmPassword" aria-label="Mostrar contraseña" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/></svg></button>
+            </div>
         </div>
 
         <small id="passwordError" style="color:#ff4d4d; display:none; grid-column:span 2; font-size:.75rem; text-align:left;">
@@ -679,7 +720,7 @@ form {
             <h2>Verifica tu correo 📩</h2>
             <p>Te enviamos un código de 8 dígitos a tu email.</p>
 
-            <input type="text" id="otpCode" placeholder="Ingresa el código de 8 dígitos" maxlength="8">
+            <input type="text" id="otpCode" placeholder="Ingresa el código recibido" maxlength="8" inputmode="numeric" autocomplete="one-time-code">
             <button type="button" id="verifyOtp" class="btn-register">
                 VERIFICAR CÓDIGO
             </button>
@@ -717,6 +758,7 @@ const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 const planSeleccionado = (new URLSearchParams(window.location.search).get("plan") || "prueba").toUpperCase();
+let registroReanudado = false;
 // ==========================
 // GENERAR SLUG AUTOMÁTICO
 // ==========================
@@ -760,7 +802,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         passwordInput.classList.add("input-error");
         confirmInput.classList.add("input-error");
         submitButton.disabled = false;
-        btnText.innerText = "CREAR DEMO";
+        btnText.innerText = "CREAR MI TIENDA";
         submitButton.style.opacity = "1";
         submitButton.style.cursor = "pointer";
 
@@ -780,7 +822,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         phoneError.style.display = "block";
         phoneInput.classList.add("input-error");
         submitButton.disabled = false;
-        btnText.innerText = "CREAR DEMO";
+        btnText.innerText = "CREAR MI TIENDA";
         submitButton.style.opacity = "1";
         submitButton.style.cursor = "pointer";
         return;
@@ -792,11 +834,10 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         const email = document.getElementById("email").value.trim().toLowerCase();
         const passwordValue = document.getElementById("password").value;
 
-        const { error } = await supabaseClient.auth.signInWithOtp({
-            email: email,
+        let { error } = await supabaseClient.auth.signUp({
+            email,
+            password: passwordValue,
             options: {
-                shouldCreateUser: true,
-                emailOtpType: "numeric",
                 data: {
                     acepta_politica_datos: true,
                     politica_datos_version: window.TamakuLegal?.VERSION || "2026-08-09",
@@ -810,28 +851,54 @@ document.getElementById("registerForm").addEventListener("submit", async functio
             }
         });
 
+        // Si un intento anterior alcanzó a crear el usuario pero no la tienda,
+        // reanudamos el alta mediante un código nuevo en vez de bloquearlo.
+        if (error && /already registered|already exists|user_already_exists/i.test(error.message || "")) {
+            const resultadoReanudacion = await supabaseClient.auth.signInWithOtp({
+                email,
+                options: { shouldCreateUser: false }
+            });
+            error = resultadoReanudacion.error;
+            registroReanudado = !error;
+        } else {
+            registroReanudado = false;
+        }
+
         if (error) {
-            alert(error.message);
+            console.error("Error iniciando el registro:", error);
+            alert(`No fue posible iniciar el registro: ${error.message}`);
             submitButton.disabled = false;
-            btnText.innerText = "CREAR DEMO";
+            btnText.innerText = "CREAR MI TIENDA";
             submitButton.style.opacity = "1";
             submitButton.style.cursor = "pointer";
             return;
         }
         document.getElementById("registerForm").style.display = "none";
+        document.querySelector(".register-card")?.classList.add("otp-active");
         document.getElementById("otpModal").classList.add("show");
 
         setTimeout(() => {
             document.getElementById("otpCode").focus();
         }, 300);
         submitButton.disabled = false;
-        btnText.innerText = "CREAR DEMO";
+        btnText.innerText = "CREAR MI TIENDA";
         submitButton.style.opacity = "1";
         submitButton.style.cursor = "pointer";
 });
 const passwordInput = document.getElementById("password");
 const confirmInput = document.getElementById("confirmPassword");
 const errorText = document.getElementById("passwordError");
+
+document.querySelectorAll(".password-toggle").forEach((button) => {
+    button.addEventListener("click", () => {
+        const input = document.getElementById(button.dataset.passwordTarget);
+        const mostrar = input.type === "password";
+        input.type = mostrar ? "text" : "password";
+        button.classList.toggle("is-visible", mostrar);
+        button.setAttribute("aria-label", mostrar ? "Ocultar contraseña" : "Mostrar contraseña");
+        button.setAttribute("aria-pressed", String(mostrar));
+    });
+});
 
 function validatePasswords(){
     if(passwordInput.value === confirmInput.value){
@@ -856,6 +923,10 @@ phoneInput.addEventListener("input", function(){
     }
 });
 
+document.getElementById("otpCode").addEventListener("input", function(){
+    this.value = this.value.replace(/\D/g, "").slice(0, 8);
+});
+
     // ==========================
     // VERIFICAR CÓDIGO OTP
     // ==========================
@@ -865,15 +936,7 @@ phoneInput.addEventListener("input", function(){
     verifyBtn.innerText = "VERIFICANDO...";
     verifyBtn.style.opacity = "0.7";
 
-    const code = document.getElementById("otpCode").value.trim();
-    if(!/^\d{8}$/.test(code)){
-    alert("Ingresa un código válido de 8 dígitos");
-    verifyBtn.disabled = false;
-    verifyBtn.innerText = "VERIFICAR CÓDIGO";
-    verifyBtn.style.opacity = "1";
-    return;
-}
-    const email = document.getElementById("email").value.trim();
+    const email = document.getElementById("email").value.trim().toLowerCase();
 
     if(!email){
     alert("Primero debes registrarte con tu correo.");
@@ -883,24 +946,37 @@ phoneInput.addEventListener("input", function(){
     return;
 }
 
-    const { data, error } = await supabaseClient.auth.verifyOtp({
-    email: email,
-    token: code,
-    type: 'email'
-});
+    // Si el código ya se verificó y solo falló la creación de la tienda,
+    // Supabase conserva la sesión. En ese caso continuamos sin consumir otro.
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    let user = sessionData.session?.user || null;
 
-    if(error){
-    alert("Código incorrecto o vencido");
-    verifyBtn.disabled = false;
-    verifyBtn.innerText = "VERIFICAR CÓDIGO";
-    verifyBtn.style.opacity = "1";
-    return;
-}
-// ==========================
-// 1️⃣ OBTENER USUARIO AUTENTICADO
-// ==========================
-const { data: userData } = await supabaseClient.auth.getUser();
-const user = userData.user;
+    if (!user) {
+        const code = document.getElementById("otpCode").value.replace(/\D/g, "");
+        if(!/^\d{6,8}$/.test(code)){
+            alert("Ingresa el código numérico que recibiste por correo");
+            verifyBtn.disabled = false;
+            verifyBtn.innerText = "VERIFICAR CÓDIGO";
+            verifyBtn.style.opacity = "1";
+            return;
+        }
+
+        const { data, error } = await supabaseClient.auth.verifyOtp({
+            email,
+            token: code,
+            type: "email"
+        });
+
+        if(error){
+            console.error("Error verificando el código de registro:", error);
+            alert(`No fue posible verificar el código: ${error.message || "código incorrecto o vencido"}`);
+            verifyBtn.disabled = false;
+            verifyBtn.innerText = "VERIFICAR CÓDIGO";
+            verifyBtn.style.opacity = "1";
+            return;
+        }
+        user = data.user;
+    }
 
 if (!user) {
     alert("Error obteniendo usuario autenticado.");
@@ -910,13 +986,42 @@ if (!user) {
     return;
 }
 
-// El OTP autentica el correo; ahora asignamos la contraseña elegida en el formulario.
-const { error: passwordError } = await supabaseClient.auth.updateUser({
-    password: document.getElementById("password").value
-});
-if (passwordError) {
-    alert("No fue posible configurar la contraseña: " + passwordError.message);
-    verifyBtn.disabled = false;
+// En una reanudación, el usuario provenía del flujo OTP anterior y todavía
+// no tenía la contraseña del formulario asignada.
+if (registroReanudado) {
+    const { error: passwordError } = await supabaseClient.auth.updateUser({
+        password: document.getElementById("password").value
+    });
+    if (passwordError) {
+        // Algunos usuarios incompletos ya alcanzaron a guardar esta misma
+        // contraseña en un intento anterior. Comprobamos que funcione antes
+        // de detener el proceso por el 422 de "misma contraseña".
+        const { error: loginError } = await supabaseClient.auth.signInWithPassword({
+            email,
+            password: document.getElementById("password").value
+        });
+        if (loginError) {
+            console.error("No fue posible configurar ni validar la contraseña:", passwordError, loginError);
+            alert("El correo fue verificado, pero no fue posible configurar la contraseña: " + passwordError.message);
+            verifyBtn.disabled = false;
+            verifyBtn.innerText = "VERIFICAR CÓDIGO";
+            verifyBtn.style.opacity = "1";
+            return;
+        }
+    }
+}
+
+// Evita crear una segunda tienda si el usuario ya había terminado el proceso.
+const { data: perfilExistente, error: perfilConsultaError } = await supabaseClient
+    .from("perfiles")
+    .select("tienda_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+if (!perfilConsultaError && perfilExistente?.tienda_id) {
+    localStorage.setItem("tamakoSession", "active");
+    alert("Tu cuenta ya tiene una tienda. Te llevaremos al panel principal.");
+    window.location.href = "dashboard.html";
     return;
 }
 
@@ -929,19 +1034,33 @@ const slug = generarSlug(nombreTienda);
 // ==========================
 // 3️⃣ CREAR TIENDA
 // ==========================
-const { data: tiendaInsertada, error: insertError } = await supabaseClient
+const { data: tiendasPrevias, error: tiendaPreviaError } = await supabaseClient
     .from("tiendas")
-    .insert([{
-        nombre: nombreTienda,
-        slug: slug,
-        propietario: document.getElementById("propietario").value.trim(),
-        telefono: document.getElementById("telefono").value.trim(),
-        direccion: document.getElementById("direccion").value.trim(),
-        cantidad_puestos: parseInt(document.getElementById("cantidad_puestos").value),
-        email: document.getElementById("email").value.trim().toLowerCase()
-    }])
-    .select()
-    .single();
+    .select("*")
+    .eq("user_id", user.id)
+    .limit(1);
+
+let tiendaInsertada = !tiendaPreviaError ? tiendasPrevias?.[0] : null;
+let insertError = null;
+
+if (!tiendaInsertada) {
+    const resultadoTienda = await supabaseClient
+        .from("tiendas")
+        .insert([{
+            user_id: user.id,
+            nombre: nombreTienda,
+            slug: slug,
+            propietario: document.getElementById("propietario").value.trim(),
+            telefono: document.getElementById("telefono").value.trim(),
+            direccion: document.getElementById("direccion").value.trim(),
+            cantidad_puestos: parseInt(document.getElementById("cantidad_puestos").value),
+            email: document.getElementById("email").value.trim().toLowerCase()
+        }])
+        .select()
+        .single();
+    tiendaInsertada = resultadoTienda.data;
+    insertError = resultadoTienda.error;
+}
 
 if (insertError) {
     alert("Error al guardar la tienda: " + insertError.message);
@@ -979,12 +1098,9 @@ const { error: planError } = await supabaseClient.rpc("seleccionar_plan_tamaku",
 if (planError && !/function|schema cache/i.test(planError.message || "")) {
     console.warn("No se pudo guardar el plan seleccionado:", planError);
 }
-document.getElementById("otpModal").classList.remove("show");
-document.getElementById("registerForm").style.opacity = "1";
-document.getElementById("registerForm").style.display = "none";
-
-const modal = document.getElementById("successModal");
-modal.classList.add("show");
+verifyBtn.innerText = "ENTRANDO A TU TIENDA...";
+localStorage.setItem("tamakoSession", "active");
+window.location.replace("dashboard.html");
 
 });
 // ==========================
@@ -998,13 +1114,18 @@ document.getElementById("resendOtp").addEventListener("click", async function(){
 
     const email = document.getElementById("email").value.trim().toLowerCase();
 
-    const { error } = await supabaseClient.auth.signInWithOtp({
-        email: email,
-        options: {
-            shouldCreateUser: true,
-            emailOtpType: "numeric"
-        }
-    });
+    const { error } = registroReanudado
+        ? await supabaseClient.auth.signInWithOtp({
+            email,
+            options: { shouldCreateUser: false }
+        })
+        : await supabaseClient.auth.resend({
+            type: "signup",
+            email,
+            options: {
+                emailRedirectTo: `${window.location.origin}/pages/registro.html`
+            }
+        });
 
     if(error){
 
@@ -1033,13 +1154,6 @@ document.getElementById("goDashboard").addEventListener("click", function(){
 function showToast(message){
     TamakuUI.success(message);
 }
-// MENU HAMBURGUESA
-const toggle = document.getElementById("menuToggle");
-const nav = document.getElementById("navLinks");
-
-toggle.addEventListener("click", () => {
-    nav.classList.toggle("active");
-});
 </script>
 </body>
 </html>

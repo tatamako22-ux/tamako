@@ -189,6 +189,41 @@ export function iniciarAgenda({
     // Cargar selector de servicios dinámico
     const selectServicio = document.getElementById("res_servicio");
     if (selectServicio) {
+      let avisoBloques = document.getElementById("avisoBloquesServicio");
+      if (!avisoBloques) {
+        avisoBloques = document.createElement("div");
+        avisoBloques.id = "avisoBloquesServicio";
+        avisoBloques.style.cssText =
+          "display:none; margin:-5px 0 15px; padding:12px; border-radius:10px; " +
+          "background:rgba(191,149,63,.12); border:1px solid rgba(191,149,63,.35); " +
+          "color:#e7c778; font-size:.82rem; line-height:1.4;";
+        selectServicio.insertAdjacentElement("afterend", avisoBloques);
+      }
+
+      const actualizarAvisoBloques = () => {
+        const opcion = selectServicio.options[selectServicio.selectedIndex];
+        const duracion = parseInt(opcion?.getAttribute("data-duracion"), 10);
+        const intervalo =
+          parseInt(profesional?.intervalo_citas, 10) ||
+          parseInt(tiendaInfo.intervalo_minutos, 10) ||
+          40;
+
+        if (profesional?.modo_agenda !== "intervalo" || !duracion) {
+          avisoBloques.style.display = "none";
+          avisoBloques.textContent = "";
+          return;
+        }
+
+        const cantidad = Math.max(1, Math.ceil(duracion / intervalo));
+        const palabra = cantidad === 1 ? "turno" : "turnos";
+        avisoBloques.textContent =
+          `Este servicio dura ${duracion} min y ocupará ${cantidad} ${palabra} ` +
+          `de ${intervalo} min en la agenda.`;
+        avisoBloques.style.display = "block";
+      };
+
+      selectServicio.onchange = actualizarAvisoBloques;
+      avisoBloques.style.display = "none";
       selectServicio.innerHTML =
         '<option value="">Cargando servicios...</option>';
 
@@ -211,6 +246,7 @@ export function iniciarAgenda({
             </option>`;
           });
           selectServicio.innerHTML = html;
+          actualizarAvisoBloques();
         }
       } catch (err) {
         console.error("Error al cargar servicios:", err);
@@ -254,6 +290,39 @@ export function iniciarAgenda({
     const fecha = getState("fechaSeleccionada").toLocaleDateString("sv-SE");
 
     const hora24 = normalizarHora(reserva.horaInicio);
+
+    // La duracion de la cita la define el servicio, no el tamano visual del
+    // bloque sobre el que se hizo clic. Si no hay servicio seleccionado,
+    // conservamos la duracion del bloque como respaldo.
+    const selectServicio = document.getElementById("res_servicio");
+    const opcionSel = selectServicio?.options[selectServicio.selectedIndex];
+    const duracionBloque =
+      horaToMin(normalizarHora(reserva.horaFin)) -
+      horaToMin(normalizarHora(reserva.horaInicio));
+    const duracionServicio =
+      parseInt(opcionSel?.getAttribute("data-duracion"), 10) || duracionBloque;
+
+    const horarioDia = profesional
+      ? (() => {
+          const dias = [
+            "domingo",
+            "lunes",
+            "martes",
+            "miÃ©rcoles",
+            "jueves",
+            "viernes",
+            "sÃ¡bado",
+          ];
+          const indiceDia = getState("fechaSeleccionada").getDay();
+          const horario = profesional.horario_semanal?.[dias[indiceDia]];
+          return horario?.activo
+            ? horario
+            : {
+                inicio: profesional.horario_inicio || "08:00",
+                fin: profesional.horario_fin || "20:00",
+              };
+        })()
+      : { inicio: "00:00", fin: "24:00" };
     console.group("=== RESERVA ===");
 
     console.log("Hora inicio:", reserva.horaInicio);
@@ -278,13 +347,15 @@ export function iniciarAgenda({
     const resultado = calcularCita({
       inicioDeseado: horaToMin(hora24),
 
-      duracion:
-        horaToMin(normalizarHora(reserva.horaFin)) -
-        horaToMin(normalizarHora(reserva.horaInicio)),
+      duracion: duracionServicio,
 
       modo: profesional?.modo_agenda || "auto",
 
       bloques,
+
+      jornadaInicio: horaToMin(normalizarHora(horarioDia.inicio)),
+
+      jornadaFin: horaToMin(normalizarHora(horarioDia.fin)),
 
       profesional,
 
@@ -304,14 +375,9 @@ export function iniciarAgenda({
     const hhFin = String(Math.floor(resultado.fin / 60)).padStart(2, "0");
 
     const mmFin = String(resultado.fin % 60).padStart(2, "0");
-    const horaFinGuardar = reserva.horaFin
-      ? `${reserva.horaFin}:00`
-      : `${hhFin}:${mmFin}:00`;
+    const horaFinGuardar = `${hhFin}:${mmFin}:00`;
 
     // Capturar servicio seleccionado
-    const selectServicio = document.getElementById("res_servicio");
-    const opcionSel = selectServicio?.options[selectServicio.selectedIndex];
-
     const servicioId = selectServicio?.value || null;
     const servicioNombre =
       opcionSel?.getAttribute("data-nombre") || "Servicio General";

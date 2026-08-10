@@ -229,6 +229,18 @@ header { padding:0; }
 #welcome-user p { margin-bottom:4px; color:var(--gold-light); font-size:.48rem; font-weight:800; letter-spacing:.18em; }
 #user-name-display { color:#fff !important; font-family:"Montserrat",sans-serif !important; font-size:.7rem !important; letter-spacing:.05em !important; text-shadow:none !important; }
 
+/* La tarjeta de identidad también adopta el modo claro y el color de marca. */
+body:not(.dark-mode) .header-card{color:var(--text);background:radial-gradient(circle at 100% 0,var(--accent-soft),transparent 46%),var(--surface);border-color:var(--gold-border);box-shadow:0 20px 55px rgba(0,0,0,.09)}
+body:not(.dark-mode) .header-card::before{-webkit-text-stroke-color:var(--gold-border)}
+body:not(.dark-mode) .shop-location{color:var(--muted)}
+body:not(.dark-mode) .brand-logo-shell{border-color:var(--gold-border);box-shadow:0 14px 35px rgba(0,0,0,.11),0 0 0 5px var(--accent-soft)}
+body:not(.dark-mode) .brand-promise{color:var(--text);background:color-mix(in srgb,var(--accent) 5%,#fff);border-color:var(--gold-border)}
+body:not(.dark-mode) .brand-promise>i{color:var(--gold);background:var(--accent-soft)}
+body:not(.dark-mode) .brand-promise span{color:var(--muted)}
+body:not(.dark-mode) #welcome-user{color:var(--text);background:var(--accent-soft);border-color:var(--gold-border)}
+body:not(.dark-mode) #welcome-user p{color:var(--gold)}
+body:not(.dark-mode) #user-name-display{color:var(--text)!important}
+
 @media (min-width:901px) {
   .app-container {
     width:min(100%,1320px);

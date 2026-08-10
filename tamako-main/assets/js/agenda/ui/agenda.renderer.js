@@ -255,7 +255,7 @@ function renderModoMovil({
       HORARIO_INICIO,
       HORARIO_FIN,
       citasOcupadas,
-      40,
+      parseInt(barbero.intervalo_citas, 10) || 40,
     );
 
     if (lineaTiempoCompleta.length === 0) {
@@ -340,7 +340,7 @@ function renderModoEscritorio({
       HORARIO_INICIO,
       HORARIO_FIN,
       citasOcupadas,
-      40,
+      parseInt(barbero.intervalo_citas, 10) || 40,
     );
 
     lineaTiempoCompleta.forEach((bloque) => {
@@ -361,42 +361,42 @@ function obtenerLineaTiempoCompleta(
   citasOcupadas,
   intervaloMin = 40,
 ) {
-  let lineaTiempo = [];
-  let tiempoActual = horarioInicioMin;
-
-  const ocupadas = citasOcupadas.sort(
+  const ocupadas = [...citasOcupadas].sort(
     (a, b) =>
       horaToMin(normalizarHora(a.hora_inicio)) -
       horaToMin(normalizarHora(b.hora_inicio)),
   );
 
-  ocupadas.forEach((cita) => {
-    const citaInicio = horaToMin(normalizarHora(cita.hora_inicio));
-    const citaFin = horaToMin(normalizarHora(cita.hora_fin));
-
-    while (tiempoActual + intervaloMin <= citaInicio) {
-      lineaTiempo.push({
-        id_barbero,
-        hora_inicio: minToHora(tiempoActual),
-        hora_fin: minToHora(tiempoActual + intervaloMin),
-      });
-      tiempoActual += intervaloMin;
-    }
-
-    lineaTiempo.push(cita);
-    tiempoActual = citaFin;
-  });
-
-  while (tiempoActual + intervaloMin <= horarioFinMin) {
-    lineaTiempo.push({
-      id_barbero,
-      hora_inicio: minToHora(tiempoActual),
-      hora_fin: minToHora(tiempoActual + intervaloMin),
+  // Los bloques libres siempre quedan anclados al inicio de la jornada. Una
+  // cita de 55 min con intervalo de 40 ocupa por solapamiento dos bloques,
+  // pero no desplaza toda la cuadricula 15 minutos hacia adelante.
+  const libres = [];
+  for (
+    let inicio = horarioInicioMin;
+    inicio + intervaloMin <= horarioFinMin;
+    inicio += intervaloMin
+  ) {
+    const fin = inicio + intervaloMin;
+    const seCruza = ocupadas.some((cita) => {
+      const citaInicio = horaToMin(normalizarHora(cita.hora_inicio));
+      const citaFin = horaToMin(normalizarHora(cita.hora_fin));
+      return inicio < citaFin && fin > citaInicio;
     });
-    tiempoActual += intervaloMin;
+
+    if (!seCruza) {
+      libres.push({
+        id_barbero,
+        hora_inicio: minToHora(inicio),
+        hora_fin: minToHora(fin),
+      });
+    }
   }
 
-  return lineaTiempo;
+  return [...ocupadas, ...libres].sort(
+    (a, b) =>
+      horaToMin(normalizarHora(a.hora_inicio)) -
+      horaToMin(normalizarHora(b.hora_inicio)),
+  );
 }
 
 // 🎯 RENDER PRINCIPAL (entry point)

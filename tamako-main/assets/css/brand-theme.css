@@ -1,0 +1,27 @@
+/* Modo claro accesible para el panel privado de cada tienda. */
+body.tamaku-brand-light{color:#171717!important;background:radial-gradient(circle at 90% 0,var(--accent-soft),transparent 27%),#f4f3ef!important}
+body.tamaku-brand-light>.sidebar{background:#fff!important;border-right-color:rgba(0,0,0,.11)!important}
+body.tamaku-brand-light>.sidebar .sidebar-logo{color:var(--gold)!important}
+body.tamaku-brand-light>.sidebar .nav-item{color:#626262!important}
+body.tamaku-brand-light>.sidebar .nav-item:hover,body.tamaku-brand-light>.sidebar .nav-item.active{color:#171717!important;background:var(--accent-soft)!important}
+body.tamaku-brand-light>.main-content,body.tamaku-brand-light>.plan-page{color:#171717!important;background:radial-gradient(circle at 94% 0,var(--accent-soft),transparent 28%),#f4f3ef!important}
+body.tamaku-brand-light :is(h1,h2,h3,h4,strong,.welcome-text h1,.settings-header-v3 h1){color:#171717!important;text-shadow:none!important}
+body.tamaku-brand-light :is(p,small,.welcome-text p,.settings-header-v3 p){color:#666}
+body.tamaku-brand-light :is(.settings-card,.stat-card,.panel,.plan-panel,.plan-kpis article,.users-panel,.user-card,.access-summary article,.dashboard-panel,.agenda-panel,.modal-card,.dialog-card,.user-dialog,.search-box,.dinamic-row,.dia-card){color:#171717!important;background:#fff!important;border-color:rgba(0,0,0,.1)!important;box-shadow:0 12px 35px rgba(0,0,0,.055)!important}
+body.tamaku-brand-light :is(input,select,textarea,.editable-input){color:#171717!important;background:#fff!important;border-color:rgba(0,0,0,.16)!important}
+body.tamaku-brand-light :is(input,textarea)::placeholder{color:#888!important}
+body.tamaku-brand-light :is(table,thead,tbody,tr,td,th){color:#252525}
+body.tamaku-brand-light .plan-hero{color:#171717;background:radial-gradient(circle at 100% 0,var(--accent-soft),transparent 42%),#fff!important}
+body.tamaku-brand-light .dashboard-v3{background:radial-gradient(circle at 92% 0,var(--accent-soft),transparent 27%),#f4f3ef!important}
+body.tamaku-brand-light .kpi-card{color:#171717!important;background:#fff!important;border-color:rgba(0,0,0,.1)!important;box-shadow:0 12px 35px rgba(0,0,0,.055)!important}
+body.tamaku-brand-light .kpi-card.kpi-primary{background:linear-gradient(145deg,var(--accent-soft),#fff 65%)!important;border-color:var(--gold-border)!important}
+body.tamaku-brand-light .kpi-card>span{color:#666!important}body.tamaku-brand-light .kpi-card>strong{color:#171717!important}body.tamaku-brand-light .kpi-card>small{color:#6d6d6d!important}
+body.tamaku-brand-light .kpi-icon{color:var(--gold)!important;background:var(--accent-soft)!important}
+body.tamaku-brand-light .dashboard-panel{color:#171717!important;background:#fff!important;border-color:rgba(0,0,0,.1)!important;box-shadow:0 12px 35px rgba(0,0,0,.055)!important}
+body.tamaku-brand-light :is(.appointment-row,.payment-method,.performance-item,.quick-action,.operation-alert){color:#171717!important;background:#f8f8f6!important;border-color:rgba(0,0,0,.09)!important}
+body.tamaku-brand-light .trend-track{border-bottom-color:rgba(0,0,0,.1)!important}
+body.tamaku-brand-light .brand-preview:not(.light){color:#f5f5f2!important;background:#0b0b0b!important}
+body.tamaku-brand-light .mobile-tab-bar{background:rgba(255,255,255,.88)!important;border-color:var(--gold-border)!important;box-shadow:0 12px 35px rgba(0,0,0,.16)!important}
+body.tamaku-brand-light .mobile-tab-bar .tab-item{color:#666!important;background:#f5f4f1!important;box-shadow:none!important}
+body.tamaku-brand-light .mobile-tab-bar .tab-item.active{color:var(--gold)!important;background:var(--accent-soft)!important}
+body.tamaku-brand-light .menu-logout-overlay,body.tamaku-brand-light .modal{color:#eee}

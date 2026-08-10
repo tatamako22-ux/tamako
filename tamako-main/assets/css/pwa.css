@@ -89,6 +89,13 @@
 
 .pwa-close:hover { color: #fff; }
 
+/* El aviso de instalación acompaña la apariencia de la reserva. */
+body:not(.dark-mode) .tamaku-pwa-widget{color:var(--text);background:rgba(255,255,255,.94);border-color:var(--gold-border);box-shadow:0 15px 35px rgba(0,0,0,.14),0 0 20px var(--accent-soft)}
+body:not(.dark-mode) .pwa-title{color:var(--gold)}
+body:not(.dark-mode) .pwa-desc{color:var(--muted)}
+.pwa-btn{background:linear-gradient(90deg,var(--gold),var(--gold-light),var(--gold));color:var(--accent-contrast)}
+body:not(.dark-mode) .pwa-close:hover{color:var(--text)}
+
 /* Instrucción específica para iOS */
 .ios-instruction {
     display: none;

@@ -59,9 +59,11 @@ function activarFeedbackMovil() {
 
 activarFeedbackMovil();
 
-window.tamakuContextReady = import("./session.js").then((session) => {
+window.tamakuContextReady = Promise.all([import("./session.js"), import("./brand-theme.js")]).then(async ([session, marca]) => {
   window.cerrarSesion = session.cerrarSesion;
-  return session.requireTiendaInfo();
+  const tienda = await session.requireTiendaInfo();
+  marca.aplicarMarcaTienda(tienda);
+  return tienda;
 });
 
 const PERMISOS_RUTA = {
@@ -75,22 +77,40 @@ const PERMISOS_RUTA = {
   "ajustes.html": "ajustes_ver",
 };
 
+const FUNCIONES_RUTA = {
+  "dashboard.html": "dashboard",
+  "agenda.html": "agenda",
+  "clientes.html": "clientes",
+  "profesionales.html": "profesionales",
+  "facturacion.html": "facturacion",
+  "tienda.html": "tienda",
+  "usuarios.html": "usuarios",
+  "ajustes.html": "ajustes",
+};
+
+function permitePlan(tienda, pagina) {
+  const funciones = tienda?.suscripcion?.funcionalidades;
+  if (!funciones) return true;
+  const funcion = FUNCIONES_RUTA[pagina];
+  return !funcion || funciones[funcion] === true;
+}
+
 function puede(tienda, permiso) {
   return Boolean(tienda?.sesion?.es_propietario || tienda?.sesion?.permisos?.[permiso]);
 }
 
 function protegerRuta(tienda, pagina) {
   const permiso = PERMISOS_RUTA[pagina];
-  if (!permiso || puede(tienda, permiso)) return true;
-  const destino = Object.entries(PERMISOS_RUTA).find(([, clave]) =>
-    puede(tienda, clave),
+  if ((!permiso || puede(tienda, permiso)) && permitePlan(tienda, pagina)) return true;
+  const destinoPermitido = Object.entries(PERMISOS_RUTA).find(([ruta, clave]) =>
+    puede(tienda, clave) && permitePlan(tienda, ruta),
   )?.[0];
-  window.location.replace(destino || "../index.html");
+  window.location.replace(destinoPermitido || "../index.html");
   return false;
 }
 
 function enlace(tienda, permiso, href, pagina, icono, texto) {
-  if (!puede(tienda, permiso)) return "";
+  if (!puede(tienda, permiso) || !permitePlan(tienda, href)) return "";
   return `<a href="${href}" class="nav-item ${pagina === href ? "active" : ""}">
     <i class="fa-solid ${icono}"></i>${texto}
   </a>`;
@@ -112,6 +132,7 @@ function renderMenuGlobal(tienda) {
         ${enlace(tienda, "tienda_ver", "tienda.html", pagina, "fa-bag-shopping", "Tienda")}
         ${enlace(tienda, "usuarios_gestionar", "usuarios.html", pagina, "fa-user-shield", "Usuarios")}
         ${enlace(tienda, "ajustes_ver", "ajustes.html", pagina, "fa-gear", "Ajustes")}
+        ${tienda?.sesion?.es_propietario ? `<a href="mi-plan.html" class="nav-item ${pagina === "mi-plan.html" ? "active" : ""}"><i class="fa-solid fa-gem"></i>Mi plan</a>` : ""}
       </nav>
       <button class="logout-btn" type="button" onclick="toggleLogout(true)">Cerrar sesión</button>`;
   }
@@ -123,10 +144,10 @@ function renderMenuGlobal(tienda) {
       ["agenda_ver", "agenda.html", "fa-calendar", "Agenda"],
       ["clientes_ver", "clientes.html", "fa-users", "Clientes"],
       ["facturacion_ver", "facturacion.html", "fa-file-invoice-dollar", "Facturas"],
-    ].filter(([permiso]) => puede(tienda, permiso));
+    ].filter(([permiso, href]) => puede(tienda, permiso) && permitePlan(tienda, href));
     mobile.innerHTML = tabs.map(([, href, icono, texto]) =>
       `<a href="${href}" class="tab-item ${pagina === href ? "active" : ""}"><i class="fa-solid ${icono}"></i><span>${texto}</span></a>`,
-    ).join("") + `<button type="button" class="tab-item tab-more ${["profesionales.html", "usuarios.html", "ajustes.html", "tienda.html"].includes(pagina) ? "active" : ""}" onclick="toggleMobileMore(true)"><i class="fa-solid fa-ellipsis"></i><span>Más</span></button>`;
+    ).join("") + `<button type="button" class="tab-item tab-more ${["profesionales.html", "usuarios.html", "ajustes.html", "tienda.html", "mi-plan.html"].includes(pagina) ? "active" : ""}" onclick="toggleMobileMore(true)"><i class="fa-solid fa-ellipsis"></i><span>Más</span></button>`;
   }
 
   crearModalLogoutGlobal();
@@ -134,7 +155,7 @@ function renderMenuGlobal(tienda) {
 }
 
 function opcionMas(tienda, permiso, href, pagina, icono, titulo, detalle) {
-  if (!puede(tienda, permiso)) return "";
+  if (!puede(tienda, permiso) || !permitePlan(tienda, href)) return "";
   return `<a href="${href}" class="${pagina === href ? "active" : ""}"><i class="fa-solid ${icono}"></i><div><strong>${titulo}</strong><span>${detalle}</span></div><i class="fa-solid fa-chevron-right"></i></a>`;
 }
 
@@ -151,6 +172,7 @@ function crearMenuMasMobile(pagina, tienda) {
       ${opcionMas(tienda, "profesionales_ver", "profesionales.html", pagina, "fa-user-tie", "Profesionales", "Equipo, servicios y horarios")}
       ${opcionMas(tienda, "usuarios_gestionar", "usuarios.html", pagina, "fa-user-shield", "Usuarios", "Accesos, roles y permisos")}
       ${opcionMas(tienda, "ajustes_ver", "ajustes.html", pagina, "fa-sliders", "Ajustes", "Identidad y reglas del negocio")}
+      ${tienda?.sesion?.es_propietario ? `<a href="mi-plan.html" class="${pagina === "mi-plan.html" ? "active" : ""}"><i class="fa-solid fa-gem"></i><div><strong>Mi plan</strong><span>Suscripción, vencimiento y pagos</span></div><i class="fa-solid fa-chevron-right"></i></a>` : ""}
       <button type="button" class="mobile-more-logout" onclick="toggleMobileMore(false); toggleLogout(true)"><i class="fa-solid fa-power-off"></i><div><strong>Cerrar sesión</strong><span>Salir de la administración</span></div><i class="fa-solid fa-chevron-right"></i></button>
     </nav>
   </section>`;

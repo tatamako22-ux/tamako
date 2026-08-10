@@ -6,7 +6,7 @@
     <title>TAMAKU | Configuración</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/menu.css?v=8">
+    <link rel="stylesheet" href="../assets/css/menu.css?v=10">
     <style>
         body { 
             display: flex !important; 
@@ -142,7 +142,7 @@
             .horarios-grid { grid-template-columns: 1fr; }
         }
     </style>
-<link rel="stylesheet" href="../assets/css/ajustes.css?v=3">
+<link rel="stylesheet" href="../assets/css/ajustes.css?v=4">
 <link rel="stylesheet" href="../assets/css/notifications.css?v=1">
 <script src="../assets/js/core/notifications.js?v=1" defer></script>
 </head>
@@ -179,6 +179,27 @@
                     <input type="text" id="shopAddress">
                 </div>
                 <button class="btn-action" id="saveId">Guardar Identidad</button>
+                <section class="brand-customizer">
+                    <div class="brand-customizer-heading">
+                        <div><small>PANEL Y RESERVAS</small><h3>Colores de tu marca</h3></div>
+                        <label class="brand-switch"><input id="brandApplyBooking" type="checkbox" checked><span></span>Usar en reservas</label>
+                    </div>
+                    <div class="brand-presets" id="brandPresets" aria-label="Paletas prediseñadas">
+                        <button type="button" data-palette="dorado" data-primary="#d1a13a" data-secondary="#f0cf79"><i style="--p:#d1a13a;--s:#f0cf79"></i>Dorado</button>
+                        <button type="button" data-palette="spa" data-primary="#7c4dff" data-secondary="#c5a7ff"><i style="--p:#7c4dff;--s:#c5a7ff"></i>Spa</button>
+                        <button type="button" data-palette="rosa" data-primary="#c33c75" data-secondary="#f3a9c6"><i style="--p:#c33c75;--s:#f3a9c6"></i>Rosa</button>
+                        <button type="button" data-palette="natural" data-primary="#387b67" data-secondary="#91c9b6"><i style="--p:#387b67;--s:#91c9b6"></i>Natural</button>
+                        <button type="button" data-palette="azul" data-primary="#2563eb" data-secondary="#8eb5ff"><i style="--p:#2563eb;--s:#8eb5ff"></i>Azul</button>
+                    </div>
+                    <div class="brand-fields">
+                        <label>Estilo del tablero<select id="brandPanelBase"><option value="oscuro">Oscuro</option><option value="claro">Claro accesible</option></select></label>
+                        <label>Estilo de reservas<select id="brandBookingBase"><option value="oscuro">Oscuro</option><option value="claro">Claro accesible</option></select></label>
+                        <label>Color principal<span class="color-field"><input id="brandPrimary" type="color" value="#d1a13a"><input id="brandPrimaryHex" value="#D1A13A" maxlength="7"></span></label>
+                        <label>Color secundario<span class="color-field"><input id="brandSecondary" type="color" value="#f0cf79"><input id="brandSecondaryHex" value="#F0CF79" maxlength="7"></span></label>
+                    </div>
+                    <div class="brand-preview" id="brandPreview"><span>VISTA PREVIA</span><strong id="brandPreviewName">Tu negocio</strong><p>Reserva tu próxima experiencia.</p><button type="button">Reservar ahora</button></div>
+                    <div class="brand-actions"><button type="button" id="resetBrand">Restaurar TAMAKU</button><button type="button" class="btn-action" id="saveBrand">Guardar colores</button></div>
+                </section>
             </div>
 
             <div class="settings-card">
@@ -245,6 +266,38 @@
 
         let tiendaInfo = await requireTiendaInfo();
         const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+        const HEX_VALIDO = /^#[0-9a-f]{6}$/i;
+        const marcaDefault = { tema_base:'oscuro', color_primario:'#D1A13A', color_secundario:'#F0CF79', aplicar_marca_reservas:true };
+
+        function normalizarHex(valor, respaldo) {
+            const color = String(valor || '').trim();
+            return HEX_VALIDO.test(color) ? color.toUpperCase() : respaldo;
+        }
+
+        function pintarVistaMarca() {
+            const principal = normalizarHex(document.getElementById('brandPrimaryHex').value, marcaDefault.color_primario);
+            const secundario = normalizarHex(document.getElementById('brandSecondaryHex').value, marcaDefault.color_secundario);
+            document.getElementById('brandPrimary').value = principal;
+            document.getElementById('brandSecondary').value = secundario;
+            document.getElementById('brandPrimaryHex').value = principal;
+            document.getElementById('brandSecondaryHex').value = secundario;
+            const preview = document.getElementById('brandPreview');
+            preview.style.setProperty('--preview-primary', principal);
+            preview.style.setProperty('--preview-secondary', secundario);
+            preview.classList.toggle('light', document.getElementById('brandBookingBase').value === 'claro');
+            document.getElementById('brandPreviewName').textContent = document.getElementById('shopName').value.trim() || 'Tu negocio';
+            document.querySelectorAll('#brandPresets button').forEach(b => b.classList.toggle('active', b.dataset.primary.toUpperCase() === principal && b.dataset.secondary.toUpperCase() === secundario));
+        }
+
+        function cargarMarca(data = {}) {
+            const marca = { ...marcaDefault, ...data };
+            document.getElementById('brandPanelBase').value = (marca.tema_panel || marca.tema_base) === 'claro' ? 'claro' : 'oscuro';
+            document.getElementById('brandBookingBase').value = (marca.tema_reservas || marca.tema_base) === 'claro' ? 'claro' : 'oscuro';
+            document.getElementById('brandPrimaryHex').value = normalizarHex(marca.color_primario, marcaDefault.color_primario);
+            document.getElementById('brandSecondaryHex').value = normalizarHex(marca.color_secundario, marcaDefault.color_secundario);
+            document.getElementById('brandApplyBooking').checked = marca.aplicar_marca_reservas !== false;
+            pintarVistaMarca();
+        }
         function horaToMin(hora) {
             const [h, m] = hora.split(":").map(Number);
             return h * 60 + m;
@@ -289,6 +342,7 @@
                 document.getElementById('shopAddress').value = data.direccion || "";
                 document.getElementById('currency').value = data.moneda || "COP";
                 document.getElementById('commission').value = data.comision || 0;
+                cargarMarca(data);
                 // Aquí usamos 'intervalo_minutos' que es como está en tu Supabase
                 document.getElementById('modo_agenda').value = data.modo_agenda || "intervalo";
                 document.getElementById('intervalo').value = data.intervalo_minutos || "30";
@@ -484,6 +538,45 @@
                 document.getElementById('shopAddress').value = direccion;
             }
         };
+
+        document.querySelectorAll('#brandPresets button').forEach(boton => boton.onclick = () => {
+            document.getElementById('brandPrimaryHex').value = boton.dataset.primary;
+            document.getElementById('brandSecondaryHex').value = boton.dataset.secondary;
+            pintarVistaMarca();
+        });
+        [['brandPrimary','brandPrimaryHex'],['brandSecondary','brandSecondaryHex']].forEach(([selector, texto]) => {
+            document.getElementById(selector).addEventListener('input', e => { document.getElementById(texto).value = e.target.value.toUpperCase(); pintarVistaMarca(); });
+            document.getElementById(texto).addEventListener('change', pintarVistaMarca);
+        });
+        document.getElementById('brandPanelBase').addEventListener('change', pintarVistaMarca);
+        document.getElementById('brandBookingBase').addEventListener('change', pintarVistaMarca);
+        document.getElementById('shopName').addEventListener('input', pintarVistaMarca);
+        document.getElementById('resetBrand').onclick = () => cargarMarca(marcaDefault);
+        document.getElementById('saveBrand').onclick = async () => {
+            const datosMarca = {
+                tema_panel: document.getElementById('brandPanelBase').value,
+                tema_reservas: document.getElementById('brandBookingBase').value,
+                tema_base: document.getElementById('brandBookingBase').value,
+                color_primario: normalizarHex(document.getElementById('brandPrimaryHex').value, ''),
+                color_secundario: normalizarHex(document.getElementById('brandSecondaryHex').value, ''),
+                aplicar_marca_reservas: document.getElementById('brandApplyBooking').checked
+            };
+            if (!datosMarca.color_primario || !datosMarca.color_secundario) {
+                window.TamakuUI?.error?.('Los colores deben tener el formato #RRGGBB.');
+                return;
+            }
+            const { error } = await supabase.from('tiendas').update(datosMarca).eq('id', tiendaInfo.id).eq('user_id', tiendaInfo.user_id);
+            if (error) {
+                window.TamakuUI?.error?.(error.message.includes('tema_panel') || error.message.includes('tema_reservas') ? 'Primero ejecuta temas_independientes.sql en Supabase.' : error.message);
+                return;
+            }
+            tiendaInfo = { ...tiendaInfo, ...datosMarca };
+            localStorage.setItem('tamaku_tienda', JSON.stringify(tiendaInfo));
+            const { aplicarMarcaTienda } = await import('../assets/js/core/brand-theme.js');
+            aplicarMarcaTienda(tiendaInfo);
+            window.TamakuUI?.success?.('Colores guardados. Ya están disponibles en tu página de reservas.');
+            pintarVistaMarca();
+        };
         document.getElementById('saveCloses').onclick = async () => {
             const filas = document.querySelectorAll('#listaCierres .dinamic-row');
             const data = [];
@@ -590,6 +683,6 @@
 
         init();
     </script>
-    <script src="../assets/js/core/menu.js?v=9" defer></script>
+    <script src="../assets/js/core/menu.js?v=10" defer></script>
 </body>
 </html>

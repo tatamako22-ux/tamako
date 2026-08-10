@@ -14,7 +14,32 @@
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="assets/css/pwa.css">
 
-<title>TAMAKU | Plataforma Premium para Negocios de Belleza</title>
+<title>TAMAKU | Agenda y software para peluquerías y barberías</title>
+<meta name="description" content="TAMAKU es un software de agenda de citas online y CRM para peluquerías, barberías, salones de belleza, estilistas, manicuristas, spas y centros de cosmetología en Colombia.">
+<meta name="robots" content="index, follow">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "TAMAKU",
+  "applicationCategory": "BusinessApplication",
+  "applicationSubCategory": "Software de gestión para negocios de belleza",
+  "operatingSystem": "Web",
+  "inLanguage": "es-CO",
+  "description": "Agenda de citas online y CRM para peluquerías, barberías, salones de belleza, estilistas, manicuristas, spas y centros de cosmetología en Colombia.",
+  "audience": {
+    "@type": "BusinessAudience",
+    "audienceType": "Profesionales y negocios de belleza"
+  },
+  "featureList": [
+    "Gestión de citas online",
+    "Agenda para profesionales",
+    "CRM y gestión de clientes",
+    "Administración de servicios y equipo",
+    "Ventas, caja y reportes"
+  ]
+}
+</script>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -1220,7 +1245,7 @@ html{
 .landing-v2 .plans-heading > span { grid-column:1/-1; color:#ffd277; font-size:.64rem; font-weight:700; letter-spacing:.22em; }
 .landing-v2 .plans-heading h2 { max-width:820px; margin:0; color:#fff; font-family:'Playfair Display',serif; font-size:clamp(2.15rem,4vw,3.8rem); line-height:1.08; letter-spacing:-.04em; }
 .landing-v2 .plans-heading p { color:#858585; font-size:.84rem; line-height:1.7; }
-.landing-v2 .plans-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px; }
+.landing-v2 .plans-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:13px; }
 .landing-v2 .plan-card { min-width:0; min-height:480px; padding:27px; display:flex; flex-direction:column; border:1px solid rgba(255,255,255,.08); border-radius:20px; background:linear-gradient(145deg,#111,#090909); }
 .landing-v2 .plan-card.featured { border-color:rgba(255,210,119,.4); background:radial-gradient(circle at 100% 0%,rgba(255,210,119,.14),transparent 42%),linear-gradient(145deg,#15130e,#090909); }
 .landing-v2 .plan-tag { align-self:flex-start; min-height:27px; display:inline-flex; align-items:center; padding:0 9px; border-radius:8px; background:rgba(191,149,63,.11); color:#d8b151; font-size:.51rem; font-weight:700; letter-spacing:.1em; }
@@ -1259,6 +1284,7 @@ html{
   .landing-v2 .hero-left { max-width:760px; }
   .landing-v2 .hero-right { width:min(100%,850px); }
   .landing-v2 .business-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .landing-v2 .plans-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
 
 @media (max-width:900px) {
@@ -1496,13 +1522,13 @@ html{
     <div class="section-heading">
         <span>CRECE A TU MANERA</span>
         <h2>Una plataforma, diferentes negocios de belleza</h2>
-        <p>TAMAKU se adapta a la operación de tu marca, desde un profesional independiente hasta un equipo con varias especialidades.</p>
+        <p>TAMAKU es una agenda de citas online y CRM para organizar peluquerías, barberías, salones de belleza, spas y profesionales independientes en Colombia.</p>
     </div>
     <div class="business-grid">
-        <article><span>01</span><h3>Salones y peluquerías</h3><p>Organiza agenda, profesionales, servicios, clientes y ventas desde un solo lugar.</p></article>
-        <article><span>02</span><h3>Uñas y manicure</h3><p>Controla tiempos, disponibilidad, precios y seguimiento de cada cliente.</p></article>
-        <article><span>03</span><h3>Estética y bienestar</h3><p>Construye una experiencia premium desde la reserva hasta el pago final.</p></article>
-        <article><span>04</span><h3>Profesionales independientes</h3><p>Digitaliza tu negocio sin procesos complicados y mantén el control de tus ingresos.</p></article>
+        <article><span>01</span><h3>Salones, peluquerías y barberías</h3><p>Organiza la agenda, los profesionales, servicios, clientes y ventas desde un solo lugar.</p></article>
+        <article><span>02</span><h3>Uñas y manicuristas</h3><p>Controla citas, tiempos, disponibilidad, precios y seguimiento de cada cliente.</p></article>
+        <article><span>03</span><h3>Spa, estética y cosmetología</h3><p>Gestiona las reservas y construye una experiencia premium hasta el pago final.</p></article>
+        <article><span>04</span><h3>Estilistas independientes</h3><p>Digitaliza y administra tu negocio sin procesos complicados, con control de clientes e ingresos.</p></article>
     </div>
 </section>
 
@@ -1515,10 +1541,10 @@ html{
     <div class="plans-grid">
         <article class="plan-card featured">
             <span class="plan-tag">PRUEBA GRATUITA</span>
-            <h3>7 días completos</h3>
-            <p>Descubre toda la plataforma antes de elegir un plan.</p>
+            <h3>Premium por 7 días</h3>
+            <p>Prueba todas las funciones antes de elegir tu plan.</p>
             <strong>Gratis</strong>
-            <ul><li>Agenda y clientes</li><li>Profesionales y servicios</li><li>Facturación, caja y reportes</li><li>Sin tarjeta</li></ul>
+            <ul><li>Acceso Premium completo</li><li>Hasta 20 profesionales</li><li>Facturación, caja y reportes</li><li>Sin tarjeta</li></ul>
             <a href="pages/registro.html?plan=prueba">Crear mi tienda</a>
         </article>
         <article class="plan-card">
@@ -1526,7 +1552,7 @@ html{
             <h3>Plan Básico</h3>
             <p>Las herramientas esenciales para organizar tu operación.</p>
             <strong>$29.900 <small>/ mes</small></strong>
-            <ul><li>Agenda inteligente</li><li>Gestión de clientes</li><li>Servicios y equipo</li><li>Soporte básico</li></ul>
+            <ul><li>Agenda y reservas online</li><li>Clientes y servicios</li><li>Hasta 2 profesionales</li><li>1 usuario administrador</li></ul>
             <a href="pages/registro.html?plan=basico">Elegir Básico</a>
         </article>
         <article class="plan-card">
@@ -1534,8 +1560,16 @@ html{
             <h3>Plan Pro</h3>
             <p>Control financiero y analítica para tomar mejores decisiones.</p>
             <strong>$59.900 <small>/ mes</small></strong>
-            <ul><li>Todo lo del Básico</li><li>Facturación y cuentas</li><li>Caja y movimientos</li><li>Reportes financieros</li></ul>
+            <ul><li>Todo lo del Básico</li><li>Facturación, caja y reportes</li><li>Hasta 6 profesionales</li><li>Hasta 3 usuarios</li></ul>
             <a href="pages/registro.html?plan=pro">Elegir Pro</a>
+        </article>
+        <article class="plan-card">
+            <span class="plan-tag">CONTROL COMPLETO</span>
+            <h3>Plan Premium</h3>
+            <p>Todos los módulos para equipos con una operación más exigente.</p>
+            <strong>$99.900 <small>/ mes</small></strong>
+            <ul><li>Todo lo del Pro</li><li>Tienda e inventario</li><li>Hasta 20 profesionales</li><li>Hasta 10 usuarios</li></ul>
+            <a href="pages/registro.html?plan=premium">Elegir Premium</a>
         </article>
     </div>
     <a class="plans-more" href="pages/servicios.html">Comparar todos los planes <b>→</b></a>

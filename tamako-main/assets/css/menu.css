@@ -406,6 +406,7 @@
     border-radius: 0 !important;
     box-shadow: none !important;
     backdrop-filter: none !important;
+    overflow: hidden !important;
   }
 
   body > .sidebar .sidebar-logo {
@@ -426,6 +427,7 @@
     letter-spacing: 5px !important;
     text-align: center !important;
     white-space: nowrap !important;
+    flex: 0 0 auto !important;
   }
 
   body > .sidebar .nav-menu {
@@ -436,7 +438,22 @@
     flex: 1 1 auto !important;
     flex-direction: column !important;
     gap: 10px !important;
+    min-height: 0 !important;
+    padding-right: 6px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold, rgba(191, 149, 63, .45)) transparent;
   }
+
+  body > .sidebar .nav-menu::-webkit-scrollbar { width: 5px; }
+  body > .sidebar .nav-menu::-webkit-scrollbar-track { background: transparent; }
+  body > .sidebar .nav-menu::-webkit-scrollbar-thumb {
+    background: rgba(191, 149, 63, .42);
+    border-radius: 999px;
+  }
+  body > .sidebar .nav-menu::-webkit-scrollbar-thumb:hover { background: rgba(230, 200, 122, .68); }
 
   body > .sidebar .nav-item {
     width: 100% !important;
@@ -462,8 +479,8 @@
 
   body > .sidebar .nav-item:hover,
   body > .sidebar .nav-item.active {
-    color: #e6c87a !important;
-    background: rgba(191, 149, 63, 0.1) !important;
+    color: var(--gold-light, #e6c87a) !important;
+    background: var(--accent-soft, rgba(191, 149, 63, 0.1)) !important;
   }
 
   body > .sidebar .nav-item i {
@@ -475,7 +492,7 @@
   body > .sidebar .logout-btn {
     width: 100% !important;
     min-height: 48px !important;
-    margin: auto 0 0 !important;
+    margin: 12px 0 0 !important;
     padding: 15px !important;
     display: block !important;
     color: #ff4d4d !important;
@@ -492,6 +509,7 @@
     text-transform: uppercase !important;
     cursor: pointer !important;
     box-shadow: none !important;
+    flex: 0 0 auto !important;
   }
 
   body > .sidebar .logout-btn:hover {
@@ -499,6 +517,13 @@
     background: rgba(255, 77, 77, 0.18) !important;
     box-shadow: 0 0 20px rgba(255, 77, 77, 0.25) !important;
     transform: scale(1.03) !important;
+  }
+
+  @media (max-height: 800px) {
+    body > .sidebar { padding-top: 20px !important; padding-bottom: 20px !important; }
+    body > .sidebar .sidebar-logo { margin-bottom: 24px !important; }
+    body > .sidebar .nav-menu { gap: 6px !important; }
+    body > .sidebar .nav-item { min-height: 44px !important; padding-top: 12px !important; padding-bottom: 12px !important; }
   }
 }
 

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TAMAKU | Mi plan</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/menu.css?v=10">
+  <link rel="stylesheet" href="../assets/css/mi-plan.css?v=2">
+</head>
+<body>
+  <aside class="sidebar"></aside>
+  <main class="plan-page">
+    <header class="plan-header"><div><span>CUENTA TAMAKU</span><h1>Mi plan y pagos</h1><p>Consulta el estado de tu suscripción y los pagos registrados.</p></div><div class="plan-status" id="planEstado">Cargando...</div></header>
+    <section class="plan-hero">
+      <div><span>PLAN ACTUAL</span><h2 id="planNombre">—</h2><p id="planDescripcion">Estamos consultando tu suscripción.</p></div>
+      <strong id="planPrecio">—</strong>
+    </section>
+    <section class="plan-kpis">
+      <article><i class="fa-regular fa-calendar-check"></i><span>Vencimiento</span><strong id="planVence">—</strong></article>
+      <article><i class="fa-regular fa-clock"></i><span>Días restantes</span><strong id="planDias">—</strong></article>
+      <article><i class="fa-solid fa-user-tie"></i><span>Profesionales incluidos</span><strong id="planProfesionales">—</strong></article>
+      <article><i class="fa-solid fa-users-gear"></i><span>Usuarios incluidos</span><strong id="planUsuarios">—</strong></article>
+    </section>
+    <section class="plan-panel"><div class="panel-heading"><div><span>COBROS CONFIRMADOS</span><h2>Historial de pagos</h2></div><strong id="totalPagado">$0</strong></div><div class="payments-head"><span>Fecha</span><span>Plan</span><span>Periodo</span><span>Referencia</span><span>Monto</span></div><div id="listaPagos" class="payments-list"><p>Cargando pagos...</p></div></section>
+  </main>
+  <nav class="mobile-tab-bar"></nav>
+  <script type="module" src="../assets/js/core/menu.js?v=10"></script>
+  <script type="module" src="../assets/js/mi-plan.js?v=1"></script>
+</body>
+</html>

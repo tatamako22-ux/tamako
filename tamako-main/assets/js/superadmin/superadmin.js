@@ -25,6 +25,8 @@ function textoDias(s) {
   return `${Math.abs(d)} día${d === -1 ? "" : "s"} vencido${d === -1 ? "" : "s"}`;
 }
 function nombreTienda(id) { return suscripciones.find((s) => s.id_tienda === id)?.tiendas?.nombre || "Tienda"; }
+function codigoPlan(s) { return s.estado === "PRUEBA" ? "PRUEBA" : (s.tamaku_planes?.codigo || s.plan_solicitado || "SIN PLAN"); }
+function textoPlan(s) { return s.estado === "PRUEBA" ? `PRUEBA → ${s.plan_solicitado && s.plan_solicitado !== "PRUEBA" ? s.plan_solicitado : "POR ELEGIR"}` : codigoPlan(s); }
 
 function cambiarVista(nombre) {
   $$(".vista").forEach((v) => v.classList.toggle("active", v.dataset.seccion === nombre));
@@ -40,6 +42,7 @@ function renderResumen() {
   $("#totalActivas").textContent = estados.filter((e) => e === "ACTIVA").length;
   $("#totalVencidas").textContent = estados.filter((e) => ["VENCIDA", "SUSPENDIDA", "CANCELADA"].includes(e)).length;
   $("#ingresosMes").textContent = dinero.format(pagos.filter((p) => { const f = new Date(p.fecha_pago); return f.getMonth() === ahora.getMonth() && f.getFullYear() === ahora.getFullYear(); }).reduce((a, p) => a + Number(p.monto), 0));
+  $("#ingresoProyectado").textContent = dinero.format(suscripciones.filter((s) => estadoEfectivo(s) === "ACTIVA").reduce((total, s) => total + Number(s.tamaku_planes?.precio_mensual || 0), 0));
   $("#notifBadge").textContent = notificaciones.filter((n) => !n.leida).length;
   renderAnalitica();
 }
@@ -47,7 +50,7 @@ function renderResumen() {
 function renderAnalitica() {
   const proximas = suscripciones.filter((s) => finAcceso(s) && !["SUSPENDIDA", "CANCELADA"].includes(s.estado)).sort((a, b) => new Date(finAcceso(a)) - new Date(finAcceso(b))).slice(0, 6);
   $("#proximosVencimientos").innerHTML = proximas.map((s) => `<button data-abrir-tienda="${s.id_tienda}"><span><strong>${escapar(s.tiendas?.nombre || "Tienda")}</strong><small>${escapar(textoDias(s))}</small></span><time>${fecha(finAcceso(s))}</time></button>`).join("") || `<div class="vacio">No hay vencimientos programados.</div>`;
-  const conteos = ["PRUEBA", "BASICO", "PRO", "PREMIUM"].map((plan) => ({ plan, total: suscripciones.filter((s) => (s.plan_solicitado || s.tamaku_planes?.codigo) === plan).length }));
+  const conteos = ["PRUEBA", "BASICO", "PRO", "PREMIUM"].map((plan) => ({ plan, total: suscripciones.filter((s) => codigoPlan(s) === plan).length }));
   const max = Math.max(1, ...conteos.map((x) => x.total));
   $("#distribucionPlanes").innerHTML = conteos.map((x) => `<div><label><span>${x.plan}</span><b>${x.total}</b></label><i><em style="width:${x.total / max * 100}%"></em></i></div>`).join("");
   const meses = Array.from({ length: 6 }, (_, i) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - (5 - i)); return d; });
@@ -59,7 +62,7 @@ function renderAnalitica() {
 function renderTiendas() {
   const q = $("#buscarTienda").value.toLowerCase(), filtro = $("#filtroEstado").value;
   const lista = suscripciones.filter((s) => `${s.tiendas?.nombre} ${s.tiendas?.email} ${s.tiendas?.telefono}`.toLowerCase().includes(q)).filter((s) => filtro === "TODAS" || (filtro === "PROBLEMAS" ? ["VENCIDA", "SUSPENDIDA", "CANCELADA"].includes(estadoEfectivo(s)) : estadoEfectivo(s) === filtro));
-  $("#tablaTiendas").innerHTML = lista.map((s) => { const estado = estadoEfectivo(s); return `<button class="tienda-row" data-abrir-tienda="${s.id_tienda}"><span><strong>${escapar(s.tiendas?.nombre || "Tienda")}</strong><small>${escapar(s.tiendas?.email || "")} · ${escapar(s.tiendas?.telefono || "")}</small></span><b>${escapar(s.plan_solicitado || s.tamaku_planes?.nombre || "PRUEBA")}</b><em class="estado ${estado.toLowerCase()}">${estado}</em><time>${fecha(finAcceso(s))}<small>${escapar(textoDias(s))}</small></time><i class="fa-solid fa-chevron-right"></i></button>`; }).join("") || `<div class="vacio">No hay tiendas con este filtro.</div>`;
+  $("#tablaTiendas").innerHTML = lista.map((s) => { const estado = estadoEfectivo(s); return `<button class="tienda-row" data-abrir-tienda="${s.id_tienda}"><span><strong>${escapar(s.tiendas?.nombre || "Tienda")}</strong><small>${escapar(s.tiendas?.email || "")} · ${escapar(s.tiendas?.telefono || "")}</small></span><b>${escapar(textoPlan(s))}</b><em class="estado ${estado.toLowerCase()}">${estado}</em><time>${fecha(finAcceso(s))}<small>${escapar(textoDias(s))}</small></time><i class="fa-solid fa-chevron-right"></i></button>`; }).join("") || `<div class="vacio">No hay tiendas con este filtro.</div>`;
 }
 
 function pagosFiltrados() {
@@ -79,7 +82,7 @@ function renderHistorial(id) {
 function abrirDetalle(id) {
   seleccionada = suscripciones.find((s) => s.id_tienda === id); if (!seleccionada) return;
   $("#detalleNombre").textContent = seleccionada.tiendas?.nombre || "Tienda"; $("#detalleContacto").textContent = `${seleccionada.tiendas?.email || ""} · ${seleccionada.tiendas?.telefono || ""}`;
-  $("#detalleEstado").textContent = estadoEfectivo(seleccionada); $("#detalleDias").textContent = textoDias(seleccionada); $("#diasGracia").value = seleccionada.dias_gracia || 0; $("#mensajeBloqueo").value = seleccionada.mensaje_bloqueo || "";
+  $("#detalleEstado").textContent = `${estadoEfectivo(seleccionada)} · ${textoPlan(seleccionada)}`; $("#detalleDias").textContent = textoDias(seleccionada); $("#diasGracia").value = seleccionada.dias_gracia || 0; $("#mensajeBloqueo").value = seleccionada.mensaje_bloqueo || "";
   $("#pagoPlan").value = ["BASICO", "PRO", "PREMIUM"].includes(seleccionada.plan_solicitado) ? seleccionada.plan_solicitado : "BASICO"; $("#pagoMonto").value = { BASICO: 29900, PRO: 59900, PREMIUM: 99900 }[$("#pagoPlan").value];
   $("#pagoFecha").value = hoyISO(); $("#periodoInicio").value = diferenciaDias(seleccionada.fin_periodo) >= 0 ? new Date(seleccionada.fin_periodo).toISOString().slice(0, 10) : hoyISO(); renderHistorial(id);
   $("#reactivarTienda").hidden = !["SUSPENDIDA", "CANCELADA"].includes(seleccionada.estado); $("#detallePanel").classList.add("open");

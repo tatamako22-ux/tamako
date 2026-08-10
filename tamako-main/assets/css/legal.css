@@ -1,0 +1,23 @@
+.legal-consent { display:grid; gap:10px; padding:16px; border:1px solid rgba(191,149,63,.28); border-radius:16px; background:rgba(191,149,63,.055); text-align:left; }
+.legal-check { display:grid; grid-template-columns:20px 1fr; gap:10px; align-items:start; color:inherit; font-size:.72rem; line-height:1.55; cursor:pointer; }
+.legal-check input { width:17px !important; height:17px; margin:2px 0 0; accent-color:#bf953f; }
+.legal-check a,.legal-link-button { color:#d9ad4b; text-decoration:underline; font:inherit; font-weight:700; }
+.legal-link-button { padding:0; border:0; background:none; cursor:pointer; }
+.tamaku-legal-modal { position:fixed; z-index:30000; inset:0; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.86); backdrop-filter:blur(8px); opacity:0; visibility:hidden; pointer-events:none; transition:.2s ease; }
+.tamaku-legal-modal.is-visible { opacity:1; visibility:visible; pointer-events:auto; }
+.legal-modal-open { overflow:hidden; }
+.tamaku-legal-card { width:min(720px,100%); max-height:90vh; display:grid; grid-template-rows:auto minmax(0,1fr) auto; color:#eee; background:#101010; border:1px solid rgba(191,149,63,.45); border-radius:22px; box-shadow:0 30px 100px #000; overflow:hidden; text-align:left; }
+.tamaku-legal-card header,.tamaku-legal-card footer { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:18px 22px; background:#0b0b0b; }
+.tamaku-legal-card header { border-bottom:1px solid rgba(255,255,255,.08); }
+.tamaku-legal-card footer { border-top:1px solid rgba(255,255,255,.08); color:#888; font-size:.68rem; }
+.tamaku-legal-card header small { color:#bf953f; font-size:.62rem; letter-spacing:2px; font-weight:800; }
+.tamaku-legal-card h2 { margin:5px 0 0; color:#fff; font-size:1.15rem; }
+.tamaku-legal-card header button { flex:0 0 38px; width:38px; height:38px; border:1px solid rgba(255,255,255,.1); border-radius:11px; color:#bbb; background:#1b1b1b; font-size:1.4rem; cursor:pointer; }
+.tamaku-legal-card footer button { padding:11px 22px; border:0; border-radius:11px; color:#111; background:linear-gradient(135deg,#bf953f,#fcf6ba); font-weight:800; cursor:pointer; }
+.tamaku-legal-body { overflow-y:auto; padding:22px; font-size:.78rem; line-height:1.72; color:#c8c8c8; }
+.tamaku-legal-body h3 { margin:22px 0 6px; color:#e2b956; font-size:.88rem; }
+.tamaku-legal-body h3:first-of-type { margin-top:5px; }
+.tamaku-legal-body p,.tamaku-legal-body ul { margin:0 0 12px; }
+.tamaku-legal-body ul { padding-left:20px; }
+.tamaku-legal-body .legal-warning { padding:13px; color:#f2d997; background:rgba(191,149,63,.1); border:1px solid rgba(191,149,63,.25); border-radius:12px; }
+@media (max-width:600px) { .tamaku-legal-modal{padding:8px}.tamaku-legal-card{max-height:94dvh;border-radius:17px}.tamaku-legal-card header,.tamaku-legal-card footer{padding:14px}.tamaku-legal-body{padding:16px;font-size:.75rem}.tamaku-legal-card h2{font-size:.95rem} }

@@ -570,7 +570,9 @@ form {
 }
 </style>
 <link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<link rel="stylesheet" href="../assets/css/legal.css?v=1">
 <script src="../assets/js/core/notifications.js?v=1" defer></script>
+<script src="../assets/js/core/legal-consent.js?v=1" defer></script>
 </head>
 <body class="registration-v2">
 
@@ -657,6 +659,12 @@ form {
             Las contraseñas no coinciden
         </small>
 
+        <div class="legal-consent" style="grid-column:span 2;">
+            <label class="legal-check"><input type="checkbox" id="aceptaDatosTienda"><span>Autorizo el tratamiento de mis datos personales y declaro haber leído la <button class="legal-link-button" type="button" onclick="event.preventDefault();event.stopPropagation();abrirDocumentoLegal('datos','aceptaDatosTienda')">Política de Tratamiento de Datos</button>.</span></label>
+            <label class="legal-check"><input type="checkbox" id="aceptaTerminosTienda"><span>Acepto los <button class="legal-link-button" type="button" onclick="event.preventDefault();event.stopPropagation();abrirDocumentoLegal('terminos','aceptaTerminosTienda')">Términos y Condiciones</button> de TAMAKU.</span></label>
+            <label class="legal-check"><input type="checkbox" id="aceptaMarketingTienda"><span>Quiero recibir novedades y ofertas de TAMAKU por correo o WhatsApp (opcional).</span></label>
+        </div>
+
         <button type="submit" class="btn-register" id="createBtn" style="grid-column:span 2;">
             <span id="btnText">CREAR MI TIENDA</span>
         </button>
@@ -727,6 +735,18 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     btnText.innerText = "CREANDO...";
     submitButton.style.opacity = "0.7";
     submitButton.style.cursor = "not-allowed";
+    const aceptaDatos = document.getElementById("aceptaDatosTienda").checked;
+    const aceptaTerminos = document.getElementById("aceptaTerminosTienda").checked;
+    const aceptaMarketing = document.getElementById("aceptaMarketingTienda").checked;
+
+    if (!aceptaDatos || !aceptaTerminos) {
+        alert("Debes leer y aceptar la Política de Tratamiento de Datos y los Términos y Condiciones para crear la tienda.");
+        submitButton.disabled = false;
+        btnText.innerText = "CREAR MI TIENDA";
+        submitButton.style.opacity = "1";
+        submitButton.style.cursor = "pointer";
+        return;
+    }
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
 
@@ -776,7 +796,17 @@ document.getElementById("registerForm").addEventListener("submit", async functio
             email: email,
             options: {
                 shouldCreateUser: true,
-                emailOtpType: "numeric"   // 👈 ESTA LÍNEA ES LA CLAVE
+                emailOtpType: "numeric",
+                data: {
+                    acepta_politica_datos: true,
+                    politica_datos_version: window.TamakuLegal?.VERSION || "2026-08-09",
+                    politica_datos_aceptada_en: new Date().toISOString(),
+                    acepta_terminos: true,
+                    terminos_version: window.TamakuLegal?.VERSION || "2026-08-09",
+                    acepta_marketing: aceptaMarketing,
+                    origen_consentimiento: "registro_tienda",
+                    navegador_consentimiento: navigator.userAgent.slice(0, 500)
+                }
             }
         });
 

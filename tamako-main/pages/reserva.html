@@ -8,12 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/reserva.css?v=4">
+    <link rel="stylesheet" href="../assets/css/legal.css?v=1">
     <!-- Conexión PWA -->
     <link rel="manifest" href="../manifest.json">
     <link rel="stylesheet" href="../assets/css/pwa.css">
     
 <link rel="stylesheet" href="../assets/css/notifications.css?v=1">
 <script src="../assets/js/core/notifications.js?v=1" defer></script>
+<script src="../assets/js/core/legal-consent.js?v=1" defer></script>
 </head>
 <body class="dark-mode">
 
@@ -117,6 +119,16 @@
                     <label>CREAR CONTRASEÑA (MÍN. 6 CARACTERES)</label>
                     <input type="password" id="res-password-step4" placeholder="Crea tu contraseña" autocomplete="new-password" required>
                     <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('res-password-step4', this)"></i>
+                </div>
+                <div class="legal-consent">
+                    <label class="legal-check">
+                        <input type="checkbox" id="res-acepta-datos">
+                        <span>Autorizo de forma previa, expresa e informada el tratamiento de mis datos para crear mi cuenta y gestionar esta reserva. Leí la <button class="legal-link-button" type="button" onclick="event.preventDefault();event.stopPropagation();abrirDocumentoLegal('datos','res-acepta-datos')">Política de Tratamiento de Datos</button>.</span>
+                    </label>
+                    <label class="legal-check">
+                        <input type="checkbox" id="res-acepta-marketing">
+                        <span>Quiero recibir promociones y novedades por correo o WhatsApp (opcional).</span>
+                    </label>
                 </div>
                 </section>
         </main>
@@ -741,6 +753,15 @@ if (resDate) {
             const phone = document.getElementById("res-phone")?.value.trim() || "";
             const email = document.getElementById("res-email")?.value.trim() || "";
             const pass = document.getElementById("res-password-step4")?.value || "";
+            const aceptaDatos = document.getElementById("res-acepta-datos")?.checked === true;
+            const aceptaMarketing = document.getElementById("res-acepta-marketing")?.checked === true;
+
+            if (!aceptaDatos) {
+                showAlert("⚠️ Para crear tu cuenta y reservar debes leer y aceptar la Política de Tratamiento de Datos.");
+                btn.disabled = false;
+                btn.innerText = "Finalizar y Unirme";
+                return;
+            }
 
             // 1. VALIDAMOS QUE LA CLAVE NO ESTÉ VACÍA
             if (name === "" || phone === "" || email === "" || pass === "") {
@@ -805,7 +826,18 @@ if (resDate) {
             } else {
                 const { data: authData, error: authError } = await supabase.auth.signUp({
                     email: email,
-                    password: pass
+                    password: pass,
+                    options: {
+                        data: {
+                            acepta_politica_datos: true,
+                            politica_datos_version: window.TamakuLegal?.VERSION || "2026-08-09",
+                            politica_datos_aceptada_en: new Date().toISOString(),
+                            acepta_marketing: aceptaMarketing,
+                            origen_consentimiento: "reserva_publica",
+                            tienda_id_consentimiento: tiendaId,
+                            navegador_consentimiento: navigator.userAgent.slice(0, 500)
+                        }
+                    }
                 });
                 
                 if (authError) {

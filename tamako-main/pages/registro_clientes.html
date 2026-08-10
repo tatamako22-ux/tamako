@@ -6,6 +6,7 @@
 <title>TAMAKU | Crear Tienda</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/legal.css?v=1">
 
 <style>
 :root { --gold:#bf953f; --gold-light:#fcf6ba; }
@@ -63,6 +64,7 @@ button{
 </style>
 <link rel="stylesheet" href="../assets/css/notifications.css?v=1">
 <script src="../assets/js/core/notifications.js?v=1" defer></script>
+<script src="../assets/js/core/legal-consent.js?v=1" defer></script>
 </head>
 
 <body>
@@ -94,6 +96,12 @@ button{
         <input type="password" id="password" placeholder="Contraseña">
     </div>
 
+    <div class="legal-consent">
+        <label class="legal-check"><input type="checkbox" id="aceptaDatos"><span>Autorizo el tratamiento de mis datos conforme a la <button class="legal-link-button" type="button" onclick="event.preventDefault();event.stopPropagation();abrirDocumentoLegal('datos','aceptaDatos')">Política de Tratamiento de Datos</button>.</span></label>
+        <label class="legal-check"><input type="checkbox" id="aceptaTerminos"><span>Acepto los <button class="legal-link-button" type="button" onclick="event.preventDefault();event.stopPropagation();abrirDocumentoLegal('terminos','aceptaTerminos')">Términos y Condiciones</button>.</span></label>
+        <label class="legal-check"><input type="checkbox" id="aceptaMarketing"><span>Deseo recibir promociones por correo o WhatsApp (opcional).</span></label>
+    </div>
+
     <button id="btnCrear">CREAR MI NEGOCIO</button>
 </div>
 
@@ -119,16 +127,33 @@ document.getElementById("btnCrear").onclick = async () => {
     const direccion = document.getElementById("direccion").value.trim();
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
+    const aceptaDatos = document.getElementById("aceptaDatos").checked;
+    const aceptaTerminos = document.getElementById("aceptaTerminos").checked;
+    const aceptaMarketing = document.getElementById("aceptaMarketing").checked;
 
     if(!nombre || !email || !password){
         alert("Completa los campos obligatorios");
+        return;
+    }
+    if(!aceptaDatos || !aceptaTerminos){
+        alert("Debes aceptar la Política de Tratamiento de Datos y los Términos y Condiciones.");
         return;
     }
 
     // 1. CREAR USUARIO AUTH
     const { data, error } = await supabase.auth.signUp({
         email,
-        password
+        password,
+        options: { data: {
+            acepta_politica_datos: true,
+            politica_datos_version: window.TamakuLegal?.VERSION || "2026-08-09",
+            politica_datos_aceptada_en: new Date().toISOString(),
+            acepta_terminos: true,
+            terminos_version: window.TamakuLegal?.VERSION || "2026-08-09",
+            acepta_marketing: aceptaMarketing,
+            origen_consentimiento: "registro_tienda_legacy",
+            navegador_consentimiento: navigator.userAgent.slice(0, 500)
+        }}
     });
 
     if(error){

@@ -100,6 +100,11 @@ $0
         Caja
     </button>
 
+    <button class="tab-btn" data-tab="insumos">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        Insumos
+    </button>
+
     <button class="tab-btn" data-tab="reportes">
         <i class="fa-solid fa-chart-line"></i>
         Reportes
@@ -524,6 +529,12 @@ id="tab-caja">
     </div>
 </div>
 
+<!-- INSUMOS -->
+<section class="tab-content" id="tab-insumos">
+  <div class="insumos-kpis"><article><span>Pendiente por pagar</span><strong id="insumosPendiente">$0</strong></article><article><span>Pagado este mes</span><strong id="insumosPagadoMes">$0</strong></article><article><span>Registros</span><strong id="insumosCantidad">0</strong></article></div>
+  <div class="facturacion-panel"><div class="panel-header"><div><h2>Insumos y compras</h2><p class="panel-subtitle">Registra compras pendientes y págalas desde tus cuentas financieras.</p></div><button class="btn-primary" id="btnNuevoInsumo"><i class="fa-solid fa-plus"></i> Nuevo insumo</button></div><div class="filtros-insumos"><label class="filtro-busqueda"><i class="fa-solid fa-magnifying-glass"></i><input id="buscarInsumo" type="search" placeholder="Buscar insumo o proveedor"></label><select id="filtrarEstadoInsumo"><option value="">Todos los estados</option><option value="PENDIENTE">Pendientes</option><option value="PAGADO">Pagados</option></select></div><div class="insumos-head"><span>Insumo</span><span>Cantidad</span><span>Proveedor</span><span>Estado</span><span>Valor</span><span></span></div><div id="listaInsumos"></div></div>
+</section>
+
 <!-- ========================= -->
 <!-- REPORTES -->
 <!-- ========================= -->
@@ -623,6 +634,32 @@ id="tab-reportes">
             <button type="button" class="btn-secondary" id="btnCancelarFactura">Cancelar</button>
             <button type="submit" form="formFactura" class="btn-primary">Guardar Factura</button>
         </div>
+</div>
+</div>
+
+<!-- MODALES DE INSUMOS -->
+<div id="modalNuevoInsumo" class="modal-overlay hidden"><div class="modal-content modal-insumo"><div class="modal-header"><div><span class="modal-eyebrow">NUEVA COMPRA</span><h2>Registrar insumo</h2></div><button class="btn-close" id="cerrarNuevoInsumo" type="button"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><form id="formInsumo"><div class="form-grid"><label class="input-group">Nombre del insumo<input id="insumoNombre" required placeholder="Ej. Shampoo profesional"></label><label class="input-group">Proveedor<input id="insumoProveedor" placeholder="Nombre del proveedor"></label></div><div class="form-grid"><label class="input-group">Cantidad<input id="insumoCantidad" type="number" min="0.01" step="0.01" value="1" required></label><label class="input-group">Unidad<select id="insumoUnidad"><option>UNIDAD</option><option>CAJA</option><option>PAQUETE</option><option>LITRO</option><option>KILO</option><option>GALÓN</option></select></label></div><label class="input-group">Costo total<input id="insumoCosto" type="number" min="1" step="1" required></label><label class="input-group">Notas<textarea id="insumoNotas" rows="2"></textarea></label></form></div><div class="modal-footer"><button class="btn-secondary" id="cancelarNuevoInsumo" type="button">Cancelar</button><button class="btn-primary" type="submit" form="formInsumo">Guardar pendiente</button></div></div></div>
+<div id="modalPagarInsumo" class="modal-overlay hidden"><div class="modal-content modal-insumo"><div class="modal-header"><div><span class="modal-eyebrow">REGISTRAR EGRESO</span><h2>Pagar insumo</h2></div><button class="btn-close" id="cerrarPagarInsumo" type="button"><i class="fa-solid fa-xmark"></i></button></div><div class="modal-body"><div class="pago-insumo-resumen"><span id="pagarInsumoNombre">Insumo</span><strong id="pagarInsumoValor">$0</strong></div><label class="input-group">Descontar de la cuenta<select id="pagarInsumoCuenta"><option value="">Cargando cuentas...</option></select></label><p class="aviso-contable"><i class="fa-solid fa-circle-info"></i> El pago descontará el valor de la cuenta y creará un movimiento de egreso.</p></div><div class="modal-footer"><button class="btn-secondary" id="cancelarPagarInsumo" type="button">Cancelar</button><button class="btn-primary" id="confirmarPagarInsumo" type="button">Confirmar pago</button></div></div></div>
+
+<!-- MODAL CORREGIR FACTURA -->
+<div id="modalEditarFactura" class="modal-overlay hidden">
+    <div class="modal-content modal-editar-factura">
+        <div class="modal-header">
+            <div><span class="modal-eyebrow">CORRECCIÓN CONTABLE</span><h2>Editar método de pago</h2></div>
+            <button class="btn-close" id="btnCerrarEditarFactura" type="button"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="factura-resumen-edicion">
+                <div><span>Cliente</span><strong id="editarFacturaCliente">—</strong></div>
+                <div><span>Total</span><strong id="editarFacturaTotal">$0</strong></div>
+                <div><span>Método registrado</span><strong id="editarFacturaMetodoActual">—</strong></div>
+            </div>
+            <label class="input-group">Método de pago correcto
+                <select id="editarFacturaMetodo"><option value="">Cargando métodos...</option></select>
+            </label>
+            <p class="aviso-contable"><i class="fa-solid fa-circle-info"></i> TAMAKU moverá automáticamente el valor de la cuenta anterior a la nueva y dejará constancia en la factura.</p>
+        </div>
+        <div class="modal-footer"><button class="btn-secondary" id="btnCancelarEditarFactura" type="button">Cancelar</button><button class="btn-primary" id="btnGuardarEditarFactura" type="button">Guardar corrección</button></div>
     </div>
 </div>
 </main>

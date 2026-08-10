@@ -1,5 +1,27 @@
 import { supabase } from "../config/supabaseClient.js";
 
+const cacheCategorias = new Map();
+const normalizarTelefono = (valor) => String(valor || "").replace(/\D/g, "");
+
+async function obtenerCategoriasClientes(idTienda) {
+  const guardada = cacheCategorias.get(idTienda);
+  if (guardada && Date.now() - guardada.creada < 120000) return guardada.datos;
+
+  const { data, error } = await supabase
+    .from("citas")
+    .select("telefono_cliente")
+    .eq("id_tienda", idTienda);
+  if (error) throw error;
+
+  const visitas = new Map();
+  (data || []).forEach((cita) => {
+    const telefono = normalizarTelefono(cita.telefono_cliente);
+    if (telefono) visitas.set(telefono, (visitas.get(telefono) || 0) + 1);
+  });
+  cacheCategorias.set(idTienda, { creada: Date.now(), datos: visitas });
+  return visitas;
+}
+
 // 👨‍💼 OBTENER PROFESIONALES
 export async function obtenerBarberos(idTienda) {
   const { data, error } = await supabase
@@ -85,11 +107,37 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
       throw error;
     }
 
-    return data || [];
+    const categorias = await obtenerCategoriasClientes(idTienda);
+    return (data || []).map((cita) => {
+      const visitas = categorias.get(normalizarTelefono(cita.telefono_cliente)) || 1;
+      return {
+        ...cita,
+        visitas_cliente: visitas,
+        categoria_cliente: visitas >= 5 ? "VIP" : visitas === 1 ? "NUEVO" : "FRECUENTE",
+      };
+    });
   } catch (error) {
     console.error("❌ Error obteniendo citas:", error);
 
     return [];
+  }
+}
+
+export async function obtenerConteoCitasRango({ idTienda, desde, hasta, idBarbero }) {
+  try {
+    let query = supabase.from("citas").select("fecha")
+      .eq("id_tienda", idTienda).gte("fecha", desde).lte("fecha", hasta)
+      .neq("estado", "CANCELADA");
+    if (idBarbero) query = query.eq("id_barbero", idBarbero);
+    const { data, error } = await query;
+    if (error) throw error;
+    return (data || []).reduce((conteo, cita) => {
+      conteo[cita.fecha] = (conteo[cita.fecha] || 0) + 1;
+      return conteo;
+    }, {});
+  } catch (error) {
+    console.error("Error obteniendo conteo semanal:", error);
+    return {};
   }
 }
 

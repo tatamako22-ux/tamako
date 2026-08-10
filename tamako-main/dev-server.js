@@ -3,6 +3,7 @@ import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import createUserHandler from "./api/create-user.js";
+import sendEmailHandler from "./api/send-email.js";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3000;
@@ -91,6 +92,11 @@ createServer(async (req, res) => {
     if (url.pathname === "/api/create-user") {
       req.body = await leerBody(req);
       await createUserHandler(req, prepararRespuestaApi(res));
+      return;
+    }
+    if (url.pathname === "/api/send-email") {
+      req.body = await leerBody(req);
+      await sendEmailHandler(req, prepararRespuestaApi(res));
       return;
     }
     await servirArchivo(req, res, url);

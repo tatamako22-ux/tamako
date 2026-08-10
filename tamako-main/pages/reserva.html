@@ -243,7 +243,14 @@
         const mm = min % 60;
         return `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
     };
-
+    // 🕒 Formato cliente AM / PM
+    function formatoHora12(hora) {
+        if (!hora) return "";
+        const [h, m] = hora.split(":").map(Number);
+        const periodo = h >= 12 ? "PM" : "AM";
+        const hora12 = h % 12 || 12;
+        return `${hora12}:${String(m).padStart(2, "0")} ${periodo}`;
+    }
     function obtenerHorarioDelDia(profesional, dia) {
         const diaKey = dia.toLowerCase();
         const horarios = profesional.horario_semanal || {};
@@ -383,7 +390,7 @@
                 const chip = document.createElement("div");
                 chip.className = "hora-chip";
                 const labelBloques = numBloques > 1 ? `<br><small style="font-size:0.5rem; color:var(--gold); font-weight:800;">${numBloques} BLOQUES</small>` : '';
-                const horaTxt = minToHora(currentMin);
+                const horaTxt = formatoHora12(minToHora(currentMin));
                 chip.innerHTML = `<span>${horaTxt}</span>${labelBloques}`;
                 const hFin = minToHora(horaFinMin);
                 chip.onclick = () => {

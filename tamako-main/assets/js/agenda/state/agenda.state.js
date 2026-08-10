@@ -9,6 +9,7 @@ export const agendaState = {
 
   // 📋 Reservas/citas del día
   citasDelDia: [],
+  conteoCitasSemana: {},
 
   // ❌ Reserva a cancelar
   citaACancelar: null,

@@ -18,12 +18,12 @@ export default async function handler(req, res) {
     citaId,
   } = req.body;
 
-  console.log("===== VARIABLES DE ENTORNO =====");
-  console.log("GMAIL_USER:", process.env.GMAIL_USER);
-  console.log(
-    "GMAIL_APP_PASS:",
-    process.env.GMAIL_APP_PASS ? "EXISTE" : "NO EXISTE",
-  );
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASS) {
+    return res.status(500).json({ error: "El servicio de correo no está configurado." });
+  }
+  if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+    return res.status(400).json({ error: "El correo del destinatario no es válido." });
+  }
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,

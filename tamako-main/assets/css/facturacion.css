@@ -856,7 +856,7 @@ transform:translateY(0);
 
 .factura-row {
   display: grid;
-  grid-template-columns: 44px minmax(170px, 1.4fr) minmax(130px, 1fr) auto auto auto;
+  grid-template-columns: 44px minmax(170px, 1.4fr) minmax(130px, 1fr) auto auto auto 38px;
   align-items: center;
   gap: 16px;
   padding: 16px;
@@ -942,6 +942,10 @@ transform:translateY(0);
   white-space: nowrap;
 }
 
+.btn-editar-factura{width:36px;height:36px;display:grid;place-items:center;color:var(--gold);background:rgba(191,149,63,.08);border:1px solid rgba(191,149,63,.2);border-radius:10px;cursor:pointer;transition:.2s}
+.btn-editar-factura:hover{color:#111;background:var(--gold-light);transform:translateY(-1px)}
+.modal-editar-factura{max-width:540px}.factura-resumen-edicion{margin-bottom:20px;display:grid;grid-template-columns:1.2fr .8fr 1fr;gap:9px}.factura-resumen-edicion>div{padding:13px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);border-radius:12px}.factura-resumen-edicion span,.factura-resumen-edicion strong{display:block}.factura-resumen-edicion span{color:#777;font-size:.58rem}.factura-resumen-edicion strong{margin-top:7px;color:#eee;font-size:.72rem}.aviso-contable{margin:18px 0 0;padding:13px;display:flex;gap:9px;color:#a68e59;background:rgba(191,149,63,.07);border:1px solid rgba(191,149,63,.15);border-radius:11px;font-size:.66rem;line-height:1.6}
+
 .facturas-estado {
   min-height: 170px;
   display: flex;
@@ -997,6 +1001,7 @@ transform:translateY(0);
     grid-column: 3;
     grid-row: 1 / span 2;
   }
+  .btn-editar-factura{grid-column:3;grid-row:3}.factura-resumen-edicion{grid-template-columns:1fr}
 }
 
 @media (max-width: 768px) {
@@ -1774,3 +1779,6 @@ transform:translateY(0);
     text-align: left;
   }
 }
+/* Insumos */
+.insumos-kpis{margin-bottom:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.insumos-kpis article{padding:17px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:14px}.insumos-kpis span,.insumos-kpis strong{display:block}.insumos-kpis span{color:#777;font-size:.62rem}.insumos-kpis strong{margin-top:8px;color:var(--gold-light);font-size:1.15rem}.panel-subtitle{margin:4px 0 0;color:#666;font-size:.68rem}.filtros-insumos{margin-bottom:15px;display:grid;grid-template-columns:1fr 190px;gap:10px}.filtros-insumos>select{padding:11px;color:#ddd;background:#111;border:1px solid rgba(255,255,255,.08);border-radius:10px}.insumos-head,.insumo-row{display:grid;grid-template-columns:1.4fr .65fr 1fr .7fr .7fr 90px;gap:12px;align-items:center}.insumos-head{padding:0 13px 9px;color:#555;font-size:.56rem}.insumo-row{padding:13px;background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.055);font-size:.66rem}.insumo-row strong,.insumo-row small{display:block}.insumo-row strong{color:#eee}.insumo-row small{margin-top:4px;color:#606060;font-size:.55rem}.insumo-row>span{color:#999}.insumo-row>b{color:var(--gold-light)}.insumo-estado{width:max-content;padding:6px 8px;border-radius:8px;font-size:.52rem;font-style:normal}.insumo-estado.pendiente{color:#ffd277;background:rgba(191,149,63,.11)}.insumo-estado.pagado{color:#78dfa0;background:rgba(45,190,105,.1)}.insumo-acciones{display:flex;justify-content:flex-end;gap:5px}.insumo-acciones button{width:34px;height:34px;color:#c7a34f;background:#151515;border:1px solid rgba(255,255,255,.07);border-radius:9px}.insumo-acciones button:last-child{color:#e87979}.modal-insumo{max-width:600px}.pago-insumo-resumen{margin-bottom:18px;padding:16px;display:flex;align-items:center;justify-content:space-between;background:rgba(191,149,63,.07);border:1px solid rgba(191,149,63,.16);border-radius:12px}.pago-insumo-resumen span{color:#aaa}.pago-insumo-resumen strong{color:var(--gold-light);font-size:1.1rem}
+@media(max-width:900px){.insumos-head{display:none}.insumo-row{grid-template-columns:1fr auto}.insumo-row>span:nth-child(2),.insumo-row>span:nth-child(3){display:none}.insumo-row .insumo-estado{grid-column:1}.insumo-row>b{grid-column:2;grid-row:1}.insumo-acciones{grid-column:2;grid-row:2}.filtros-insumos{grid-template-columns:1fr}.insumos-kpis{grid-template-columns:1fr 1fr}.insumos-kpis article:last-child{grid-column:1/-1}}

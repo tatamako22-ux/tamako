@@ -120,18 +120,11 @@ function crearTarjetaCita(cita, esMovil = false) {
       `abrirModalReserva('${cita.id_barbero}', '${cita.hora_inicio}', '${cita.hora_fin}')`,
     );
   }
-  console.log("CITA RENDER:", cita);
-  console.log("telefono:", cita.telefono);
-  console.log("telefono_cliente:", cita.telefono_cliente);
   const telefono = cita.telefono_cliente
     ? String(cita.telefono_cliente).replace(/\D/g, "")
     : "";
   const telefonoWhatsApp = telefono ? `57${telefono}` : "";
   const telefonoLlamar = telefono ? `tel:${telefono}` : "#";
-  console.log("📞 telefono:", telefono);
-  console.log("📱 whatsapp:", telefonoWhatsApp);
-  console.log("☎️ llamar:", telefonoLlamar);
-
   // Renderizado condicional según el estado del bloque
   evento.innerHTML = `
     <div class="event-glow"></div>
@@ -155,6 +148,7 @@ function crearTarjetaCita(cita, esMovil = false) {
         <div class="event-client">
           ${esDisponible ? "Espacio Disponible" : cita.nombre_cliente || "Cliente"}
         </div>
+        ${esDisponible ? "" : `<div class="event-client-category category-${String(cita.categoria_cliente || "NUEVO").toLowerCase()}"><i class="fa-solid ${cita.categoria_cliente === "VIP" ? "fa-crown" : cita.categoria_cliente === "FRECUENTE" ? "fa-repeat" : "fa-user-plus"}"></i> ${cita.categoria_cliente || "NUEVO"}${cita.visitas_cliente ? ` · ${cita.visitas_cliente} visita${cita.visitas_cliente === 1 ? "" : "s"}` : ""}</div>`}
         <div class="event-service">
   ${
     esDisponible
@@ -250,10 +244,6 @@ function renderModoMovil({
     );
 
     const horarioDia = obtenerHorarioDelDia(barbero, fechaSeleccionada);
-    console.log("👨‍💼 BARBERO:", barbero.nombre_empleado);
-    console.log("📆 FECHA:", fechaSeleccionada);
-    console.log("🗂️ HORARIO SEMANAL:", barbero.horario_semanal);
-    console.log("⏰ HORARIO DIA:", horarioDia);
 
     const HORARIO_INICIO = horaToMin(normalizarHora(horarioDia.inicio));
 
@@ -340,10 +330,6 @@ function renderModoEscritorio({
     );
 
     const horarioDia = obtenerHorarioDelDia(barbero, fechaSeleccionada);
-    console.log("👨‍💼 BARBERO:", barbero.nombre_empleado);
-    console.log("📆 FECHA:", fechaSeleccionada);
-    console.log("🗂️ HORARIO SEMANAL:", barbero.horario_semanal);
-    console.log("⏰ HORARIO DIA:", horarioDia);
 
     const HORARIO_INICIO = horaToMin(normalizarHora(horarioDia.inicio));
 
@@ -418,6 +404,7 @@ export function renderizarAgenda({
   agendaGrid,
   listaBarberos = [],
   citasDelDia = [],
+  conteoCitasSemana = {},
   fechaSeleccionada = new Date(),
 }) {
   if (!agendaGrid) {
@@ -428,7 +415,7 @@ export function renderizarAgenda({
   agendaGrid.innerHTML = "";
 
   // ¡Ponemos esto aquí para que dibuje el minicalendario cada vez que se renderice la agenda!
-  renderizarMiniCalendario(citasDelDia, fechaSeleccionada);
+  renderizarMiniCalendario(conteoCitasSemana, fechaSeleccionada);
 
   const esMobile =
     window.innerWidth <= 900 || window.matchMedia("(max-width: 900px)").matches;
@@ -489,7 +476,7 @@ window.addEventListener("resize", () => {
 });
 // 🗓️ RENDERIZAR MINI CALENDARIO DINÁMICO
 export function renderizarMiniCalendario(
-  citasDelDia = [],
+  conteoCitasSemana = {},
   fechaSeleccionada = new Date(),
 ) {
   const container = document.getElementById("miniCalendarStrip");
@@ -509,15 +496,13 @@ export function renderizarMiniCalendario(
     const numeroDia = String(copiaFecha.getDate()).padStart(2, "0");
 
     // Formato YYYY-MM-DD para comparar de manera segura con tus datos de Supabase
-    const fechaISO = copiaFecha.toISOString().split("T")[0];
+    const fechaISO = copiaFecha.toLocaleDateString("sv-SE");
 
     // Contamos cuántas de las citas cargadas pertenecen a este día exacto
     // (Nota: Si tu "citasDelDia" ya viene filtrado solo para el día seleccionado,
     // pasaremos un contador global del estado en el controller más adelante,
     // pero esta lógica base ya te dibuja los días perfectamente)
-    const totalCitas = citasDelDia.filter((c) =>
-      c.fecha === fechaISO || i === 0 ? c : false,
-    ).length;
+    const totalCitas = Number(conteoCitasSemana[fechaISO] || 0);
 
     const diaDiv = document.createElement("div");
     // Al primer día (hoy) le ponemos la clase active por defecto
@@ -529,7 +514,7 @@ export function renderizarMiniCalendario(
     diaDiv.innerHTML = `
       <span class="day-name">${nombreDia}</span>
       <span class="day-number">${numeroDia}</span>
-      <span class="day-count">${totalCitas > 0 ? `${totalCitas} citas` : "Libre"}</span>
+      <span class="day-count">${totalCitas > 0 ? `${totalCitas} ${totalCitas === 1 ? "cita" : "citas"}` : "Libre"}</span>
     `;
 
     // Evento por si el administrador toca un día del minicalendario
@@ -540,10 +525,6 @@ export function renderizarMiniCalendario(
       diaDiv.classList.add("active");
 
       // Lanza un evento personalizado para que tu agenda.controller.js sepa que debe cambiar de fecha
-      console.log("📅 CLICK MINI CALENDARIO:", fechaISO);
-
-      console.log("📅 CLICK MINI CALENDARIO:", fechaISO);
-
       window.dispatchEvent(
         new CustomEvent("cambiar-fecha-agenda", {
           detail: {

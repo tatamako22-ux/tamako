@@ -86,16 +86,6 @@ export function calcularCita({
   intervaloTienda = 60,
   debug = false,
 }) {
-  console.log("===== ENTRÓ A calcularCita =====");
-  console.log({
-    inicioDeseado,
-    duracion,
-    modo,
-    jornadaInicio,
-    jornadaFin,
-    bloques,
-  });
-
   // Asegurar duración positiva y mínima de 15 min
   const duracionValida = Math.max(15, duracion);
   const intervalo =

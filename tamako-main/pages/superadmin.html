@@ -1,1 +1,56 @@
-<!doctype html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TAMAKU | Superadmin</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet"><link rel="stylesheet" href="../assets/css/superadmin.css?v=1"></head><body><aside><h1>✦ TAMAKU</h1><span>CONTROL CENTRAL</span><nav><a href="#resumen"><i class="fa-solid fa-chart-pie"></i> Resumen</a><a href="#tiendas"><i class="fa-solid fa-store"></i> Tiendas</a><a href="#notificaciones"><i class="fa-solid fa-bell"></i> Alertas <b id="notifBadge">0</b></a></nav><footer><small id="adminNombre">Superadmin</small><button id="cerrarSesionAdmin">Cerrar sesión</button></footer></aside><main><header><div><span>OPERACIÓN TAMAKU</span><h2>Centro de control</h2></div><time id="fechaPanel"></time></header><section id="resumen" class="kpis"><article><span>Tiendas</span><strong id="totalTiendas">0</strong></article><article><span>En prueba</span><strong id="totalPruebas">0</strong></article><article><span>Activas</span><strong id="totalActivas">0</strong></article><article class="alerta"><span>Vencidas</span><strong id="totalVencidas">0</strong></article><article><span>Ingresos del mes</span><strong id="ingresosMes">$0</strong></article></section><section id="tiendas" class="panel"><div class="panel-head"><div><span>SUSCRIPCIONES</span><h3>Tiendas registradas</h3></div><label><i class="fa-solid fa-search"></i><input id="buscarTienda" placeholder="Buscar tienda..."></label></div><div class="tabla-head"><span>Tienda</span><span>Plan</span><span>Estado</span><span>Vencimiento</span><span></span></div><div id="tablaTiendas"></div></section><section id="notificaciones" class="panel"><div class="panel-head"><div><span>ACTIVIDAD</span><h3>Notificaciones recientes</h3></div></div><div id="listaNotificaciones" class="notificaciones"></div></section></main><aside id="detallePanel" class="detalle"><header><div><span>GESTIONAR TIENDA</span><h2 id="detalleNombre"></h2><p id="detalleContacto"></p></div><button id="cerrarDetalle"><i class="fa-solid fa-xmark"></i></button></header><div class="estado-actual">Estado actual <strong id="detalleEstado"></strong></div><form id="pagoForm"><h3>Confirmar pago manual</h3><label>Plan<select id="pagoPlan" name="plan"><option>BASICO</option><option>PRO</option><option>PREMIUM</option></select></label><label>Monto<input id="pagoMonto" name="monto" type="number" required></label><label>Referencia<input name="referencia" required></label><label>Notas<textarea name="notas"></textarea></label><button>Confirmar y activar 30 días</button></form><div class="acciones-sec"><button id="extenderPrueba">Extender prueba</button><button id="suspenderTienda">Suspender tienda</button></div></aside><script>fechaPanel.textContent=new Date().toLocaleDateString('es-CO',{dateStyle:'full'})</script><script type="module" src="../assets/js/superadmin/superadmin.js?v=1"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TAMAKU | Superadmin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/superadmin.css?v=3">
+</head>
+<body>
+  <aside class="sidebar-admin">
+    <h1>✦ TAMAKU</h1><span>CONTROL CENTRAL</span>
+    <nav id="navAdmin">
+      <button class="active" data-vista="resumen"><i class="fa-solid fa-chart-pie"></i> Resumen</button>
+      <button data-vista="tiendas"><i class="fa-solid fa-store"></i> Tiendas</button>
+      <button data-vista="pagos"><i class="fa-solid fa-wallet"></i> Pagos</button>
+      <button data-vista="alertas"><i class="fa-solid fa-bell"></i> Alertas <b id="notifBadge">0</b></button>
+    </nav>
+    <footer><small id="adminNombre">Superadmin</small><button id="cerrarSesionAdmin">Cerrar sesión</button></footer>
+  </aside>
+  <main>
+    <header><div><span>OPERACIÓN TAMAKU</span><h2 id="tituloVista">Centro de control</h2></div><time id="fechaPanel"></time></header>
+
+    <section class="vista active" data-seccion="resumen">
+      <div class="kpis"><article data-filtro="TODAS"><span>Tiendas</span><strong id="totalTiendas">0</strong></article><article data-filtro="PRUEBA"><span>En prueba</span><strong id="totalPruebas">0</strong></article><article data-filtro="ACTIVA"><span>Activas</span><strong id="totalActivas">0</strong></article><article class="alerta" data-filtro="PROBLEMAS"><span>Vencidas / apagadas</span><strong id="totalVencidas">0</strong></article><article><span>Ingresos del mes</span><strong id="ingresosMes">$0</strong></article></div>
+      <div class="dashboard-grid">
+        <section class="panel"><div class="panel-head"><div><span>PRÓXIMAS ACCIONES</span><h3>Vencimientos cercanos</h3></div><button class="link-btn" data-ir="tiendas">Ver todas</button></div><div id="proximosVencimientos" class="lista-compacta"></div></section>
+        <section class="panel"><div class="panel-head"><div><span>CARTERA</span><h3>Distribución por plan</h3></div></div><div id="distribucionPlanes" class="barras"></div></section>
+      </div>
+      <section class="panel"><div class="panel-head"><div><span>INGRESOS</span><h3>Últimos 6 meses</h3></div></div><div id="graficoIngresos" class="grafico"></div></section>
+    </section>
+
+    <section class="vista" data-seccion="tiendas">
+      <section class="panel"><div class="panel-head"><div><span>SUSCRIPCIONES</span><h3>Tiendas registradas</h3></div><div class="herramientas"><label><i class="fa-solid fa-search"></i><input id="buscarTienda" placeholder="Buscar tienda..."></label><select id="filtroEstado"><option value="TODAS">Todos los estados</option><option value="PRUEBA">En prueba</option><option value="ACTIVA">Activas</option><option value="PROBLEMAS">Vencidas / apagadas</option><option value="VENCIDA">Solo vencidas</option><option value="SUSPENDIDA">Solo apagadas</option></select></div></div><div class="tabla-head"><span>Tienda</span><span>Plan</span><span>Estado</span><span>Vencimiento</span><span></span></div><div id="tablaTiendas"></div></section>
+    </section>
+
+    <section class="vista" data-seccion="pagos">
+      <section class="panel"><div class="panel-head"><div><span>RECAUDO</span><h3>Historial general de pagos</h3></div><div class="herramientas"><input id="filtroMesPago" type="month"><button id="exportarPagos" class="btn-outline"><i class="fa-solid fa-download"></i> Exportar CSV</button></div></div><div class="pagos-head"><span>Tienda</span><span>Plan / referencia</span><span>Periodo</span><span>Fecha</span><span>Monto</span></div><div id="tablaPagos" class="tabla-pagos"></div></section>
+    </section>
+
+    <section class="vista" data-seccion="alertas">
+      <section class="panel"><div class="panel-head"><div><span>ACTIVIDAD</span><h3>Centro de alertas</h3></div><button id="marcarTodas" class="btn-outline">Marcar todas como leídas</button></div><div id="listaNotificaciones" class="notificaciones"></div></section>
+    </section>
+  </main>
+
+  <aside id="detallePanel" class="detalle">
+    <header><div><span>GESTIONAR TIENDA</span><h2 id="detalleNombre"></h2><p id="detalleContacto"></p></div><button id="cerrarDetalle" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></header>
+    <div class="estado-actual"><span>Estado actual</span><strong id="detalleEstado"></strong><small id="detalleDias"></small></div>
+    <section class="bloque-control"><h3>Control de acceso</h3><label>Días de gracia<input id="diasGracia" type="number" min="0" max="90" value="0"></label><label>Mensaje que verá la tienda<textarea id="mensajeBloqueo" rows="3" placeholder="Tu pago está vencido. Comunícate con TAMAKU..."></textarea></label><button id="guardarControl" class="btn-secundario">Guardar configuración</button></section>
+    <form id="pagoForm"><h3>Registrar pago manual</h3><div class="form-grid"><label>Plan<select id="pagoPlan" name="plan"><option value="BASICO">Básico</option><option value="PRO">Pro</option><option value="PREMIUM">Premium</option></select></label><label>Monto<input id="pagoMonto" name="monto" type="number" min="1" required></label></div><div class="form-grid"><label>Fecha del pago<input id="pagoFecha" name="fecha_pago" type="date" required></label><label>Inicio del periodo<input id="periodoInicio" name="fecha_inicio" type="date" required></label></div><div class="form-grid"><label>Días contratados<input id="pagoDias" name="dias" type="number" min="1" max="366" value="30" required></label><label>Referencia<input name="referencia" required></label></div><label>Notas<textarea name="notas" rows="2"></textarea></label><button>Registrar pago y activar</button></form>
+    <div class="acciones-sec"><button id="extenderPrueba">Dar días adicionales</button><button id="reactivarTienda">Reactivar acceso</button><button id="suspenderTienda">Apagar tienda</button></div>
+    <section class="historial"><h3>Historial de pagos</h3><div id="historialPagos"></div></section>
+  </aside>
+  <script>fechaPanel.textContent=new Date().toLocaleDateString('es-CO',{dateStyle:'full'})</script>
+  <script type="module" src="../assets/js/superadmin/superadmin.js?v=3"></script>
+</body></html>

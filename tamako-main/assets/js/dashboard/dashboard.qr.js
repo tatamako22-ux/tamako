@@ -9,6 +9,7 @@ export function initQR(tienda) {
   window.generarYMostrarQR = generarYMostrarQR;
   window.descargarQR = descargarQR;
   window.copiarAlPortapapeles = copiarAlPortapapeles;
+  window.irAPaginaReservas = irAPaginaReservas;
 }
 
 /* =========================
@@ -46,6 +47,18 @@ function generarYMostrarQR() {
   });
 
   toggleModal("modalQR", true);
+}
+
+/* =========================
+   ABRIR PÁGINA DE RESERVAS
+========================= */
+function irAPaginaReservas() {
+  if (!linkFinal) {
+    window.TamakuUI?.toast?.("No fue posible abrir la página de reservas.", "error");
+    return;
+  }
+
+  window.open(linkFinal, "_blank", "noopener,noreferrer");
 }
 
 /* =========================

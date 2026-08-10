@@ -3,6 +3,7 @@ import { FacturacionCuentas } from "./facturacion.cuentas.js";
 import { FacturacionFacturas } from "./facturacion.facturas.js";
 import { FacturacionCaja } from "./facturacion.caja.js";
 import { FacturacionReportes } from "./facturacion.reportes.js";
+import { FacturacionInsumos } from "./facturacion.insumos.js";
 
 export const initFacturacion = async () => {
   console.log("Inicializando módulo de Facturación...");
@@ -17,6 +18,7 @@ export const initFacturacion = async () => {
       FacturacionFacturas.init(),
       FacturacionCaja.init(),
       FacturacionReportes.init(),
+      FacturacionInsumos.init(),
     ]);
   } catch (error) {
     console.error("Error inicializando facturación:", error);

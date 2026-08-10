@@ -8,6 +8,7 @@ import {
 import {
   obtenerBarberos,
   obtenerCitas,
+  obtenerConteoCitasRango,
   cancelarCita,
 } from "../../services/agenda.service.js";
 
@@ -44,6 +45,8 @@ export function iniciarAgenda({
 
       citasDelDia: getState("citasDelDia"),
 
+      conteoCitasSemana: getState("conteoCitasSemana"),
+
       fechaSeleccionada: getState("fechaSeleccionada"),
 
       tiendaInfo,
@@ -58,21 +61,15 @@ export function iniciarAgenda({
 
     if (!idBarbero) return;
 
-    const citas = await obtenerCitas({
-      idTienda: tiendaInfo.id,
-
-      fecha,
-
-      idBarbero,
-    });
-    console.log("📋 CITAS RECIBIDAS:", citas);
-    console.log("📋 PRIMERA CITA COMPLETA:");
-    console.table(citas);
-
-    console.log("SERVICIO NOMBRE:", citas[0]?.servicio_nombre);
-    console.log("SERVICIO:", citas[0]?.servicio);
-
+    const fechaHasta = new Date(getState("fechaSeleccionada"));
+    fechaHasta.setDate(fechaHasta.getDate() + 6);
+    const hasta = fechaHasta.toLocaleDateString("sv-SE");
+    const [citas, conteoSemana] = await Promise.all([
+      obtenerCitas({ idTienda: tiendaInfo.id, fecha, idBarbero }),
+      obtenerConteoCitasRango({ idTienda: tiendaInfo.id, desde: fecha, hasta, idBarbero }),
+    ]);
     setState("citasDelDia", citas);
+    setState("conteoCitasSemana", conteoSemana);
 
     renderizar();
   }
@@ -102,8 +99,6 @@ export function iniciarAgenda({
     });
 
     await cargarCitasDelDia();
-    console.log("🎨 TERMINO CARGA, RENDERIZANDO");
-    renderizar();
   }
 
   // 👨‍💼 CARGAR BARBEROS
@@ -443,9 +438,12 @@ export function iniciarAgenda({
   }
 
   function iniciarActualizacionAutomatica() {
+    const intervaloRespaldo = window.matchMedia("(max-width: 900px)").matches
+      ? 30000
+      : 15000;
     intervaloActualizacion = setInterval(() => {
       if (document.visibilityState === "visible") cargarCitasDelDia();
-    }, 12000);
+    }, intervaloRespaldo);
 
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") programarActualizacion();

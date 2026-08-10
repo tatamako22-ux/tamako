@@ -15,13 +15,31 @@ function getTienda() {
   return JSON.parse(localStorage.getItem("tamaku_tienda")) || {};
 }
 
+function puedeEditar(factura) {
+  const sesion = getTienda().sesion || {};
+  if (sesion.es_propietario) return true;
+  if (!sesion.permisos?.facturas_crear) return false;
+  return !sesion.id_profesional || String(sesion.id_profesional) === String(factura.id_barbero);
+}
+
 export const FacturacionFacturas = {
   facturas: [],
+  facturaEnEdicion: null,
 
   async init() {
     window.addEventListener("factura-creada", () => this.cargar());
     this.asignarFiltros();
+    this.asignarEdicion();
     await this.cargar();
+  },
+
+  asignarEdicion() {
+    const modal = document.getElementById("modalEditarFactura");
+    const cerrar = () => this.cerrarEdicion();
+    document.getElementById("btnCerrarEditarFactura")?.addEventListener("click", cerrar);
+    document.getElementById("btnCancelarEditarFactura")?.addEventListener("click", cerrar);
+    document.getElementById("btnGuardarEditarFactura")?.addEventListener("click", () => this.guardarEdicion());
+    modal?.addEventListener("click", (event) => { if (event.target === modal) cerrar(); });
   },
 
   asignarFiltros() {
@@ -146,12 +164,71 @@ export const FacturacionFacturas = {
           <span>${factura.metodo_pago || "Sin método"}</span>
         </div>
         <span class="factura-badge estado-${estado.toLowerCase()}">${estado}</span>
-        <strong class="factura-valor">${moneda.format(Number(factura.total) || 0)}</strong>`;
+        <strong class="factura-valor">${moneda.format(Number(factura.total) || 0)}</strong>
+        ${puedeEditar(factura) ? '<button type="button" class="btn-editar-factura" title="Corregir método de pago" aria-label="Editar factura"><i class="fa-solid fa-pen"></i></button>' : '<span></span>'}`;
       tarjeta.querySelector(".factura-cliente").textContent =
         factura.perfiles_clientes?.nombre_completo || "Cliente ocasional";
       tarjeta.querySelector(".factura-profesional strong").textContent =
         factura.profesionales?.nombre_empleado || "Sin asignar";
+      tarjeta.querySelector(".btn-editar-factura")?.addEventListener("click", () => this.abrirEdicion(factura));
       contenedor.appendChild(tarjeta);
     });
+  },
+
+  async abrirEdicion(factura) {
+    if (String(factura.estado).toUpperCase() !== "PAGADA") return alert("Solo se puede corregir el método de una factura pagada.");
+    this.facturaEnEdicion = factura;
+    document.getElementById("editarFacturaCliente").textContent = factura.perfiles_clientes?.nombre_completo || "Cliente ocasional";
+    document.getElementById("editarFacturaTotal").textContent = moneda.format(Number(factura.total) || 0);
+    document.getElementById("editarFacturaMetodoActual").textContent = factura.metodo_pago || "Sin método";
+    const select = document.getElementById("editarFacturaMetodo");
+    select.innerHTML = '<option value="">Cargando métodos...</option>';
+    document.getElementById("modalEditarFactura").classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+    try {
+      const metodos = await FacturacionService.getMetodosPago(getTienda().id, factura.id_barbero || null);
+      select.replaceChildren();
+      metodos.forEach((metodo) => {
+        const option = document.createElement("option");
+        option.value = metodo.id_metodo;
+        option.textContent = `${metodo.nombre} · ${metodo.tipo_destino === "PROFESIONAL" ? "Profesional" : "Tienda"}`;
+        option.selected = String(metodo.id_metodo) === String(factura.id_metodo_pago);
+        select.appendChild(option);
+      });
+      if (!metodos.length) select.innerHTML = '<option value="">No hay métodos activos</option>';
+    } catch (error) {
+      alert(`No se pudieron cargar los métodos: ${error.message}`);
+      this.cerrarEdicion();
+    }
+  },
+
+  cerrarEdicion() {
+    document.getElementById("modalEditarFactura")?.classList.add("hidden");
+    document.body.style.overflow = "auto";
+    this.facturaEnEdicion = null;
+  },
+
+  async guardarEdicion() {
+    const idMetodoNuevo = document.getElementById("editarFacturaMetodo")?.value;
+    const boton = document.getElementById("btnGuardarEditarFactura");
+    if (!this.facturaEnEdicion || !idMetodoNuevo) return alert("Selecciona el método correcto.");
+    if (String(idMetodoNuevo) === String(this.facturaEnEdicion.id_metodo_pago)) return alert("Selecciona un método diferente al registrado actualmente.");
+    if (!confirm("¿Confirmas la corrección? El dinero se moverá a la cuenta financiera seleccionada.")) return;
+    try {
+      boton.disabled = true;
+      boton.textContent = "Corrigiendo...";
+      await FacturacionService.corregirMetodoPago({ idTienda: getTienda().id, idFactura: this.facturaEnEdicion.id_factura, idMetodoNuevo });
+      this.cerrarEdicion();
+      await this.cargar();
+      window.dispatchEvent(new CustomEvent("factura-corregida"));
+      window.dispatchEvent(new CustomEvent("factura-creada"));
+      alert("Método de pago corregido y saldos actualizados correctamente.");
+    } catch (error) {
+      console.error("Error corrigiendo factura:", error);
+      alert(`No se pudo corregir la factura: ${error.message}`);
+    } finally {
+      boton.disabled = false;
+      boton.textContent = "Guardar corrección";
+    }
   },
 };

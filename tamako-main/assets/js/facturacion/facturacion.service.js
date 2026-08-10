@@ -323,11 +323,14 @@ export const FacturacionService = {
       .select(`
         id_factura,
         id_cita,
+        id_barbero,
+        id_metodo_pago,
         fecha_emision,
         metodo_pago,
         destino_pago,
         estado,
         total,
+        notas,
         profesionales(nombre_empleado),
         perfiles_clientes(nombre_completo)
       `)
@@ -336,6 +339,47 @@ export const FacturacionService = {
 
     if (error) throw error;
     return data || [];
+  },
+
+  async getInsumos(idTienda) {
+    exigirTienda(idTienda);
+    const { data, error } = await supabase.from("insumos")
+      .select("*, cuentas_financieras:id_cuenta(nombre,tipo)")
+      .eq("id_tienda", idTienda).order("fecha_registro", { ascending: false });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async crearInsumo(insumo) {
+    exigirTienda(insumo?.id_tienda);
+    const { data, error } = await supabase.from("insumos").insert([insumo]).select().single();
+    if (error) throw error;
+    return data;
+  },
+
+  async pagarInsumo({ idInsumo, idCuenta }) {
+    const { data, error } = await supabase.rpc("pagar_insumo", { p_insumo: idInsumo, p_cuenta: idCuenta });
+    if (error) throw error;
+    return data;
+  },
+
+  async eliminarInsumo(idTienda, idInsumo) {
+    exigirTienda(idTienda);
+    const { error } = await supabase.from("insumos").delete().eq("id", idInsumo).eq("id_tienda", idTienda).eq("estado", "PENDIENTE");
+    if (error) throw error;
+  },
+
+  async corregirMetodoPago({ idTienda, idFactura, idMetodoNuevo }) {
+    exigirTienda(idTienda);
+    if (!idFactura || !idMetodoNuevo)
+      throw new Error("Selecciona una factura y un método de pago válido.");
+
+    const { error } = await supabase.rpc("corregir_metodo_pago_factura", {
+      p_factura: idFactura,
+      p_metodo_nuevo: idMetodoNuevo,
+    });
+
+    if (error) throw error;
   },
 
   async getDatosReporte(idTienda, desde, hasta) {

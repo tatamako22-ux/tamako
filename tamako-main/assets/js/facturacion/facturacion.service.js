@@ -159,6 +159,31 @@ export const FacturacionService = {
     return data;
   },
 
+  async editarCuentaAdministrativa({ idTienda, idCuenta, nombre, tipo }) {
+    exigirTienda(idTienda);
+    const nombreLimpio = nombre?.trim();
+    if (!idCuenta || !nombreLimpio) throw new Error("Completa los datos de la cuenta.");
+    const { data, error } = await supabase.rpc("editar_cuenta_financiera_tienda", {
+      p_id_tienda: idTienda,
+      p_id_cuenta: idCuenta,
+      p_nombre: nombreLimpio,
+      p_tipo: tipo,
+    });
+    if (error) throw error;
+    return data;
+  },
+
+  async eliminarCuentaAdministrativa({ idTienda, idCuenta }) {
+    exigirTienda(idTienda);
+    if (!idCuenta) throw new Error("La cuenta no es válida.");
+    const { data, error } = await supabase.rpc("eliminar_cuenta_financiera_tienda", {
+      p_id_tienda: idTienda,
+      p_id_cuenta: idCuenta,
+    });
+    if (error) throw error;
+    return data;
+  },
+
   async getMovimientosCuenta(idTienda, idCuenta, limite = 30) {
     exigirTienda(idTienda);
 

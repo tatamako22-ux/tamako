@@ -1,5 +1,5 @@
 import { FacturacionModal } from "./facturacion.modal.js";
-import { FacturacionCuentas } from "./facturacion.cuentas.js";
+import { FacturacionCuentas } from "./facturacion.cuentas.js?v=2";
 import { FacturacionFacturas } from "./facturacion.facturas.js";
 import { FacturacionCaja } from "./facturacion.caja.js";
 import { FacturacionReportes } from "./facturacion.reportes.js";

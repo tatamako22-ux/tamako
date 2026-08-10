@@ -1,4 +1,4 @@
-import { FacturacionService } from "./facturacion.service.js";
+import { FacturacionService } from "./facturacion.service.js?v=2";
 
 const formatoMoneda = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -16,11 +16,17 @@ export const FacturacionCuentas = {
   btnGuardar: null,
   cuentaActual: null,
   cuentas: [],
+  puedeGestionar: false,
 
   async init() {
+    const tienda = getTienda();
+    this.puedeGestionar = Boolean(
+      tienda.sesion?.es_propietario || tienda.sesion?.permisos?.cuentas_gestionar,
+    );
     this.modal = document.getElementById("modalCuenta");
     this.modalGestion = document.getElementById("modalGestionCuenta");
     this.btnGuardar = document.getElementById("guardarCuenta");
+    document.getElementById("btnNuevaCuenta")?.toggleAttribute("hidden", !this.puedeGestionar);
     this.inicializarEventos();
     window.addEventListener("factura-creada", () => this.cargarCuentas());
     window.addEventListener("movimiento-financiero", () => this.cargarCuentas());
@@ -61,6 +67,7 @@ export const FacturacionCuentas = {
   },
 
   abrirModal() {
+    if (!this.puedeGestionar) return;
     this.modal?.classList.remove("hidden");
     document.body.style.overflow = "hidden";
     setTimeout(() => document.getElementById("cuentaNombre")?.focus(), 50);
@@ -177,9 +184,9 @@ export const FacturacionCuentas = {
       </div>
       <div class="cuenta-card-footer">
         <span>Saldo inicial: ${formatoMoneda.format(Number(cuenta.saldo_inicial) || 0)}</span>
-        <button type="button" class="btn-cuenta-opciones" data-id="${cuenta.id}" aria-label="Opciones de la cuenta" title="Gestionar cuenta">
+        ${this.puedeGestionar ? `<button type="button" class="btn-cuenta-opciones" data-id="${cuenta.id}" aria-label="Opciones de la cuenta" title="Gestionar cuenta">
           <i class="fa-solid fa-ellipsis"></i>
-        </button>
+        </button>` : ""}
       </div>`;
     tarjeta.querySelector("h3").textContent = cuenta.nombre;
     return tarjeta;
@@ -261,7 +268,7 @@ export const FacturacionCuentas = {
   },
 
   async guardarCambiosCuenta() {
-    if (!this.cuentaActual) return;
+    if (!this.cuentaActual || !this.puedeGestionar) return;
     const tienda = getTienda();
     const boton = document.getElementById("guardarCambiosCuenta");
     const nombre = document.getElementById("gestionCuentaNombre").value.trim();
@@ -270,7 +277,7 @@ export const FacturacionCuentas = {
     try {
       boton.disabled = true;
       boton.textContent = "Guardando...";
-      await FacturacionService.actualizarCuenta({
+      await FacturacionService.editarCuentaAdministrativa({
         idTienda: tienda.id,
         idCuenta: this.cuentaActual.id,
         nombre,
@@ -290,11 +297,11 @@ export const FacturacionCuentas = {
   },
 
   async desactivarCuenta() {
-    if (!this.cuentaActual) return;
+    if (!this.cuentaActual || !this.puedeGestionar) return;
     const confirmar = await window.TamakuUI.confirm({
-      titulo: "¿Desactivar cuenta?",
-      mensaje: `${this.cuentaActual.nombre} dejará de aparecer al crear facturas, pero conservará todo su historial.`,
-      textoConfirmar: "Desactivar",
+      titulo: "¿Eliminar cuenta?",
+      mensaje: `${this.cuentaActual.nombre} dejará de aparecer en nuevas facturas. Las facturas y movimientos anteriores se conservarán para proteger el historial contable.`,
+      textoConfirmar: "Eliminar cuenta",
       peligro: true,
     });
     if (!confirmar) return;
@@ -303,20 +310,17 @@ export const FacturacionCuentas = {
     const boton = document.getElementById("desactivarCuenta");
     try {
       boton.disabled = true;
-      await FacturacionService.actualizarCuenta({
+      await FacturacionService.eliminarCuentaAdministrativa({
         idTienda: tienda.id,
         idCuenta: this.cuentaActual.id,
-        nombre: this.cuentaActual.nombre,
-        tipo: this.cuentaActual.tipo,
-        activa: false,
       });
       this.cerrarGestion();
       await this.cargarCuentas();
       window.dispatchEvent(new CustomEvent("cuenta-financiera-actualizada"));
-      alert("Cuenta desactivada correctamente.");
+      alert("Cuenta eliminada de los métodos de pago activos.");
     } catch (error) {
-      console.error("Error desactivando cuenta:", error);
-      alert(`No se pudo desactivar la cuenta: ${error.message}`);
+      console.error("Error eliminando cuenta:", error);
+      alert(`No se pudo eliminar la cuenta: ${error.message}`);
     } finally {
       boton.disabled = false;
     }

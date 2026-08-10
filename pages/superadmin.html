@@ -5,7 +5,7 @@
   <title>TAMAKU | Superadmin</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/superadmin.css?v=4">
+  <link rel="stylesheet" href="../assets/css/superadmin.css?v=5">
 </head>
 <body>
   <aside class="sidebar-admin">
@@ -19,7 +19,7 @@
     <footer><small id="adminNombre">Superadmin</small><button id="cerrarSesionAdmin">Cerrar sesión</button></footer>
   </aside>
   <main>
-    <header><div><span>OPERACIÓN TAMAKU</span><h2 id="tituloVista">Centro de control</h2></div><time id="fechaPanel"></time></header>
+    <header><div><span>OPERACIÓN TAMAKU</span><h2 id="tituloVista">Centro de control</h2></div><div class="admin-header-actions"><time id="fechaPanel"></time><button id="cerrarSesionAdminMovil" class="admin-mobile-logout" type="button"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Cerrar sesión</span></button></div></header>
 
     <section class="vista active" data-seccion="resumen">
       <div class="kpis"><article data-filtro="TODAS"><span>Tiendas</span><strong id="totalTiendas">0</strong></article><article data-filtro="PRUEBA"><span>En prueba</span><strong id="totalPruebas">0</strong></article><article data-filtro="ACTIVA"><span>Activas</span><strong id="totalActivas">0</strong></article><article class="alerta" data-filtro="PROBLEMAS"><span>Vencidas / apagadas</span><strong id="totalVencidas">0</strong></article><article><span>Recaudo del mes</span><strong id="ingresosMes">$0</strong></article><article><span>Proyección mensual</span><strong id="ingresoProyectado">$0</strong></article></div>
@@ -51,6 +51,7 @@
     <div class="acciones-sec"><button id="extenderPrueba">Dar días adicionales</button><button id="reactivarTienda">Reactivar acceso</button><button id="suspenderTienda">Apagar tienda</button></div>
     <section class="historial"><h3>Historial de pagos</h3><div id="historialPagos"></div></section>
   </aside>
+  <div id="adminToast" class="admin-toast" role="status" aria-live="polite" aria-atomic="true"></div>
   <script>fechaPanel.textContent=new Date().toLocaleDateString('es-CO',{dateStyle:'full'})</script>
-  <script type="module" src="../assets/js/superadmin/superadmin.js?v=4"></script>
+  <script type="module" src="../assets/js/superadmin/superadmin.js?v=5"></script>
 </body></html>

@@ -7,6 +7,18 @@ const escapar = (v = "") => String(v).replaceAll("&", "&amp;").replaceAll("<", "
 const hoyISO = () => new Date().toISOString().slice(0, 10);
 const fecha = (v) => v ? new Date(v).toLocaleDateString("es-CO") : "—";
 let suscripciones = [], pagos = [], notificaciones = [], seleccionada = null;
+let temporizadorAviso = null;
+
+function mostrarAviso(tipo, titulo, mensaje) {
+  const aviso = $("#adminToast");
+  if (!aviso) return window.alert(`${titulo}: ${mensaje}`);
+  clearTimeout(temporizadorAviso);
+  aviso.className = `admin-toast ${tipo}`;
+  aviso.innerHTML = `<i class="fa-solid ${tipo === "success" ? "fa-circle-check" : "fa-circle-exclamation"}"></i><div><strong>${escapar(titulo)}</strong><p>${escapar(mensaje)}</p></div><button type="button" aria-label="Cerrar aviso"><i class="fa-solid fa-xmark"></i></button>`;
+  aviso.querySelector("button").onclick = () => aviso.classList.remove("show");
+  requestAnimationFrame(() => aviso.classList.add("show"));
+  temporizadorAviso = setTimeout(() => aviso.classList.remove("show"), 6500);
+}
 
 function finAcceso(s) { return s.estado === "PRUEBA" ? s.fin_prueba : s.fin_periodo; }
 function diferenciaDias(v) { return v ? Math.ceil((new Date(v) - new Date()) / 86400000) : null; }
@@ -100,7 +112,21 @@ document.addEventListener("click", (e) => { const tienda = e.target.closest("[da
 $("#buscarTienda").addEventListener("input", renderTiendas); $("#filtroEstado").addEventListener("change", renderTiendas); $("#filtroMesPago").addEventListener("change", renderPagos);
 $$('[data-filtro]').forEach((kpi) => kpi.onclick = () => { cambiarVista("tiendas"); $("#filtroEstado").value = kpi.dataset.filtro; renderTiendas(); });
 $("#cerrarDetalle").onclick = () => $("#detallePanel").classList.remove("open"); $("#pagoPlan").onchange = (e) => $("#pagoMonto").value = { BASICO: 29900, PRO: 59900, PREMIUM: 99900 }[e.target.value];
-$("#pagoForm").onsubmit = async (e) => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.currentTarget)); const { error } = await supabase.rpc("registrar_pago_manual_tamaku", { p_tienda: seleccionada.id_tienda, p_plan: d.plan, p_monto: Number(d.monto), p_fecha_pago: d.fecha_pago, p_fecha_inicio: d.fecha_inicio, p_dias: Number(d.dias), p_referencia: d.referencia, p_notas: d.notas || null }); if (error) return alert(error.message); alert("Pago registrado y tienda activada."); await cargar(); abrirDetalle(seleccionada.id_tienda); };
+$("#pagoForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const formulario = e.currentTarget, boton = formulario.querySelector('button[type="submit"], button:not([type])');
+  const d = Object.fromEntries(new FormData(formulario));
+  const idTienda = seleccionada.id_tienda, tienda = seleccionada.tiendas?.nombre || "La tienda";
+  const textoOriginal = boton.textContent;
+  boton.disabled = true; boton.textContent = "Registrando pago...";
+  const { error } = await supabase.rpc("registrar_pago_manual_tamaku", { p_tienda: idTienda, p_plan: d.plan, p_monto: Number(d.monto), p_fecha_pago: d.fecha_pago, p_fecha_inicio: d.fecha_inicio, p_dias: Number(d.dias), p_referencia: d.referencia, p_notas: d.notas || null });
+  boton.disabled = false; boton.textContent = textoOriginal;
+  if (error) return mostrarAviso("error", "No se pudo registrar el pago", error.message);
+  formulario.elements.referencia.value = ""; formulario.elements.notas.value = "";
+  await cargar(); abrirDetalle(idTienda);
+  const actualizada = suscripciones.find((s) => s.id_tienda === idTienda);
+  mostrarAviso("success", "Pago registrado correctamente", `${tienda} quedó activa en el plan ${d.plan}. Nuevo vencimiento: ${fecha(finAcceso(actualizada))}.`);
+};
 $("#guardarControl").onclick = async () => { const { error } = await supabase.rpc("configurar_acceso_tamaku", { p_tienda: seleccionada.id_tienda, p_dias_gracia: Number($("#diasGracia").value), p_mensaje: $("#mensajeBloqueo").value || null }); if (error) return alert(error.message); alert("Configuración guardada."); await cargar(); abrirDetalle(seleccionada.id_tienda); };
 $("#extenderPrueba").onclick = async () => { const dias = Number(prompt("¿Cuántos días deseas agregar?", "7")); if (!dias) return; const { error } = await supabase.rpc("extender_prueba_tamaku", { p_tienda: seleccionada.id_tienda, p_dias: dias }); if (error) return alert(error.message); await cargar(); abrirDetalle(seleccionada.id_tienda); };
 $("#suspenderTienda").onclick = async () => { if (!confirm("¿Apagar esta tienda inmediatamente?")) return; const motivo = prompt("Mensaje que verá la tienda:", $("#mensajeBloqueo").value || "Tu acceso fue suspendido. Comunícate con TAMAKU."); if (motivo === null) return; const { error } = await supabase.rpc("cambiar_estado_suscripcion_tamaku", { p_tienda: seleccionada.id_tienda, p_estado: "SUSPENDIDA", p_observacion: motivo }); if (error) return alert(error.message); await cargar(); abrirDetalle(seleccionada.id_tienda); };
@@ -108,7 +134,18 @@ $("#reactivarTienda").onclick = async () => { const estado = seleccionada.fin_pe
 $("#listaNotificaciones").onclick = async (e) => { const n = e.target.closest("[data-notif]"); if (!n) return; await supabase.from("tamaku_notificaciones_admin").update({ leida: true }).eq("id", n.dataset.notif); await cargar(); };
 $("#marcarTodas").onclick = async () => { const ids = notificaciones.filter((n) => !n.leida).map((n) => n.id); if (!ids.length) return; const { error } = await supabase.from("tamaku_notificaciones_admin").update({ leida: true }).in("id", ids); if (error) return alert(error.message); await cargar(); };
 $("#exportarPagos").onclick = () => { const filas = [["Tienda", "Plan", "Monto", "Fecha pago", "Periodo desde", "Periodo hasta", "Referencia"], ...pagosFiltrados().map((p) => [nombreTienda(p.id_tienda), p.tamaku_planes?.codigo || "", p.monto, fecha(p.fecha_pago), fecha(p.periodo_desde), fecha(p.periodo_hasta), p.referencia || ""])]; const csv = filas.map((f) => f.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(",")).join("\n"); const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" })); a.download = `pagos-tamaku-${hoyISO()}.csv`; a.click(); URL.revokeObjectURL(a.href); };
-$("#cerrarSesionAdmin").onclick = async () => { await supabase.auth.signOut(); location.replace("../index.html"); };
+async function cerrarSesionAdmin() {
+  const botones = [$("#cerrarSesionAdmin"), $("#cerrarSesionAdminMovil")].filter(Boolean);
+  botones.forEach((boton) => { boton.disabled = true; });
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    botones.forEach((boton) => { boton.disabled = false; });
+    return mostrarAviso("error", "No se pudo cerrar la sesión", error.message);
+  }
+  location.replace("../index.html");
+}
+$("#cerrarSesionAdmin").onclick = cerrarSesionAdmin;
+$("#cerrarSesionAdminMovil").onclick = cerrarSesionAdmin;
 
 const inicial = location.hash.slice(1); if (["resumen", "tiendas", "pagos", "alertas"].includes(inicial)) cambiarVista(inicial);
 verificar().catch((e) => { $("#proximosVencimientos").innerHTML = `<div class="vacio">No se pudo cargar el panel: ${escapar(e.message)}</div>`; });

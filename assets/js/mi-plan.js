@@ -29,11 +29,22 @@ async function cargarPlan() {
   document.getElementById("planProfesionales").textContent = plan.limite_profesionales ?? "—";
   document.getElementById("planUsuarios").textContent = plan.limite_usuarios ?? "—";
 
-  const { data: pagos, error } = await supabase.from("tamaku_pagos_suscripcion").select("monto,fecha_pago,periodo_desde,periodo_hasta,referencia,tamaku_planes(nombre,codigo)").eq("id_tienda", tienda.id).order("fecha_pago", { ascending: false });
+  let { data: pagos, error } = await supabase.rpc("obtener_pagos_tienda_tamaku", { p_tienda: tienda.id });
+  // Conserva compatibilidad mientras la función nueva se instala en Supabase.
+  if (error && /function|schema cache|could not find/i.test(error.message || "")) {
+    const resultadoAnterior = await supabase
+      .from("tamaku_pagos_suscripcion")
+      .select("monto,fecha_pago,periodo_desde,periodo_hasta,referencia,estado,tamaku_planes(nombre,codigo)")
+      .eq("id_tienda", tienda.id)
+      .eq("estado", "CONFIRMADO")
+      .order("fecha_pago", { ascending: false });
+    pagos = resultadoAnterior.data;
+    error = resultadoAnterior.error;
+  }
   if (error) throw error;
   const lista = pagos || [];
   document.getElementById("totalPagado").textContent = dinero.format(lista.reduce((total, pago) => total + Number(pago.monto || 0), 0));
-  document.getElementById("listaPagos").innerHTML = lista.length ? lista.map((pago) => `<article><span>${fecha(pago.fecha_pago)}</span><span>${escapar(pago.tamaku_planes?.nombre || "Plan")}</span><span>${fecha(pago.periodo_desde)}<small>hasta ${fecha(pago.periodo_hasta)}</small></span><span>${escapar(pago.referencia || "Sin referencia")}</span><strong>${dinero.format(pago.monto)}</strong></article>`).join("") : "<p>Aún no hay pagos registrados.</p>";
+  document.getElementById("listaPagos").innerHTML = lista.length ? lista.map((pago) => `<article><span>${fecha(pago.fecha_pago)}</span><span>${escapar(pago.plan_nombre || pago.tamaku_planes?.nombre || "Plan")}</span><span>${fecha(pago.periodo_desde)}<small>hasta ${fecha(pago.periodo_hasta)}</small></span><span>${escapar(pago.referencia || "Sin referencia")}</span><strong>${dinero.format(pago.monto)}</strong></article>`).join("") : "<p>Aún no hay pagos confirmados registrados.</p>";
 }
 
 cargarPlan().catch((error) => { console.error(error); document.getElementById("listaPagos").innerHTML = `<p>No fue posible cargar los pagos: ${escapar(error.message)}</p>`; });

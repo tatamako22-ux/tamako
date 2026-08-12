@@ -635,7 +635,7 @@
             }
         }
     </style>
-<link rel="stylesheet" href="../assets/css/clientes.css?v=3">
+<link rel="stylesheet" href="../assets/css/clientes.css?v=5">
 <link rel="stylesheet" href="../assets/css/notifications.css?v=1">
 <script src="../assets/js/core/notifications.js?v=1" defer></script>
 </head>
@@ -801,6 +801,17 @@
         </div>
     </div>
 
+    <div id="modalDesbloqueo" class="modal-overlay">
+        <div class="modal-card" style="border-color:rgba(37,211,102,.45);">
+            <div style="width:40px;height:5px;background:#333;border-radius:10px;margin:0 auto 20px;"></div>
+            <h2 style="color:#48dc86;"><i class="fa-solid fa-unlock"></i> Quitar bloqueo</h2>
+            <p style="text-align:center;color:#aaa;font-size:.78rem;margin-bottom:18px;">Selecciona cuál bloqueo deseas retirar de <strong id="nombreDesbloqueo" style="color:var(--text,#fff);"></strong>.</p>
+            <div id="listaBloqueosCliente" class="client-unblock-list"></div>
+            <button id="desbloquearTodosCliente" class="btn-save" type="button" style="background:#238b51;color:#fff;">QUITAR TODOS LOS BLOQUEOS</button>
+            <button class="btn-cancel-modal" type="button" onclick="cerrarModalDesbloqueo()">Cancelar</button>
+        </div>
+    </div>
+
     <script src="../assets/js/core/menu.js?v=11" defer></script>
 
 
@@ -914,37 +925,133 @@
             const btn = document.querySelector("#modalBloqueo .btn-save");
             btn.innerText = "BLOQUEANDO...";
             
-            const tipoBloqueo = document.getElementById("tipoBloqueo").value;
+            const tipoSeleccionado = document.getElementById("tipoBloqueo").value;
+            const tipoBloqueo = tipoSeleccionado === "parcial" ? "profesional" : "global";
             const idBarbero = document.getElementById("profesionalBloqueo").value;
             
             // Si es parcial y no seleccionó a nadie, frenamos
-            if (tipoBloqueo === "parcial" && !idBarbero) {
+            if (tipoBloqueo === "profesional" && !idBarbero) {
                 alert("Por favor selecciona un profesional de la lista.");
                 btn.innerText = "APLICAR BLOQUEO";
                 return;
             }
 
-            // Insertamos el castigo en Supabase
+            const telefonoNormalizado = String(clienteParaBloquear.telefono || "").replace(/\D/g, "").slice(-10);
+            let consultaExistente = supabase
+                .from("clientes_bloqueados")
+                .select("id")
+                .eq("id_tienda", tiendaInfo.id)
+                .eq("telefono_cliente", telefonoNormalizado)
+                .eq("tipo_bloqueo", tipoBloqueo);
+            consultaExistente = tipoBloqueo === "profesional"
+                ? consultaExistente.eq("id_barbero", idBarbero)
+                : consultaExistente.is("id_barbero", null);
+            const { data: existente } = await consultaExistente.maybeSingle();
+            if (existente) {
+                alert("Este cliente ya tiene aplicado ese mismo bloqueo.");
+                btn.innerText = "APLICAR BLOQUEO";
+                return;
+            }
+
             const { error } = await supabase
                 .from("clientes_bloqueados")
                 .insert([{
                     id_tienda: tiendaInfo.id,
-                    telefono_cliente: clienteParaBloquear.telefono,
+                    telefono_cliente: telefonoNormalizado,
                     nombre_cliente: clienteParaBloquear.nombre,
                     tipo_bloqueo: tipoBloqueo,
-                    id_barbero: tipoBloqueo === "parcial" ? idBarbero : null
+                    id_barbero: tipoBloqueo === "profesional" ? idBarbero : null
                 }]);
 
             if (error) {
                 console.error("Error al bloquear:", error);
                 alert("Hubo un problema al aplicar el bloqueo.");
             } else {
-                alert(clienteParaBloquear.nombre + " ha sido bloqueado exitosamente.");
+                alert(clienteParaBloquear.nombre + (tipoBloqueo === "global" ? " fue bloqueado para toda la tienda." : " fue bloqueado únicamente para el profesional seleccionado."));
                 cerrarModalBloqueo();
+                cargarClientes();
             }
             
             btn.innerText = "APLICAR BLOQUEO";
         };
+
+        // --- DESBLOQUEO DIRECTO DESDE LA TARJETA DEL CLIENTE ---
+        let bloqueosClienteSeleccionado = [];
+
+        window.abrirModalDesbloqueo = (telefono) => {
+            const telefonoNormalizado = String(telefono || "").replace(/\D/g, "").slice(-10);
+            const cliente = (window.listaClientesGlobal || []).find(item =>
+                String(item.telefono || "").replace(/\D/g, "").slice(-10) === telefonoNormalizado
+            );
+
+            bloqueosClienteSeleccionado = cliente?.bloqueos || [];
+            document.getElementById("nombreDesbloqueo").innerText = cliente?.nombre || "este cliente";
+
+            const lista = document.getElementById("listaBloqueosCliente");
+            lista.innerHTML = bloqueosClienteSeleccionado.map(bloqueo => {
+                const esGlobal = bloqueo.tipo_bloqueo === "global";
+                const alcance = esGlobal
+                    ? "Toda la tienda"
+                    : `Solo con ${bloqueo.profesionales?.nombre_empleado || "el profesional seleccionado"}`;
+                const detalle = esGlobal
+                    ? "El cliente no puede reservar con ningún profesional."
+                    : "Los demás profesionales continúan disponibles.";
+
+                return `
+                    <article class="client-unblock-item">
+                        <div>
+                            <strong>${alcance}</strong>
+                            <small>${detalle}</small>
+                        </div>
+                        <button type="button" data-quitar-bloqueo="${bloqueo.id}">
+                            <i class="fa-solid fa-unlock"></i> Quitar
+                        </button>
+                    </article>`;
+            }).join("");
+
+            lista.querySelectorAll("[data-quitar-bloqueo]").forEach(boton => {
+                boton.addEventListener("click", () => quitarBloqueosCliente([boton.dataset.quitarBloqueo], false));
+            });
+
+            const botonTodos = document.getElementById("desbloquearTodosCliente");
+            botonTodos.style.display = bloqueosClienteSeleccionado.length > 1 ? "block" : "none";
+            botonTodos.onclick = () => quitarBloqueosCliente(bloqueosClienteSeleccionado.map(b => b.id), true);
+            document.getElementById("modalDesbloqueo").style.display = "flex";
+        };
+
+        window.cerrarModalDesbloqueo = () => {
+            document.getElementById("modalDesbloqueo").style.display = "none";
+            bloqueosClienteSeleccionado = [];
+        };
+
+        async function quitarBloqueosCliente(ids, quitarTodos) {
+            if (!ids.length) return;
+
+            const nombre = document.getElementById("nombreDesbloqueo").innerText;
+            if (!(await TamakuUI.confirm({
+                titulo: quitarTodos ? "¿Quitar todos los bloqueos?" : "¿Quitar este bloqueo?",
+                mensaje: quitarTodos
+                    ? `${nombre} podrá volver a reservar con toda la tienda.`
+                    : `Se habilitará nuevamente el acceso correspondiente para ${nombre}.`,
+                textoConfirmar: "Desbloquear"
+            }))) return;
+
+            const { error } = await supabase
+                .from("clientes_bloqueados")
+                .delete()
+                .eq("id_tienda", tiendaInfo.id)
+                .in("id", ids);
+
+            if (error) {
+                console.error("Error al desbloquear cliente:", error);
+                mostrarToast("No fue posible quitar el bloqueo.", true);
+                return;
+            }
+
+            cerrarModalDesbloqueo();
+            mostrarToast(quitarTodos ? "Todos los bloqueos fueron eliminados." : "Bloqueo eliminado correctamente.");
+            await cargarClientes();
+        }
 
         // --- FUNCIONES DE LISTA DE BLOQUEADOS ---
         window.cargarBloqueados = async () => {
@@ -1142,11 +1249,11 @@
 
         // --- CARGAR CLIENTES DESDE CITAS ---
         async function cargarClientes() {
-            const { data: citas, error } = await supabase
-                .from("citas")
-                .select("nombre_cliente, telefono_cliente, email_cliente, fecha, valor_servicio")
-                .eq("id_tienda", tiendaInfo.id)
-                .order("fecha", { ascending: false });
+            const [resultadoCitas, resultadoBloqueos] = await Promise.all([
+                supabase.from("citas").select("nombre_cliente, telefono_cliente, email_cliente, fecha, valor_servicio").eq("id_tienda", tiendaInfo.id).order("fecha", { ascending: false }),
+                supabase.from("clientes_bloqueados").select("id,telefono_cliente,tipo_bloqueo,id_barbero,profesionales(nombre_empleado)").eq("id_tienda", tiendaInfo.id)
+            ]);
+            const { data: citas, error } = resultadoCitas;
 
             if (error) {
                 console.error("Error cargando citas:", error);
@@ -1177,7 +1284,18 @@
                 }
             });
 
-            window.listaClientesGlobal = Object.values(mapa).sort((a, b) => a.nombre.localeCompare(b.nombre));
+            const bloqueosPorTelefono = new Map();
+            (resultadoBloqueos.data || []).forEach(b => {
+                const tel = String(b.telefono_cliente || "").replace(/\D/g, "").slice(-10);
+                if (!tel) return;
+                const lista = bloqueosPorTelefono.get(tel) || [];
+                lista.push(b);
+                bloqueosPorTelefono.set(tel, lista);
+            });
+            window.listaClientesGlobal = Object.values(mapa).map(cliente => ({
+                ...cliente,
+                bloqueos: bloqueosPorTelefono.get(String(cliente.telefono).replace(/\D/g, "").slice(-10)) || []
+            })).sort((a, b) => a.nombre.localeCompare(b.nombre));
 
             // Actualizar Métricas de las Tarjetas
             const hoy = new Date();
@@ -1189,8 +1307,7 @@
                 return f.getMonth() === hoy.getMonth() && f.getFullYear() === hoy.getFullYear();
             }).length;
 
-            const { count } = await supabase.from("clientes_bloqueados").select("*", { count: 'exact', head: true }).eq("id_tienda", tiendaInfo.id);
-            document.getElementById("totalBloqueados").textContent = count || 0;
+            document.getElementById("totalBloqueados").textContent = bloqueosPorTelefono.size;
 
             renderizarLista();
         }
@@ -1250,6 +1367,7 @@
                             <div style="flex:1;">
                                 <div class="client-name">${nombre}</div>
                                 <div class="client-phone"><i class="fa-brands fa-whatsapp" style="color:var(--gold)"></i> ${c.telefono}</div>
+                                ${c.bloqueos.length ? `<div class="client-block-seal"><i class="fa-solid fa-ban"></i> BLOQUEADO <small>${c.bloqueos.some(b => ["global","total"].includes(String(b.tipo_bloqueo).toLowerCase())) ? "Toda la tienda" : c.bloqueos.map(b => b.profesionales?.nombre_empleado || "Profesional").join(", ")}</small></div>` : ""}
                             </div>
                         </div>
                         <div class="card-metrics">
@@ -1264,6 +1382,10 @@
                             <a href="https://wa.me/${telLimpio}" target="_blank" class="btn-historial" style="color: #25D366; border: 1px solid rgba(37,211,102,0.3); background: rgba(37,211,102,0.08);">
                                 <i class="fa-brands fa-whatsapp"></i> Chat
                             </a>
+                            <button onclick="abrirModalBloqueo('${c.telefono}', '${nombreLimpio}')" class="btn-historial" style="color:#ff8a65;border:1px solid rgba(255,106,76,.35);background:rgba(255,106,76,.1);">
+                                <i class="fa-solid fa-ban"></i> Bloquear
+                            </button>
+                            ${c.bloqueos.length ? `<button onclick="abrirModalDesbloqueo('${String(c.telefono || "").replace(/\D/g, "")}')" class="btn-historial" style="color:#48dc86;border:1px solid rgba(37,211,102,.35);background:rgba(37,211,102,.1);"><i class="fa-solid fa-unlock"></i> Desbloquear</button>` : ""}
                             <button onclick="eliminarCliente('${c.telefono}', '${nombreLimpio}')" class="btn-historial" style="color: #ff4d4d; border: 1px solid rgba(255,77,77,0.3); background: rgba(255,77,77,0.08);">
                                 <i class="fa-solid fa-trash"></i> Eliminar
                             </button>
@@ -1310,6 +1432,7 @@
                             <div>
                                 <div class="client-name">${nombre}</div>
                                 <div class="client-phone"><i class="fa-brands fa-whatsapp"></i> ${c.telefono}</div>
+                                ${c.bloqueos.length ? `<div class="client-block-seal"><i class="fa-solid fa-ban"></i> BLOQUEADO <small>${c.bloqueos.some(b => ["global","total"].includes(String(b.tipo_bloqueo).toLowerCase())) ? "Toda la tienda" : c.bloqueos.map(b => b.profesionales?.nombre_empleado || "Profesional").join(", ")}</small></div>` : ""}
                             </div>
                         </div>
                         <div style="display: flex; gap: 6px; margin-top: 6px;">
@@ -1319,6 +1442,10 @@
                             <a href="https://wa.me/${telLimpio}" target="_blank" class="btn-historial" style="padding: 4px 10px; font-size: 0.6rem; text-decoration: none; color: #25D366; border: 1px solid rgba(37,211,102,0.3); background: rgba(37,211,102,0.08);">
                                 <i class="fa-brands fa-whatsapp"></i> Chat
                             </a>
+                            <button onclick="abrirModalBloqueo('${c.telefono}', '${nombreLimpio}')" class="btn-historial" style="padding:4px 10px;font-size:.6rem;color:#ff8a65;border:1px solid rgba(255,106,76,.35);background:rgba(255,106,76,.1);cursor:pointer;">
+                                <i class="fa-solid fa-ban"></i> Bloquear
+                            </button>
+                            ${c.bloqueos.length ? `<button onclick="abrirModalDesbloqueo('${String(c.telefono || "").replace(/\D/g, "")}')" class="btn-historial" style="padding:4px 10px;font-size:.6rem;color:#48dc86;border:1px solid rgba(37,211,102,.35);background:rgba(37,211,102,.1);cursor:pointer;"><i class="fa-solid fa-unlock"></i> Desbloquear</button>` : ""}
                             <button onclick="eliminarCliente('${c.telefono}', '${nombreLimpio}')" class="btn-historial" style="padding: 4px 10px; font-size: 0.6rem; color: #ff4d4d; border: 1px solid rgba(255,77,77,0.3); background: rgba(255,77,77,0.08); cursor: pointer;">
                                 <i class="fa-solid fa-trash"></i> Eliminar
                             </button>

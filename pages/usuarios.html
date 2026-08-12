@@ -7,7 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="../assets/css/menu.css?v=11">
-  <link rel="stylesheet" href="../assets/css/usuarios.css?v=2">
+  <link rel="stylesheet" href="../assets/css/usuarios.css?v=4">
+  <link rel="stylesheet" href="../assets/css/brand-theme.css?v=4">
   <link rel="stylesheet" href="../assets/css/notifications.css?v=1">
   <script src="../assets/js/core/menu.js?v=11" defer></script>
   <script src="../assets/js/core/notifications.js?v=1" defer></script>
@@ -42,7 +43,7 @@
         <label><span>Correo de acceso</span><input id="userEmail" type="email" required autocomplete="off"></label>
         <label><span>Rol</span><select id="userRole"><option value="EMPLEADO">Empleado</option><option value="ADMINISTRADOR">Administrador</option></select></label>
         <label><span>Profesional vinculado</span><select id="userProfessional"><option value="">Sin vincular</option></select></label>
-        <label id="passwordGroup" class="full"><span>Contraseña temporal</span><input id="userPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres"></label>
+        <label id="passwordGroup" class="full"><span id="passwordLabel">Contraseña temporal</span><input id="userPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres"></label>
       </div>
       <div class="permissions-heading"><div><span>PERMISOS</span><h3>¿Qué podrá hacer?</h3></div><button id="toggleAllPermissions" type="button">Marcar todos</button></div>
       <div id="permissionsGrid" class="permissions-grid"></div>
@@ -50,6 +51,6 @@
     </form>
   </div>
 
-  <script type="module" src="../assets/js/usuarios/usuarios.js?v=1"></script>
+  <script type="module" src="../assets/js/usuarios/usuarios.js?v=3"></script>
 </body>
 </html>

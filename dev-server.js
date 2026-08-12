@@ -6,7 +6,7 @@ import createUserHandler from "./api/create-user.js";
 import sendEmailHandler from "./api/send-email.js";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = Number(process.env.PORT) || 3100;
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -49,6 +49,16 @@ function prepararRespuestaApi(res) {
   return res;
 }
 
+function prepararCorsLocal(req, res) {
+  const origen = req.headers.origin;
+  if (/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/i.test(origen || "")) {
+    res.setHeader("Access-Control-Allow-Origin", origen);
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+    res.setHeader("Access-Control-Allow-Methods", "POST, PATCH, OPTIONS");
+  }
+}
+
 async function leerBody(req) {
   const partes = [];
   let total = 0;
@@ -89,6 +99,11 @@ await cargarEnv();
 createServer(async (req, res) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host}`);
+    prepararCorsLocal(req, res);
+    if (req.method === "OPTIONS" && url.pathname.startsWith("/api/")) {
+      res.writeHead(204).end();
+      return;
+    }
     if (url.pathname === "/api/create-user") {
       req.body = await leerBody(req);
       await createUserHandler(req, prepararRespuestaApi(res));

@@ -23,7 +23,7 @@ async function supabaseRequest(url, serviceKey, ruta, opciones = {}) {
 }
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return responder(res, 405, { error: "Método no permitido." });
+  if (!["POST", "PATCH"].includes(req.method)) return responder(res, 405, { error: "Método no permitido." });
 
   const supabaseUrl = process.env.SUPABASE_URL;
   const anonKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY;
@@ -41,9 +41,10 @@ export default async function handler(req, res) {
   if (!usuarioResponse.ok) return responder(res, 401, { error: "La sesión expiró." });
   const propietario = await usuarioResponse.json();
 
-  const { tienda_id, nombre, email, password, rol, id_profesional, permisos = {} } = req.body || {};
+  const { tienda_id, perfil_id, nombre, email, password, rol, id_profesional, permisos = {} } = req.body || {};
   if (!tienda_id || !nombre?.trim() || !email?.trim()) return responder(res, 400, { error: "Nombre, correo y tienda son obligatorios." });
-  if (!password || password.length < 8) return responder(res, 400, { error: "La contraseña debe tener mínimo 8 caracteres." });
+  if (req.method === "POST" && (!password || password.length < 8)) return responder(res, 400, { error: "La contraseña debe tener mínimo 8 caracteres." });
+  if (req.method === "PATCH" && password && password.length < 8) return responder(res, 400, { error: "La nueva contraseña debe tener mínimo 8 caracteres." });
   if (!["ADMINISTRADOR", "EMPLEADO"].includes(rol)) return responder(res, 400, { error: "El rol seleccionado no es válido." });
 
   const tiendaQuery = `/rest/v1/tiendas?select=id&id=eq.${encodeURIComponent(tienda_id)}&user_id=eq.${encodeURIComponent(propietario.id)}`;
@@ -61,6 +62,25 @@ export default async function handler(req, res) {
   const permisosLimpios = Object.fromEntries(
     Object.entries(permisos).filter(([clave]) => PERMISOS_VALIDOS.has(clave)).map(([clave, valor]) => [clave, Boolean(valor)]),
   );
+  if (req.method === "PATCH") {
+    if (!perfil_id) return responder(res, 400, { error: "No se indicó el perfil que deseas actualizar." });
+    const perfilActualResponse = await supabaseRequest(supabaseUrl, serviceKey, `/rest/v1/perfiles?select=id,user_id&id=eq.${encodeURIComponent(perfil_id)}&tienda_id=eq.${encodeURIComponent(tienda_id)}`);
+    const perfiles = await perfilActualResponse.json();
+    if (!perfilActualResponse.ok || !perfiles.length) return responder(res, 404, { error: "El acceso no pertenece a esta tienda." });
+    const userId = perfiles[0].user_id;
+    const datosAuth = { email: email.trim().toLowerCase(), user_metadata: { nombre: nombre.trim(), tipo: "equipo_tamaku" } };
+    if (password) datosAuth.password = password;
+    const authUpdate = await supabaseRequest(supabaseUrl, serviceKey, `/auth/v1/admin/users/${userId}`, { method: "PUT", body: JSON.stringify(datosAuth) });
+    const authActualizado = await authUpdate.json();
+    if (!authUpdate.ok) return responder(res, authUpdate.status, { error: authActualizado.msg || authActualizado.message || "No se pudo actualizar el correo o la contraseña." });
+    const perfilUpdate = await supabaseRequest(supabaseUrl, serviceKey, `/rest/v1/perfiles?id=eq.${encodeURIComponent(perfil_id)}&tienda_id=eq.${encodeURIComponent(tienda_id)}`, {
+      method: "PATCH", headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ nombre: nombre.trim(), email: email.trim().toLowerCase(), rol, id_profesional: id_profesional || null, permisos: permisosLimpios }),
+    });
+    const perfilActualizado = await perfilUpdate.json();
+    if (!perfilUpdate.ok) return responder(res, 400, { error: perfilActualizado.message || "No se pudo actualizar el perfil." });
+    return responder(res, 200, { usuario: { id: userId, email: authActualizado.email }, perfil: perfilActualizado[0] });
+  }
   const authResponse = await supabaseRequest(supabaseUrl, serviceKey, "/auth/v1/admin/users", {
     method: "POST",
     body: JSON.stringify({

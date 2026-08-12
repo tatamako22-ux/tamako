@@ -44,6 +44,18 @@ function establecerPermisos(permisos = {}) {
   });
 }
 
+function aplicarReglaRol() {
+  const esEmpleado = $("#userRole").value === "EMPLEADO";
+  const profesional = $("#userProfessional");
+  const soloPropias = $('input[name="permiso"][value="agenda_solo_propias"]');
+  profesional.required = esEmpleado;
+  if (soloPropias) {
+    soloPropias.checked = esEmpleado;
+    soloPropias.disabled = esEmpleado;
+    soloPropias.closest(".permission-item")?.classList.toggle("permission-locked", esEmpleado);
+  }
+}
+
 function opcionesProfesionales(seleccionado = "") {
   $("#userProfessional").innerHTML = `<option value="">Sin vincular</option>` + profesionales.map((profesional) =>
     `<option value="${profesional.id_barbero}" ${String(seleccionado) === String(profesional.id_barbero) ? "selected" : ""}>${escapar(profesional.nombre_empleado)}</option>`,
@@ -56,12 +68,15 @@ function abrirModal(perfil = null) {
   $("#userModalTitle").textContent = perfil ? "Editar acceso" : "Nuevo usuario";
   $("#userName").value = perfil?.nombre || perfil?.profesionales?.nombre_empleado || "";
   $("#userEmail").value = perfil?.email || "";
-  $("#userEmail").disabled = Boolean(perfil);
+  $("#userEmail").disabled = false;
   $("#userRole").value = perfil?.rol || "EMPLEADO";
   opcionesProfesionales(perfil?.id_profesional);
-  $("#passwordGroup").style.display = perfil ? "none" : "block";
+  $("#passwordLabel").textContent = perfil ? "Nueva contraseña (opcional)" : "Contraseña temporal";
+  $("#userPassword").placeholder = perfil ? "Vacía para conservar la contraseña actual" : "Mínimo 8 caracteres";
+  $("#passwordGroup").style.display = "block";
   $("#userPassword").required = !perfil;
   establecerPermisos(perfil?.permisos || { dashboard_ver: true, agenda_ver: true, agenda_solo_propias: true });
+  aplicarReglaRol();
   $("#userModal").classList.add("open");
   $("#userModal").setAttribute("aria-hidden", "false");
 }
@@ -82,7 +97,7 @@ function renderUsuarios() {
   }
   $("#usersList").innerHTML = lista.map((perfil) => `
     <article class="user-card" data-id="${perfil.id}">
-      <div class="user-identity"><span class="user-avatar">${escapar((perfil.nombre || "U").slice(0, 1).toUpperCase())}</span><div><strong>${escapar(perfil.nombre || "Usuario")}</strong><span>${escapar(perfil.email || "Sin correo")}</span></div></div>
+      <div class="user-identity"><span class="user-avatar">${perfil.profesionales?.foto_url ? `<img src="${escapar(perfil.profesionales.foto_url)}" alt="${escapar(perfil.profesionales.nombre_empleado || perfil.nombre)}">` : escapar((perfil.nombre || "U").slice(0, 1).toUpperCase())}</span><div><strong>${escapar(perfil.nombre || "Usuario")}</strong><span>${escapar(perfil.email || "Sin correo")}</span><small>Creado ${perfil.created_at ? new Date(perfil.created_at).toLocaleDateString("es-CO") : "sin fecha"}</small></div></div>
       <div class="user-meta"><strong>${escapar(perfil.rol)}</strong><span>${escapar(perfil.profesionales?.nombre_empleado || "Sin profesional vinculado")}</span></div>
       <div class="user-state ${perfil.activo ? "active" : ""}"><span class="state-dot"></span>${perfil.activo ? "Activo" : "Inactivo"}</div>
       <div class="user-actions"><button class="icon-button edit-user" type="button" title="Editar permisos"><i class="fa-solid fa-sliders"></i></button><button class="icon-button toggle-user" type="button" title="${perfil.activo ? "Desactivar" : "Activar"}"><i class="fa-solid ${perfil.activo ? "fa-user-lock" : "fa-user-check"}"></i></button></div>
@@ -91,8 +106,8 @@ function renderUsuarios() {
 
 async function cargarDatos() {
   const [resultadoPerfiles, resultadoProfesionales] = await Promise.all([
-    supabase.from("perfiles").select("id, user_id, tienda_id, rol, id_profesional, nombre, email, activo, permisos, profesionales:id_profesional(id_barbero,nombre_empleado)").eq("tienda_id", tienda.id).order("created_at"),
-    supabase.from("profesionales").select("id_barbero,nombre_empleado").eq("id_tienda", tienda.id).order("nombre_empleado"),
+    supabase.from("perfiles").select("id, user_id, tienda_id, rol, id_profesional, nombre, email, activo, permisos, created_at, profesionales:id_profesional(id_barbero,nombre_empleado,foto_url)").eq("tienda_id", tienda.id).order("created_at"),
+    supabase.from("profesionales").select("id_barbero,nombre_empleado,foto_url").eq("id_tienda", tienda.id).order("nombre_empleado"),
   ]);
   if (resultadoPerfiles.error) throw resultadoPerfiles.error;
   if (resultadoProfesionales.error) throw resultadoProfesionales.error;
@@ -101,15 +116,27 @@ async function cargarDatos() {
   renderUsuarios();
 }
 
-async function crearUsuario(payload) {
+async function guardarUsuarioAuth(payload, editar = false) {
   const { data: sesion } = await supabase.auth.getSession();
   const token = sesion.session?.access_token;
   if (!token) throw new Error("La sesión expiró.");
-  const response = await fetch("/api/create-user", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify(payload),
-  });
+  const esServidorEstaticoLocal = ["5500", "5501"].includes(location.port);
+  const endpoint = esServidorEstaticoLocal
+    ? `${location.protocol}//${location.hostname}:3100/api/create-user`
+    : "/api/create-user";
+  let response;
+  try {
+    response = await fetch(endpoint, {
+      method: editar ? "PATCH" : "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    if (esServidorEstaticoLocal) {
+      throw new Error("El servidor local de TAMAKU no está iniciado. Ejecuta npm run dev y vuelve a guardar el acceso.");
+    }
+    throw error;
+  }
   const resultado = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(resultado.error || "No fue posible crear el usuario.");
   return resultado;
@@ -119,15 +146,19 @@ async function guardar(event) {
   event.preventDefault();
   const id = $("#profileId").value;
   const datos = { nombre: $("#userName").value.trim(), email: $("#userEmail").value.trim().toLowerCase(), rol: $("#userRole").value, id_profesional: $("#userProfessional").value || null, permisos: obtenerPermisos() };
+  if (datos.rol === "EMPLEADO" && !datos.id_profesional) {
+    avisar("Debes vincular el empleado con su perfil profesional.", "error");
+    $("#userProfessional").focus();
+    return;
+  }
   const boton = $("#saveUser");
   boton.disabled = true;
   try {
     if (id) {
-      const { error } = await supabase.from("perfiles").update({ nombre: datos.nombre, rol: datos.rol, id_profesional: datos.id_profesional, permisos: datos.permisos }).eq("id", id).eq("tienda_id", tienda.id);
-      if (error) throw error;
-      avisar("Permisos actualizados correctamente.");
+      await guardarUsuarioAuth({ ...datos, perfil_id: id, password: $("#userPassword").value || null, tienda_id: tienda.id }, true);
+      avisar("Perfil, correo y acceso actualizados correctamente.");
     } else {
-      await crearUsuario({ ...datos, password: $("#userPassword").value, tienda_id: tienda.id });
+      await guardarUsuarioAuth({ ...datos, password: $("#userPassword").value, tienda_id: tienda.id });
       avisar("Usuario creado correctamente.");
     }
     cerrarModal();
@@ -157,6 +188,7 @@ async function iniciar() {
   $("#cancelUser").onclick = cerrarModal;
   $("#usersSearch").oninput = renderUsuarios;
   $("#userForm").onsubmit = guardar;
+  $("#userRole").onchange = aplicarReglaRol;
   $("#toggleAllPermissions").onclick = () => {
     const inputs = [...document.querySelectorAll('input[name="permiso"]')];
     const marcar = inputs.some((input) => !input.checked);

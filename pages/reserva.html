@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="../assets/css/legal.css?v=1">
     <!-- Conexión PWA -->
     <link rel="manifest" href="../manifest.json">
-    <link rel="stylesheet" href="../assets/css/pwa.css?v=2">
+    <link rel="stylesheet" href="../assets/css/pwa.css?v=5">
     
 <link rel="stylesheet" href="../assets/css/notifications.css?v=1">
 <script src="../assets/js/core/notifications.js?v=1" defer></script>
@@ -245,6 +245,7 @@
         const {r,g,b} = hexRgb(principal);
         const claro = (tienda.tema_reservas || tienda.tema_base) === 'claro';
         document.body.classList.toggle('dark-mode', !claro);
+        document.body.dataset.bookingTheme = claro ? 'claro' : 'oscuro';
         const estilos = document.body.style;
         estilos.setProperty('--gold', principal);
         estilos.setProperty('--gold-light', secundario);
@@ -317,7 +318,7 @@
                 .from("clientes_bloqueados")
                 .select("tipo_bloqueo, id_barbero")
                 .eq("id_tienda", tiendaId)
-                .eq("telefono_cliente", window.userWhatsApp);
+                .eq("telefono_cliente", String(window.userWhatsApp || "").replace(/\D/g, "").slice(-10));
 
             console.log("🛑 Resultado de bloqueos en Supabase:", bloqueos);
             if (errBloqueo) console.error("❌ Error consultando bloqueos:", errBloqueo);
@@ -898,15 +899,15 @@ if (resDate) {
             .from("clientes_bloqueados")
             .select("tipo_bloqueo, id_barbero")
             .eq("id_tienda", tiendaId)
-            .eq("telefono_cliente", finalPhone);
+            .eq("telefono_cliente", String(finalPhone || "").replace(/\D/g, "").slice(-10));
 
         if (bloqueos && bloqueos.length > 0) {
             let estaBloqueado = false;
 
             bloqueos.forEach(b => {
                 // Si está bloqueado de toda la tienda, o específicamente de este barbero
-                if (b.tipo_bloqueo === "global") estaBloqueado = true;
-                if (b.tipo_bloqueo === "profesional" && b.id_barbero === barberId) estaBloqueado = true;
+                if (b.tipo_bloqueo === "global" || b.tipo_bloqueo === "total") estaBloqueado = true;
+                if ((b.tipo_bloqueo === "profesional" || b.tipo_bloqueo === "parcial") && String(b.id_barbero) === String(barberId)) estaBloqueado = true;
             });
 
             if (estaBloqueado) {
@@ -1442,6 +1443,6 @@ if (notificar) {
     init();
 </script>
 <!-- Motor PWA -->
-    <script src="../assets/js/core/pwa.js"></script>
+    <script src="../assets/js/core/pwa.js?v=5"></script>
 </body>
 </html>

@@ -1394,3 +1394,4 @@ TOAST
 
 /* Contraste de la inicial del cliente en tarjetas móviles */
 @media(max-width:900px){.calendar-event:not(.disponible) .event-avatar{color:#f5d487!important;text-shadow:0 1px 5px rgba(245,212,135,.28)}}
+.event-client-blocked{display:inline-flex;align-items:center;gap:6px;width:max-content;max-width:100%;margin-top:6px;padding:5px 8px;color:#ff8b7e;background:rgba(255,77,77,.11);border:1px solid rgba(255,77,77,.28);border-radius:8px;font-size:.55rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}.event-client-blocked small{color:#d67b72;font-size:.48rem;font-weight:600;text-transform:none;letter-spacing:0}

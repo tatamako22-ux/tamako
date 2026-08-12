@@ -1,5 +1,5 @@
 // Cambiamos la versión de la caché para forzar la actualización en los celulares
-const CACHE_NAME = "tamaku-v9-inasistencias";
+const CACHE_NAME = "tamaku-v21-pwa-solo-movil";
 
 const urlsToCache = [
   "/",

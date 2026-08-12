@@ -152,6 +152,7 @@ function crearTarjetaCita(cita, esMovil = false) {
           ${esDisponible ? "Espacio Disponible" : cita.nombre_cliente || "Cliente"}
         </div>
         ${esDisponible ? "" : `<div class="event-client-category category-${String(cita.categoria_cliente || "NUEVO").toLowerCase()}"><i class="fa-solid ${cita.categoria_cliente === "VIP" ? "fa-crown" : cita.categoria_cliente === "FRECUENTE" ? "fa-repeat" : "fa-user-plus"}"></i> ${cita.categoria_cliente || "NUEVO"}${cita.visitas_cliente ? ` · ${cita.visitas_cliente} visita${cita.visitas_cliente === 1 ? "" : "s"}` : ""}</div>`}
+        ${cita.cliente_bloqueado ? `<div class="event-client-blocked"><i class="fa-solid fa-ban"></i> Cliente bloqueado <small>${cita.bloqueo_cliente_alcance}</small></div>` : ""}
         <div class="event-service">
   ${
     esDisponible

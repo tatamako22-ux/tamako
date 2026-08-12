@@ -1,7 +1,7 @@
 import { supabase } from "../config/supabaseClient.js";
 
 const cacheCategorias = new Map();
-const normalizarTelefono = (valor) => String(valor || "").replace(/\D/g, "");
+const normalizarTelefono = (valor) => String(valor || "").replace(/\D/g, "").slice(-10);
 
 async function obtenerCategoriasClientes(idTienda) {
   const guardada = cacheCategorias.get(idTienda);
@@ -23,8 +23,8 @@ async function obtenerCategoriasClientes(idTienda) {
 }
 
 // 👨‍💼 OBTENER PROFESIONALES
-export async function obtenerBarberos(idTienda) {
-  const { data, error } = await supabase
+export async function obtenerBarberos(idTienda, idProfesional = null) {
+  let query = supabase
 
     .from("profesionales")
 
@@ -42,7 +42,11 @@ export async function obtenerBarberos(idTienda) {
 `,
     )
 
-    .eq("id_tienda", idTienda)
+    .eq("id_tienda", idTienda);
+
+  if (idProfesional) query = query.eq("id_barbero", idProfesional);
+
+  const { data, error } = await query
 
     .order("nombre_empleado", {
       ascending: true,
@@ -107,13 +111,33 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
       throw error;
     }
 
-    const categorias = await obtenerCategoriasClientes(idTienda);
+    const [categorias, resultadoBloqueos] = await Promise.all([
+      obtenerCategoriasClientes(idTienda),
+      supabase.from("clientes_bloqueados").select("telefono_cliente,tipo_bloqueo,id_barbero").eq("id_tienda", idTienda),
+    ]);
+    if (resultadoBloqueos.error) console.warn("No se pudieron consultar los bloqueos de clientes:", resultadoBloqueos.error);
+    const bloqueosPorTelefono = new Map();
+    (resultadoBloqueos.data || []).forEach((bloqueo) => {
+      const telefono = normalizarTelefono(bloqueo.telefono_cliente);
+      if (!telefono) return;
+      const lista = bloqueosPorTelefono.get(telefono) || [];
+      lista.push(bloqueo);
+      bloqueosPorTelefono.set(telefono, lista);
+    });
     return (data || []).map((cita) => {
-      const visitas = categorias.get(normalizarTelefono(cita.telefono_cliente)) || 1;
+      const telefono = normalizarTelefono(cita.telefono_cliente);
+      const visitas = categorias.get(telefono) || 1;
+      const bloqueos = bloqueosPorTelefono.get(telefono) || [];
+      const bloqueoAplicable = bloqueos.find((bloqueo) => {
+        const tipo = String(bloqueo.tipo_bloqueo || "").toLowerCase();
+        return ["global", "total"].includes(tipo) || (["profesional", "parcial"].includes(tipo) && String(bloqueo.id_barbero) === String(cita.id_barbero));
+      });
       return {
         ...cita,
         visitas_cliente: visitas,
         categoria_cliente: visitas >= 5 ? "VIP" : visitas === 1 ? "NUEVO" : "FRECUENTE",
+        cliente_bloqueado: Boolean(bloqueoAplicable),
+        bloqueo_cliente_alcance: ["global", "total"].includes(String(bloqueoAplicable?.tipo_bloqueo || "").toLowerCase()) ? "Toda la tienda" : "Este profesional",
       };
     });
   } catch (error) {

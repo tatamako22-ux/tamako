@@ -6,7 +6,7 @@ import { calcularCita } from "./agenda.engine.js";
 
 import { renderSkeleton, renderizarAgenda } from "../ui/agenda.renderer.js";
 
-import { iniciarAgenda } from "./agenda.controller.js?v=3";
+import { iniciarAgenda } from "./agenda.controller.js?v=5";
 
 // 🚀 BOOTSTRAP APP
 export async function iniciarAppAgenda() {

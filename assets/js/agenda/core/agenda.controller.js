@@ -36,6 +36,9 @@ export function iniciarAgenda({
   const agendaGrid = document.getElementById("agendaGrid");
 
   const selectorBarbero = document.getElementById("mobileBarberSelector");
+  const sesion = tiendaInfo.sesion || {};
+  const esEmpleado = !sesion.es_propietario && String(sesion.rol || "").toUpperCase() === "EMPLEADO";
+  const idProfesionalForzado = esEmpleado ? sesion.id_profesional : null;
 
   // 🎨 RENDER
   function renderizar() {
@@ -58,7 +61,7 @@ export function iniciarAgenda({
   async function cargarCitasDelDia() {
     const fecha = getState("fechaSeleccionada").toLocaleDateString("sv-SE");
 
-    const idBarbero = selectorBarbero?.value;
+    const idBarbero = idProfesionalForzado || selectorBarbero?.value;
 
     if (!idBarbero) return;
 
@@ -104,7 +107,14 @@ export function iniciarAgenda({
 
   // 👨‍💼 CARGAR BARBEROS
   async function cargarBarberos() {
-    const barberos = await obtenerBarberos(tiendaInfo.id);
+    if (esEmpleado && !idProfesionalForzado) {
+      mostrarToast("Tu usuario no tiene un profesional vinculado. Solicita al administrador que configure tu perfil.", "error");
+      setState("listaBarberos", []);
+      setState("citasDelDia", []);
+      renderizar();
+      return;
+    }
+    const barberos = await obtenerBarberos(tiendaInfo.id, idProfesionalForzado);
     console.log("👨‍💼 BARBEROS COMPLETOS:", barberos);
 
     setState("listaBarberos", barberos);
@@ -125,6 +135,10 @@ export function iniciarAgenda({
         .join("");
 
       selectorBarbero.value = barberos[0].id_barbero;
+      if (esEmpleado) {
+        selectorBarbero.disabled = true;
+        selectorBarbero.title = "Tu acceso está limitado a tu agenda profesional";
+      }
     }
   }
 

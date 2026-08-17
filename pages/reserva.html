@@ -708,25 +708,68 @@ if (resDate) {
     };
 
     window.handleFlow = () => {
-        if (currentStep === 1) {
-            changeStep(2);
-        } else if (currentStep === 2) {
-            changeStep(3);
-            const fechaInput = document.getElementById("res-date");
-            fechaInput.removeEventListener("change", generarHorariosDisponibles);
-            fechaInput.addEventListener("change", generarHorariosDisponibles);
-            if (fechaInput.value) generarHorariosDisponibles();
-        } else if (currentStep === 3) {
-            if (!horaSeleccionada) return alert("POR FAVOR ELIGE UN TURNO");
-            if (user && window.userFullName) {
-                finalizarReserva();
-            } else {
-                changeStep(4);
-            }
-        } else if (currentStep === 4) {
-            finalizarReserva();
+
+    // PASO 1: Validar profesional
+    if (currentStep === 1) {
+
+        if (!barberId) {
+            showAlert("⚠️ Por favor selecciona un profesional antes de continuar.");
+            return;
         }
-    };
+
+        changeStep(2);
+    }
+
+
+    // PASO 2: Validar servicio
+    else if (currentStep === 2) {
+
+        if (!serviceId) {
+            showAlert("⚠️ Por favor selecciona un servicio antes de continuar.");
+            return;
+        }
+
+        if (!window.duracionServicio) {
+            showAlert("⚠️ El servicio seleccionado no tiene duración configurada.");
+            return;
+        }
+
+        changeStep(3);
+
+        const fechaInput = document.getElementById("res-date");
+
+        fechaInput.removeEventListener("change", generarHorariosDisponibles);
+        fechaInput.addEventListener("change", generarHorariosDisponibles);
+
+        if (fechaInput.value) {
+            generarHorariosDisponibles();
+        }
+    }
+
+
+    // PASO 3: Validar horario
+    else if (currentStep === 3) {
+
+        if (!horaSeleccionada) {
+            showAlert("⚠️ Por favor selecciona un horario disponible.");
+            return;
+        }
+
+        if (user && window.userFullName) {
+            finalizarReserva();
+        } else {
+            changeStep(4);
+        }
+    }
+
+
+    // PASO 4: Validar datos finales
+    else if (currentStep === 4) {
+
+        finalizarReserva();
+
+    }
+};
 
     async function enviarCorreoConfirmacion(datos) {
         try {

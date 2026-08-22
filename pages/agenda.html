@@ -251,7 +251,7 @@
     <!-- TOAST -->
     <div id="toastAgenda" class="toast-agenda"></div>
     <!-- MENU -->
-    <script src="../assets/js/core/menu.js?v=11" defer></script>
+    <script src="../assets/js/core/menu.js?v=12" defer></script>
 
     <!-- AGENDA -->
     <script type="module">
@@ -298,21 +298,28 @@
             btn.innerText = "ACTUALIZANDO...";
 
             // Actualizamos en Supabase buscando por ID de cita o por el teléfono original
-            let query = supabase.from("citas").update({
+            const telefonoOriginalNormalizado = String(telOriginal || "").replace(/\D/g, "");
+            const { error: citasError } = await supabase.from("citas").update({
                 nombre_cliente: nuevoNombre,
                 telefono_cliente: nuevoTel
-            }).eq("id_tienda", tiendaInfo.id);
+            })
+                .eq("id_tienda", tiendaInfo.id)
+                .eq("telefono_cliente", telefonoOriginalNormalizado);
 
-            if (idCita && idCita !== "undefined" && idCita !== "null") {
-                query = query.eq("id_cita", idCita);
-            } else {
-                query = query.eq("telefono_cliente", telOriginal);
+            // La reserva obtiene los datos visibles desde perfiles_clientes.
+            let perfilError = null;
+            if (!citasError) {
+                const resultadoPerfil = await supabase
+                    .from("perfiles_clientes")
+                    .update({ nombre_completo: nuevoNombre, whatsapp: nuevoTel })
+                    .eq("whatsapp", telefonoOriginalNormalizado);
+                perfilError = resultadoPerfil.error;
             }
 
-            const { error } = await query;
+            const error = citasError || perfilError;
 
             if (error) {
-                console.error("Error al actualizar la cita:", error);
+                console.error("Error al sincronizar los datos del cliente:", error);
                 alert("Hubo un error al actualizar los datos.");
             } else {
                 alert("¡Datos del cliente actualizados con éxito!");

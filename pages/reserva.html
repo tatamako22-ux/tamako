@@ -7,7 +7,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/reserva.css?v=6">
+    <link rel="stylesheet" href="../assets/css/reserva.css?v=8">
     <link rel="stylesheet" href="../assets/css/legal.css?v=1">
     <!-- Conexión PWA -->
     <link rel="manifest" href="../manifest.json">
@@ -62,6 +62,12 @@
             <div class="progress-line"></div>
             <div class="progress-item" data-progress="4"><span>4</span><small>Confirmar</small></div>
         </nav>
+
+        <button type="button" id="community-board-banner" class="community-board-banner" hidden>
+            <span id="community-board-banner-icon"><i class="fa-solid fa-bell"></i></span>
+            <span><small id="community-board-banner-type">COMUNICADO</small><strong id="community-board-banner-title"></strong></span>
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
 
         <main class="content">
             <section id="step-1" class="step-view active">
@@ -139,16 +145,31 @@
     </div>
 
     <!-- MODAL AUTENTICACIÓN -->
+    <section id="community-board" class="community-board" aria-hidden="true" aria-labelledby="community-board-title">
+        <div class="community-board-backdrop" data-board-close></div>
+        <article class="community-board-card" role="dialog" aria-modal="true">
+            <button type="button" class="community-board-close" data-board-close aria-label="Cerrar anuncio"><i class="fa-solid fa-xmark"></i></button>
+            <div id="community-board-image-wrap" class="community-board-image-wrap" hidden><img id="community-board-image" alt="Imagen del anuncio de la tienda"></div>
+            <div class="community-board-copy">
+                <div class="community-board-kicker"><span id="community-board-icon"><i class="fa-solid fa-bell"></i></span><small id="community-board-type">AVISO DE LA TIENDA</small></div>
+                <h2 id="community-board-title"></h2>
+                <p id="community-board-message"></p>
+                <a id="community-board-action" class="community-board-action" href="#" target="_blank" rel="noopener noreferrer" hidden></a>
+                <button type="button" class="community-board-continue" data-board-close>Aceptar y continuar</button>
+            </div>
+        </article>
+    </section>
+
     <div class="modal" id="modal-auth">
         <div id="auth-login-view">
             <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:40px;">ACCESO PRIVADO</h2>
-            <div class="field-3d"><label>EMAIL</label><input type="email" id="auth-email"></div>
+            <div class="field-3d"><label>EMAIL</label><input type="email" id="auth-email" inputmode="email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false"></div>
             <div class="field-3d">
                 <label>CONTRASEÑA</label>
                 <input type="password" id="auth-pass" placeholder="Ingresa tu contraseña" autocomplete="current-password">
                 <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('auth-pass', this)"></i>
             </div>
-            <button class="btn-main" onclick="executeAuth()">INGRESAR</button>
+            <button type="button" class="btn-main" id="btn-auth-login" onclick="executeAuth()">INGRESAR</button>
             
             <!-- NUEVO: Botón de recuperar contraseña -->
             <button type="button" onclick="recuperarClave()" style="width:100%; margin-top:20px; padding:8px; cursor:pointer; color:var(--gold); background:transparent; border:0; font-size:0.75rem; font-weight:600; text-decoration:underline; letter-spacing:1px;">¿Olvidaste tu contraseña?</button>
@@ -257,6 +278,76 @@
         estilos.setProperty('--inverse', claro ? '#151515' : '#ffffff');
         document.querySelector('meta[name="theme-color"]')?.setAttribute('content', principal);
     }
+
+    function mostrarTablonComunidad(tienda) {
+        if (![true, 'true'].includes(tienda?.tablon_activo) || !tienda.tablon_titulo || !tienda.tablon_mensaje) return;
+        const ahora = Date.now();
+        const desde = tienda.tablon_desde ? new Date(tienda.tablon_desde).getTime() : null;
+        const hasta = tienda.tablon_hasta ? new Date(tienda.tablon_hasta).getTime() : null;
+        if ((desde && ahora < desde) || (hasta && ahora > hasta)) return;
+        const tablon = document.getElementById('community-board');
+        const tipo = ['aviso','promocion','importante'].includes(tienda.tablon_tipo) ? tienda.tablon_tipo : 'aviso';
+        const configuracion = {
+            aviso: { etiqueta:'AVISO DE LA TIENDA', icono:'fa-bell' },
+            promocion: { etiqueta:'PROMOCIÓN ESPECIAL', icono:'fa-gift' },
+            importante: { etiqueta:'INFORMACIÓN IMPORTANTE', icono:'fa-circle-exclamation' }
+        }[tipo];
+        tablon.dataset.type = tipo;
+        document.getElementById('community-board-type').textContent = configuracion.etiqueta;
+        document.getElementById('community-board-icon').innerHTML = `<i class="fa-solid ${configuracion.icono}"></i>`;
+        document.getElementById('community-board-title').textContent = tienda.tablon_titulo;
+        document.getElementById('community-board-message').textContent = tienda.tablon_mensaje;
+        const banner = document.getElementById('community-board-banner');
+        banner.dataset.type = tipo;
+        banner.hidden = false;
+        document.getElementById('community-board-banner-type').textContent = configuracion.etiqueta;
+        document.getElementById('community-board-banner-title').textContent = tienda.tablon_titulo;
+        document.getElementById('community-board-banner-icon').innerHTML = `<i class="fa-solid ${configuracion.icono}"></i>`;
+        const imageWrap = document.getElementById('community-board-image-wrap');
+        const image = document.getElementById('community-board-image');
+        if (tienda.tablon_imagen_url) {
+            image.src = tienda.tablon_imagen_url;
+            imageWrap.hidden = false;
+            image.onerror = () => { imageWrap.hidden = true; };
+        } else {
+            image.removeAttribute('src');
+            imageWrap.hidden = true;
+        }
+        const action = document.getElementById('community-board-action');
+        action.hidden = true;
+        if (tienda.tablon_boton_texto && tienda.tablon_boton_url) {
+            try {
+                const destino = new URL(tienda.tablon_boton_url, window.location.origin);
+                if (['http:','https:'].includes(destino.protocol)) {
+                    action.textContent = tienda.tablon_boton_texto;
+                    action.href = destino.href;
+                    action.hidden = false;
+                }
+            } catch (error) { console.warn('Enlace inválido en el tablón:', error); }
+        }
+        requestAnimationFrame(() => {
+            tablon.classList.add('show');
+            tablon.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('board-open');
+            tablon.querySelector('.community-board-close')?.focus();
+        });
+    }
+    function cerrarTablonComunidad() {
+        const tablon = document.getElementById('community-board');
+        tablon.classList.remove('show');
+        tablon.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('board-open');
+    }
+    document.querySelectorAll('[data-board-close]').forEach(elemento => elemento.addEventListener('click', cerrarTablonComunidad));
+    document.getElementById('community-board-banner').addEventListener('click', () => {
+        const tablon = document.getElementById('community-board');
+        tablon.classList.add('show');
+        tablon.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('board-open');
+    });
+    document.addEventListener('keydown', evento => {
+        if (evento.key === 'Escape' && document.getElementById('community-board')?.classList.contains('show')) cerrarTablonComunidad();
+    });
 
     console.log("🔍 Buscando tienda:", tiendaRef);
 
@@ -635,6 +726,7 @@ if (!p) {
             tiendaData = tienda;
             tiendaId = tienda.id;
             aplicarMarcaReserva(tienda);
+            mostrarTablonComunidad(tienda);
             document.getElementById("shop-display").innerText = tienda.nombre.toUpperCase();
             document.getElementById("shop-location").innerHTML = `<i class="fa-solid fa-location-dot"></i> ${tienda.direccion || "Reserva online"}`;
 
@@ -708,25 +800,68 @@ if (resDate) {
     };
 
     window.handleFlow = () => {
-        if (currentStep === 1) {
-            changeStep(2);
-        } else if (currentStep === 2) {
-            changeStep(3);
-            const fechaInput = document.getElementById("res-date");
-            fechaInput.removeEventListener("change", generarHorariosDisponibles);
-            fechaInput.addEventListener("change", generarHorariosDisponibles);
-            if (fechaInput.value) generarHorariosDisponibles();
-        } else if (currentStep === 3) {
-            if (!horaSeleccionada) return alert("POR FAVOR ELIGE UN TURNO");
-            if (user && window.userFullName) {
-                finalizarReserva();
-            } else {
-                changeStep(4);
-            }
-        } else if (currentStep === 4) {
-            finalizarReserva();
+
+    // PASO 1: Validar profesional
+    if (currentStep === 1) {
+
+        if (!barberId) {
+            showAlert("⚠️ Por favor selecciona un profesional antes de continuar.");
+            return;
         }
-    };
+
+        changeStep(2);
+    }
+
+
+    // PASO 2: Validar servicio
+    else if (currentStep === 2) {
+
+        if (!serviceId) {
+            showAlert("⚠️ Por favor selecciona un servicio antes de continuar.");
+            return;
+        }
+
+        if (!window.duracionServicio) {
+            showAlert("⚠️ El servicio seleccionado no tiene duración configurada.");
+            return;
+        }
+
+        changeStep(3);
+
+        const fechaInput = document.getElementById("res-date");
+
+        fechaInput.removeEventListener("change", generarHorariosDisponibles);
+        fechaInput.addEventListener("change", generarHorariosDisponibles);
+
+        if (fechaInput.value) {
+            generarHorariosDisponibles();
+        }
+    }
+
+
+    // PASO 3: Validar horario
+    else if (currentStep === 3) {
+
+        if (!horaSeleccionada) {
+            showAlert("⚠️ Por favor selecciona un horario disponible.");
+            return;
+        }
+
+        if (user && window.userFullName) {
+            finalizarReserva();
+        } else {
+            changeStep(4);
+        }
+    }
+
+
+    // PASO 4: Validar datos finales
+    else if (currentStep === 4) {
+
+        finalizarReserva();
+
+    }
+};
 
     async function enviarCorreoConfirmacion(datos) {
         try {
@@ -1335,14 +1470,23 @@ if (notificar) {
         }
     };
     // --- LOGIN ---
+    let loginEnCurso = false;
     window.executeAuth = async () => {
-        const email = document.getElementById("auth-email").value.trim();
-        const pass = document.getElementById("auth-pass").value.trim();
+        if (loginEnCurso) return;
+
+        const email = document.getElementById("auth-email").value.trim().toLowerCase();
+        const pass = document.getElementById("auth-pass").value;
+        const loginButton = document.getElementById("btn-auth-login");
 
         if (!email || !pass) {
             showAlert("⚠️ Por favor, ingresa tu email y contraseña.");
             return;
         }
+
+        loginEnCurso = true;
+        loginButton.disabled = true;
+        loginButton.setAttribute("aria-busy", "true");
+        loginButton.textContent = "INGRESANDO...";
 
         try {
             const { data, error } = await supabase.auth.signInWithPassword({
@@ -1382,8 +1526,22 @@ if (notificar) {
         } catch (err) {
             console.error("Error inesperado:", err);
             showAlert("❌ Ocurrió un error inesperado. Inténtalo de nuevo.");
+        } finally {
+            loginEnCurso = false;
+            loginButton.disabled = false;
+            loginButton.removeAttribute("aria-busy");
+            loginButton.textContent = "INGRESAR";
         }
     };
+
+    ["auth-email", "auth-pass"].forEach((inputId) => {
+        document.getElementById(inputId)?.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                window.executeAuth();
+            }
+        });
+    });
     
     window.actualizarPerfil = async () => {
         if (!user) return;

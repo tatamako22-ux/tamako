@@ -1,5 +1,5 @@
 // Cambiamos la versión de la caché para forzar la actualización en los celulares
-const CACHE_NAME = "tamaku-v22-historial-pagos";
+const CACHE_NAME = "tamaku-v25-community-board-fixed";
 
 const urlsToCache = [
   "/",
@@ -9,6 +9,7 @@ const urlsToCache = [
   "/assets/images/icon-512.png",
   "/pages/agenda.html",
   "/pages/clientes.html",
+  "/pages/comunicados.html",
   "/pages/dashboard.html",
   "/pages/profesionales.html",
   "/pages/facturacion.html",

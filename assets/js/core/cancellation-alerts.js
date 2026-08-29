@@ -158,9 +158,7 @@ export function initCancellationAlerts(tienda) {
       const { data, error } = await query;
       if (error) throw error;
 
-      const visibles = (data || []).filter(
-        (cita) => String(cita.cancelada_por_user_id || "") !== String(usuarioId || ""),
-      );
+      const visibles = data || [];
       const vistas = leerVistas();
       const nuevas = visibles.filter((cita) => !vistas.has(claveEvento(cita)));
       renderizar(visibles, nuevas);

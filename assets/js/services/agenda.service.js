@@ -181,6 +181,7 @@ export async function cancelarCita(idCita, idTienda) {
 
       .update({
         estado: "CANCELADA",
+        cancelada_por_tipo: "EQUIPO",
       })
 
       .eq("id_cita", idCita)

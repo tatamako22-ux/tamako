@@ -212,7 +212,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const tienda = await window.tamakuContextReady;
   if (!tienda) return;
   renderMenuGlobal(tienda);
-  import("./cancellation-alerts.js?v=2")
+  import("./cancellation-alerts.js?v=3")
     .then(({ initCancellationAlerts }) => initCancellationAlerts(tienda))
     .catch((error) => console.warn("No se pudieron iniciar las alertas de cancelación:", error));
   document.addEventListener("keydown", (event) => {

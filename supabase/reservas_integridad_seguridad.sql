@@ -108,6 +108,8 @@ as $$
 declare
   v_actor uuid := auth.uid();
   v_id_profesional uuid;
+  v_cancelada_desde_agenda boolean :=
+    upper(coalesce(new.cancelada_por_tipo, '')) = 'EQUIPO';
 begin
   if upper(coalesce(new.estado, '')) = 'CANCELADA'
      and upper(coalesce(old.estado, '')) <> 'CANCELADA' then
@@ -117,6 +119,29 @@ begin
 
     if v_actor is null then
       new.cancelada_por_tipo := 'SISTEMA';
+    elsif v_cancelada_desde_agenda then
+      if exists (
+        select 1 from public.tiendas t
+        where t.id = old.id_tienda and t.user_id = v_actor
+      ) then
+        new.cancelada_por_tipo := 'PROPIETARIO';
+      else
+        select p.id_profesional into v_id_profesional
+        from public.perfiles p
+        where p.user_id = v_actor
+          and p.tienda_id = old.id_tienda
+          and p.activo = true
+        limit 1;
+
+        if v_id_profesional is not null
+           and v_id_profesional = old.id_barbero then
+          new.cancelada_por_tipo := 'PROFESIONAL';
+          new.cancelada_por_profesional_id := v_id_profesional;
+        else
+          new.cancelada_por_tipo := 'EQUIPO';
+          new.cancelada_por_profesional_id := v_id_profesional;
+        end if;
+      end if;
     elsif old.user_id = v_actor then
       new.cancelada_por_tipo := 'CLIENTE';
     elsif exists (

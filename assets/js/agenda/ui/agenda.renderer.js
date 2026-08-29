@@ -35,6 +35,33 @@ function obtenerHorarioDelDia(barbero, fecha = new Date()) {
   };
 }
 
+function normalizarTexto(valor = "") {
+  return String(valor).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+}
+
+function obtenerBloqueosProfesional(barbero, fecha, inicioJornada, finJornada) {
+  const fechaISO = fecha.toLocaleDateString("sv-SE");
+  const nombresDia = ["domingo", "lunes", "martes", "miercoles", "jueves", "viernes", "sabado"];
+  const esDescanso = normalizarTexto(barbero.dia_descanso) === nombresDia[fecha.getDay()];
+  const enVacaciones = barbero.vacaciones_inicio && barbero.vacaciones_fin
+    && fechaISO >= barbero.vacaciones_inicio && fechaISO <= barbero.vacaciones_fin;
+
+  if (esDescanso || enVacaciones) {
+    return [{ hora_inicio: minToHora(inicioJornada), hora_fin: minToHora(finJornada), tipo: "no_disponible" }];
+  }
+
+  const bloqueos = [];
+  if (barbero.almuerzo_inicio && Number(barbero.almuerzo_minutos) > 0) {
+    const inicio = horaToMin(normalizarHora(barbero.almuerzo_inicio));
+    bloqueos.push({ hora_inicio: minToHora(inicio), hora_fin: minToHora(inicio + Number(barbero.almuerzo_minutos)), tipo: "almuerzo" });
+  }
+  if (barbero.break_inicio && Number(barbero.break_minutos) > 0) {
+    const inicio = horaToMin(normalizarHora(barbero.break_inicio));
+    bloqueos.push({ hora_inicio: minToHora(inicio), hora_fin: minToHora(inicio + Number(barbero.break_minutos)), tipo: "descanso" });
+  }
+  return bloqueos;
+}
+
 // 🎨 SKELETON
 export function renderSkeleton() {
   const agendaGrid = document.getElementById("agendaGrid");
@@ -261,6 +288,8 @@ function renderModoMovil({
       HORARIO_FIN,
       citasOcupadas,
       parseInt(barbero.intervalo_citas, 10) || 40,
+      barbero,
+      fechaSeleccionada,
     );
 
     if (lineaTiempoCompleta.length === 0) {
@@ -346,6 +375,8 @@ function renderModoEscritorio({
       HORARIO_FIN,
       citasOcupadas,
       parseInt(barbero.intervalo_citas, 10) || 40,
+      barbero,
+      fechaSeleccionada,
     );
 
     lineaTiempoCompleta.forEach((bloque) => {
@@ -365,12 +396,18 @@ function obtenerLineaTiempoCompleta(
   horarioFinMin,
   citasOcupadas,
   intervaloMin = 40,
+  barbero = null,
+  fecha = new Date(),
 ) {
+  const bloqueos = barbero
+    ? obtenerBloqueosProfesional(barbero, fecha, horarioInicioMin, horarioFinMin)
+    : [];
   const ocupadas = [...citasOcupadas].sort(
     (a, b) =>
       horaToMin(normalizarHora(a.hora_inicio)) -
       horaToMin(normalizarHora(b.hora_inicio)),
   );
+  const ocupadasParaCruce = [...ocupadas, ...bloqueos];
 
   // Los bloques libres siempre quedan anclados al inicio de la jornada. Una
   // cita de 55 min con intervalo de 40 ocupa por solapamiento dos bloques,
@@ -382,7 +419,7 @@ function obtenerLineaTiempoCompleta(
     inicio += intervaloMin
   ) {
     const fin = inicio + intervaloMin;
-    const seCruza = ocupadas.some((cita) => {
+    const seCruza = ocupadasParaCruce.some((cita) => {
       const citaInicio = horaToMin(normalizarHora(cita.hora_inicio));
       const citaFin = horaToMin(normalizarHora(cita.hora_fin));
       return inicio < citaFin && fin > citaInicio;

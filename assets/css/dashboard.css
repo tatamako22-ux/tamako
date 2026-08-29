@@ -199,6 +199,31 @@ button.kpi-card:hover { border-color: var(--dash-border); transform: translateY(
 .empty-state p { margin: 0; font-size: .68rem; }
 .empty-state.compact { min-height: 120px; }
 
+.cancellations-section { margin-top: 18px; }
+.cancellations-panel { overflow: hidden; }
+.cancellations-heading { align-items: center; margin-bottom: 18px; }
+.cancellations-heading p { margin: 7px 0 0; color: #737373; font-size: .68rem; }
+.cancellation-summary { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.cancellation-summary > span { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; color: #999; background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07); border-radius: 999px; font-size: .59rem; }
+.cancellation-summary i { color: #d0a13d; }
+.cancellation-summary strong { color: #f0f0f0; }
+.cancellations-list { display: flex; max-height: 430px; flex-direction: column; overflow-y: auto; border-top: 1px solid rgba(255,255,255,.06); }
+.cancellation-row { display: grid; grid-template-columns: 38px minmax(180px,1.35fr) minmax(120px,.65fr) minmax(190px,1fr); align-items: center; gap: 14px; padding: 14px 4px; border-bottom: 1px solid rgba(255,255,255,.055); }
+.cancellation-row:last-child { border-bottom: 0; }
+.cancellation-origin-icon { display: grid; place-items: center; width: 36px; height: 36px; color: #e7b85a; background: rgba(208,161,61,.1); border-radius: 11px; }
+.cancellation-row.client .cancellation-origin-icon { color: #78b7ff; background: rgba(75,145,225,.12); }
+.cancellation-row.professional .cancellation-origin-icon { color: #ef8c8c; background: rgba(218,76,76,.12); }
+.cancellation-row.history .cancellation-origin-icon { color: #858585; background: rgba(255,255,255,.05); }
+.cancellation-main, .cancellation-appointment, .cancellation-audit { min-width: 0; }
+.cancellation-main strong, .cancellation-main span, .cancellation-appointment strong, .cancellation-appointment span, .cancellation-audit strong, .cancellation-audit span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cancellation-main strong { margin-bottom: 5px; color: #e6e6e6; font-size: .73rem; }
+.cancellation-main span, .cancellation-appointment span, .cancellation-audit span { color: #747474; font-size: .59rem; }
+.cancellation-appointment strong { margin-bottom: 5px; color: #b8b8b8; font-size: .65rem; text-transform: capitalize; }
+.cancellation-audit { padding-left: 14px; border-left: 1px solid rgba(255,255,255,.07); }
+.cancellation-audit strong { margin-bottom: 5px; color: #d6d6d6; font-size: .64rem; }
+.cancellation-row.client .cancellation-audit strong { color: #8bc2ff; }
+.cancellation-row.professional .cancellation-audit strong { color: #f19b9b; }
+
 .quick-section { margin-top: 34px; }
 .section-title { margin-bottom: 17px; }
 .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; }
@@ -277,6 +302,10 @@ button.kpi-card:hover { border-color: var(--dash-border); transform: translateY(
   .performance-grid { grid-template-columns: 1fr; }
   .operation-alert { grid-template-columns: 32px 1fr; }
   .operation-alert a { grid-column: 2; }
+  .cancellations-heading { display: flex; }
+  .cancellation-row { grid-template-columns: 38px minmax(0,1fr) minmax(170px,.8fr); }
+  .cancellation-appointment { grid-column: 2; }
+  .cancellation-audit { grid-column: 3; grid-row: 1 / span 2; }
   .quick-actions { grid-template-columns: 1fr; }
   .quick-action { padding: 14px; }
   .dashboard-modal { padding: 12px; align-items: flex-end; }
@@ -295,6 +324,11 @@ button.kpi-card:hover { border-color: var(--dash-border); transform: translateY(
   .kpi-card > strong { overflow:hidden; font-size:clamp(1.12rem,6vw,1.35rem); text-overflow:ellipsis; }
   .kpi-card > small { font-size:.58rem; }
   .dashboard-panel { min-width:0; padding:17px; }
+  .cancellations-heading { display:block; }
+  .cancellation-summary { justify-content:flex-start; margin-top:14px; }
+  .cancellation-row { grid-template-columns:36px minmax(0,1fr); gap:10px; }
+  .cancellation-appointment { grid-column:2; }
+  .cancellation-audit { grid-column:2; grid-row:auto; padding:9px 0 0; border-left:0; border-top:1px solid rgba(255,255,255,.06); }
   .sales-trend { grid-template-columns:repeat(14,minmax(8px,1fr)); }
   .period-total strong { font-size:.95rem; }
 }

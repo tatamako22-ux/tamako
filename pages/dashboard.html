@@ -6,10 +6,10 @@
   <title>TAMAKU | Panel de Control</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="../assets/css/menu.css?v=11">
-  <link rel="stylesheet" href="../assets/css/dashboard.css?v=4">
+  <link rel="stylesheet" href="../assets/css/menu.css?v=13">
+  <link rel="stylesheet" href="../assets/css/dashboard.css?v=5">
   <link rel="stylesheet" href="../assets/css/notifications.css?v=1">
-  <script src="../assets/js/core/menu.js?v=12" defer></script>
+  <script src="../assets/js/core/menu.js?v=14" defer></script>
   <script src="../assets/js/core/notifications.js?v=1" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'"></script>
@@ -155,6 +155,23 @@
       </article>
     </section>
 
+    <section class="cancellations-section" aria-labelledby="tituloCancelaciones">
+      <article class="dashboard-panel cancellations-panel">
+        <div class="panel-heading cancellations-heading">
+          <div>
+            <span class="eyebrow">SEGUIMIENTO EN TIEMPO REAL</span>
+            <h2 id="tituloCancelaciones">Cancelaciones recientes</h2>
+            <p>Consulta quién canceló cada cita y cuándo ocurrió.</p>
+          </div>
+          <div class="cancellation-summary" aria-label="Resumen de cancelaciones">
+            <span><i class="fa-regular fa-user"></i> Clientes <strong id="cancelacionesClientes">0</strong></span>
+            <span><i class="fa-solid fa-scissors"></i> Profesional/equipo <strong id="cancelacionesEquipo">0</strong></span>
+          </div>
+        </div>
+        <div id="listaCancelaciones" class="cancellations-list" aria-live="polite"></div>
+      </article>
+    </section>
+
     <section class="quick-section">
       <div class="section-title"><span class="eyebrow">ACCESOS RÁPIDOS</span><h2>¿Qué quieres hacer?</h2></div>
       <div class="quick-actions">
@@ -194,7 +211,7 @@
 
   <script type="module">
     import { requireTiendaInfo } from "../assets/js/core/session.js";
-    import { initDashboard } from "../assets/js/dashboard/dashboard.init.js?v=5";
+    import { initDashboard } from "../assets/js/dashboard/dashboard.init.js?v=6";
 
     const tiendaInfo = await requireTiendaInfo();
     if (tiendaInfo) initDashboard(tiendaInfo);

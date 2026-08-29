@@ -773,3 +773,54 @@
   background: transparent;
   border: 1px solid #444;
 }
+/* Alertas globales de cancelaciones */
+.tamaku-cancellation-bell {
+  position: fixed; right: 22px; bottom: 24px; z-index: 1450;
+  width: 54px; height: 54px; border: 1px solid rgba(238,181,70,.48);
+  border-radius: 18px; color: #f1c660; background: rgba(15,15,15,.96);
+  box-shadow: 0 16px 45px rgba(0,0,0,.48); cursor: pointer;
+}
+.tamaku-cancellation-bell[hidden] { display: none; }
+.tamaku-cancellation-bell > span { position: absolute; top: -7px; right: -7px; display: grid; place-items: center; min-width: 23px; height: 23px; padding: 0 5px; border: 2px solid #111; border-radius: 999px; color: #fff; background: #a86e22; font: 700 10px Montserrat,sans-serif; }
+.tamaku-cancellation-bell.has-new { animation: tamakuCancellationPulse 1.8s infinite; }
+@keyframes tamakuCancellationPulse { 50% { transform: translateY(-3px); box-shadow: 0 12px 42px rgba(225,160,48,.34); } }
+.tamaku-cancellation-overlay { position: fixed; inset: 0; z-index: 2400; display: flex; align-items: center; justify-content: center; padding: 18px; background: rgba(0,0,0,.82); backdrop-filter: blur(9px); opacity: 0; visibility: hidden; pointer-events: none; transition: .22s ease; }
+.tamaku-cancellation-overlay.is-visible { opacity: 1; visibility: visible; pointer-events: auto; }
+.tamaku-cancellation-card { width: min(590px,100%); max-height: min(760px,90vh); overflow: hidden; border: 1px solid rgba(221,169,61,.35); border-radius: 26px; color: #eee; background: linear-gradient(145deg,#17130d,#0b0b0b 38%); box-shadow: 0 35px 100px #000; font-family: Montserrat,sans-serif; }
+.tamaku-cancellation-accent { display: grid; place-items: center; width: 54px; height: 54px; margin: -27px auto 0; border: 4px solid #0e0e0e; border-radius: 17px; color: #15100a; background: #e1ac47; box-shadow: 0 10px 25px rgba(224,169,65,.24); }
+.tamaku-cancellation-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 30px 26px 11px; }
+.tamaku-cancellation-heading small { color: #c49439; font-size: 9px; font-weight: 700; letter-spacing: .18em; }
+.tamaku-cancellation-heading h2 { margin: 7px 0 0; font-size: 22px; }
+.tamaku-cancellation-heading button { width: 38px; height: 38px; flex: 0 0 38px; border: 1px solid rgba(255,255,255,.08); border-radius: 12px; color: #aaa; background: rgba(255,255,255,.04); cursor: pointer; }
+.tamaku-cancellation-intro { margin: 0; padding: 0 26px 18px; color: #858585; font-size: 12px; }
+.tamaku-cancellation-groups { max-height: 470px; overflow-y: auto; padding: 0 26px 8px; }
+.tamaku-cancellation-group { margin-bottom: 16px; }
+.tamaku-cancellation-group h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; color: #a8a8a8; font-size: 10px; letter-spacing: .14em; }
+.tamaku-cancellation-group h3 span { display: grid; place-items: center; min-width: 20px; height: 20px; border-radius: 999px; color: #e4b85f; background: rgba(222,170,65,.1); font-size: 9px; }
+.tamaku-cancellation-item { display: grid; grid-template-columns: 52px minmax(0,1fr) minmax(130px,.8fr); align-items: center; gap: 11px; padding: 12px; border: 1px solid rgba(255,255,255,.065); border-radius: 14px; background: rgba(255,255,255,.025); }
+.tamaku-cancellation-item + .tamaku-cancellation-item { margin-top: 7px; }
+.tamaku-cancellation-item.is-new { border-color: rgba(225,172,71,.28); background: rgba(225,172,71,.055); }
+.tamaku-cancellation-item time { color: #efbc58; font-size: 13px; font-weight: 700; }
+.tamaku-cancellation-item div { min-width: 0; }
+.tamaku-cancellation-item strong,.tamaku-cancellation-item span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tamaku-cancellation-item strong { margin-bottom: 4px; font-size: 12px; }
+.tamaku-cancellation-item span,.tamaku-cancellation-item small { color: #777; font-size: 9px; }
+.tamaku-cancellation-item small { text-align: right; line-height: 1.4; }
+.tamaku-cancellation-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; padding: 16px 26px 24px; border-top: 1px solid rgba(255,255,255,.06); }
+.tamaku-cancellation-actions a,.tamaku-cancellation-actions button { display: grid; place-items: center; min-height: 45px; border-radius: 13px; font: 700 11px Montserrat,sans-serif; cursor: pointer; text-decoration: none; }
+.tamaku-cancellation-actions a { color: #e9bc65; border: 1px solid rgba(225,172,71,.26); }
+.tamaku-cancellation-actions button { color: #15110a; border: 0; background: #dda945; }
+
+@media (max-width: 900px) {
+  .tamaku-cancellation-bell { right: 15px; bottom: 86px; }
+}
+@media (max-width: 600px) {
+  .tamaku-cancellation-overlay { align-items: flex-end; padding: 10px; }
+  .tamaku-cancellation-card { max-height: 88vh; border-radius: 24px 24px 16px 16px; }
+  .tamaku-cancellation-heading { padding: 28px 18px 10px; }
+  .tamaku-cancellation-intro { padding: 0 18px 15px; }
+  .tamaku-cancellation-groups { padding: 0 18px 6px; }
+  .tamaku-cancellation-item { grid-template-columns: 45px minmax(0,1fr); }
+  .tamaku-cancellation-item small { grid-column: 2; text-align: left; }
+  .tamaku-cancellation-actions { padding: 14px 18px 18px; }
+}

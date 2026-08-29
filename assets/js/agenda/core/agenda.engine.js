@@ -68,9 +68,9 @@ export function dentroDeJornada({
 
 // 📏 VALIDAR INTERVALOS FIJOS (múltiplo)
 // [MEJORADO] Si intervalo es 0 o null, se considera siempre válido
-export function validarIntervalo({ inicio, intervalo }) {
+export function validarIntervalo({ inicio, intervalo, origen = 0 }) {
   if (!intervalo || intervalo <= 0) return true;
-  return inicio % intervalo === 0;
+  return (inicio - origen) % intervalo === 0;
 }
 
 // 🧠 CALCULAR CITA (función principal) - [MEJORADO]
@@ -113,7 +113,11 @@ export function calcularCita({
   }
 
   // Validar intervalo fijo si aplica
-  if (modo === "fijo" && !validarIntervalo({ inicio, intervalo })) {
+  if (["fijo", "intervalo"].includes(modo) && !validarIntervalo({
+    inicio,
+    intervalo,
+    origen: jornadaInicio,
+  })) {
     if (debug) console.log(`[DEBUG] ❌ No cumple intervalo fijo`);
     return null;
   }

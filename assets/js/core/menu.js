@@ -212,6 +212,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const tienda = await window.tamakuContextReady;
   if (!tienda) return;
   renderMenuGlobal(tienda);
+  import("./cancellation-alerts.js?v=2")
+    .then(({ initCancellationAlerts }) => initCancellationAlerts(tienda))
+    .catch((error) => console.warn("No se pudieron iniciar las alertas de cancelación:", error));
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       window.toggleMobileMore(false);

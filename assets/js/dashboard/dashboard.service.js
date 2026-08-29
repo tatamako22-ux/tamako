@@ -74,9 +74,25 @@ export async function obtenerDatosDashboard(tiendaInfo) {
         .lte("fecha_emision", finDia(hoy).toISOString())
         .order("fecha_emision", { ascending: true });
 
+  let cancelacionesQuery = supabase
+        .from("citas")
+        .select(`
+          id_cita, nombre_cliente, servicio_nombre, fecha, hora_inicio,
+          cancelada_en, cancelada_por_tipo, cancelada_por_user_id,
+          cancelada_por_profesional_id,
+          profesionales (nombre_empleado)
+        `)
+        .eq("id_tienda", idTienda)
+        .eq("estado", "CANCELADA")
+        .order("cancelada_en", { ascending: false, nullsFirst: false })
+        .order("fecha", { ascending: false })
+        .order("hora_inicio", { ascending: false })
+        .limit(20);
+
   if (!esPropietario && idProfesional) {
     citasQuery = citasQuery.eq("id_barbero", idProfesional);
     facturasQuery = facturasQuery.eq("id_barbero", idProfesional);
+    cancelacionesQuery = cancelacionesQuery.eq("id_barbero", idProfesional);
   }
 
   const cajaQuery = puedeVerCaja
@@ -114,10 +130,11 @@ export async function obtenerDatosDashboard(tiendaInfo) {
     ? supabase.from("profesionales").select("id_barbero,modalidad_pago,porcentaje_comision,mensualidad").eq("id_tienda",idTienda).eq("id_barbero",idProfesional).maybeSingle()
     : Promise.resolve({ data: null, error: null });
 
-  const [citasResult, facturasResult, cajaResult, cierresResult, reglasResult, profesionalResult] =
+  const [citasResult, facturasResult, cancelacionesResult, cajaResult, cierresResult, reglasResult, profesionalResult] =
     await Promise.all([
       citasQuery,
       facturasQuery,
+      cancelacionesQuery,
       cajaQuery,
       cierresQuery,
       reglasQuery,
@@ -127,6 +144,7 @@ export async function obtenerDatosDashboard(tiendaInfo) {
   const error =
     citasResult.error ||
     facturasResult.error ||
+    cancelacionesResult.error ||
     cajaResult.error ||
     cierresResult.error ||
     reglasResult.error ||
@@ -151,6 +169,7 @@ export async function obtenerDatosDashboard(tiendaInfo) {
   return {
     citas: citasResult.data || [],
     facturas: facturasResult.data || [],
+    cancelaciones: cancelacionesResult.data || [],
     cajaAbierta: cajaResult.data || null,
     ultimosCierres: cierresResult.data || [],
     movimientosCaja,

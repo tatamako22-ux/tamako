@@ -38,7 +38,14 @@ export async function obtenerBarberos(idTienda, idProfesional = null) {
     horario_fin,
     horario_semanal,
     modo_agenda,
-    intervalo_citas
+    intervalo_citas,
+    dia_descanso,
+    vacaciones_inicio,
+    vacaciones_fin,
+    almuerzo_inicio,
+    almuerzo_minutos,
+    break_inicio,
+    break_minutos
 `,
     )
 

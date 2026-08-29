@@ -2,7 +2,7 @@ import {
   obtenerDatosDashboard,
   suscribirDashboard,
   fechaLocal,
-} from "./dashboard.service.js?v=2";
+} from "./dashboard.service.js?v=3";
 import { renderModalCitas } from "./dashboard.modal.js";
 
 const dinero = new Intl.NumberFormat("es-CO", {
@@ -314,6 +314,79 @@ function renderRendimiento(resumen) {
   ponerTexto("valorTopServicio", servicio ? dinero.format(servicio[1]) : "$0");
 }
 
+function renderCancelaciones(datos) {
+  const contenedor = document.getElementById("listaCancelaciones");
+  if (!contenedor) return;
+
+  const cancelaciones = datos.cancelaciones || [];
+  const clientes = cancelaciones.filter(
+    (cita) => String(cita.cancelada_por_tipo || "").toUpperCase() === "CLIENTE",
+  ).length;
+  const equipo = cancelaciones.filter((cita) =>
+    ["PROFESIONAL", "EQUIPO", "PROPIETARIO"].includes(
+      String(cita.cancelada_por_tipo || "").toUpperCase(),
+    )
+  ).length;
+
+  ponerTexto("cancelacionesClientes", clientes);
+  ponerTexto("cancelacionesEquipo", equipo);
+
+  if (!cancelaciones.length) {
+    contenedor.innerHTML = `
+      <div class="empty-state compact">
+        <i class="fa-regular fa-calendar-check"></i>
+        <p>No hay cancelaciones registradas.</p>
+      </div>`;
+    return;
+  }
+
+  const origen = (cita) => {
+    const tipo = String(cita.cancelada_por_tipo || "HISTORICO").toUpperCase();
+    const profesional = cita.profesionales?.nombre_empleado || "Profesional";
+    const opciones = {
+      CLIENTE: { clase: "client", icono: "fa-user", titulo: "Cancelada por el cliente" },
+      PROFESIONAL: { clase: "professional", icono: "fa-scissors", titulo: `${profesional} canceló la cita` },
+      PROPIETARIO: { clase: "team", icono: "fa-user-tie", titulo: "Cancelada por el propietario" },
+      EQUIPO: { clase: "team", icono: "fa-users", titulo: "Cancelada por el equipo" },
+      SISTEMA: { clase: "system", icono: "fa-gear", titulo: "Cancelada por el sistema" },
+      HISTORICO: { clase: "history", icono: "fa-clock-rotate-left", titulo: "Origen no registrado" },
+    };
+    return opciones[tipo] || opciones.HISTORICO;
+  };
+
+  contenedor.innerHTML = cancelaciones.map((cita) => {
+    const detalleOrigen = origen(cita);
+    const fechaCita = new Date(`${cita.fecha}T12:00:00`).toLocaleDateString("es-CO", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+    const canceladaEn = cita.cancelada_en
+      ? new Date(cita.cancelada_en).toLocaleString("es-CO", {
+          dateStyle: "short",
+          timeStyle: "short",
+        })
+      : "Registro histórico";
+
+    return `
+      <article class="cancellation-row ${detalleOrigen.clase}">
+        <div class="cancellation-origin-icon"><i class="fa-solid ${detalleOrigen.icono}"></i></div>
+        <div class="cancellation-main">
+          <strong>${escapar(cita.nombre_cliente || "Cliente ocasional")}</strong>
+          <span>${escapar(cita.servicio_nombre || "Servicio")} · ${escapar(cita.profesionales?.nombre_empleado || "Sin asignar")}</span>
+        </div>
+        <div class="cancellation-appointment">
+          <strong>${escapar(fechaCita)}</strong>
+          <span>${escapar(cita.hora_inicio?.slice(0, 5) || "--:--")}</span>
+        </div>
+        <div class="cancellation-audit">
+          <strong>${escapar(detalleOrigen.titulo)}</strong>
+          <span>${escapar(canceladaEn)}</span>
+        </div>
+      </article>`;
+  }).join("");
+}
+
 function renderAlertas(datos, resumen) {
   const contenedor = document.getElementById("alertasOperacion");
   if (!contenedor) return;
@@ -382,6 +455,7 @@ function renderDashboard(datos) {
   renderProximasCitas(datos);
   renderMetodos(resumen);
   renderRendimiento(resumen);
+  renderCancelaciones(datos);
   renderAlertas(datos, resumen);
   renderModalCitas(datos.citas);
   ponerTexto("ultimaActualizacion", `Actualizado ${hora.format(new Date())}`);

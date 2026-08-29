@@ -251,6 +251,8 @@
 
     // --- VARIABLES GLOBALES ---
     let currentStep = 1, tiendaId, barberId, serviceId, user, tiendaData, horaSeleccionada = null, precioSeleccionado = 0, nombreServicioSel = "";
+    let solicitudHorariosActual = 0;
+    let profesionalesReserva = [];
     let recoveryEmail = "", recoveryMode = "codigo";
     
     const params = new URLSearchParams(window.location.search);
@@ -377,6 +379,21 @@
         const hora12 = h % 12 || 12;
         return `${hora12}:${String(m).padStart(2, "0")} ${periodo}`;
     }
+    function obtenerFechaHoraBogota() {
+        const partes = Object.fromEntries(
+            new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'America/Bogota',
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+            }).formatToParts(new Date())
+              .filter(parte => parte.type !== 'literal')
+              .map(parte => [parte.type, parte.value])
+        );
+        return {
+            fecha: `${partes.year}-${partes.month}-${partes.day}`,
+            minutos: Number(partes.hour) * 60 + Number(partes.minute)
+        };
+    }
     function obtenerHorarioDelDia(profesional, dia) {
         const diaKey = dia.toLowerCase();
         const horarios = profesional.horario_semanal || {};
@@ -397,8 +414,13 @@
 
     // --- GENERAR HORARIOS ---
     async function generarHorariosDisponibles() {
+        const solicitudActual = ++solicitudHorariosActual;
         const grid = document.getElementById("horas-grid");
         const fechaInput = document.getElementById("res-date").value;
+
+        horaSeleccionada = null;
+        window.horaFinSeleccionada = null;
+        document.getElementById("btn-next").style.display = "none";
 
         if (!fechaInput || !barberId) return;
 
@@ -437,10 +459,10 @@
         }
         // ------------------------------------------------
 
-        const ahora = new Date();
-        const hoyLocal = ahora.toLocaleDateString('en-CA');
+        const ahoraBogota = obtenerFechaHoraBogota();
+        const hoyLocal = ahoraBogota.fecha;
         const esHoy = fechaInput === hoyLocal;
-        const horaActualEnMinutos = (ahora.getHours() * 60) + ahora.getMinutes();
+        const horaActualEnMinutos = ahoraBogota.minutos;
 
         const fechaSel = new Date(fechaInput + 'T12:00:00');
         const cierres = tiendaData.cierres_temporales || [];
@@ -455,15 +477,15 @@
             return;
         }
 
-        const [citasRes, proRes] = await Promise.all([
-            supabase.rpc("obtener_horarios_ocupados", {
+        const citasRes = await supabase.rpc("obtener_horarios_ocupados", {
+                p_id_tienda: tiendaId,
                 p_id_barbero: barberId,
                 p_fecha: fechaInput
-            }),
-            supabase.from("profesionales").select("*").eq("id_barbero", barberId).single()
-        ]);
+            });
 
-        const pro = proRes.data;
+        if (solicitudActual !== solicitudHorariosActual || fechaInput !== document.getElementById("res-date").value) return;
+
+        const pro = profesionalesReserva.find(item => String(item.id_barbero) === String(barberId));
         if (!pro) return;
 
         const nombresDias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
@@ -477,6 +499,13 @@
                 grid.innerHTML = `<div class="no-schedule-msg" style="border-color: #ff4d4d;"><i class="fa-solid fa-mug-hot" style="color: #ff4d4d;"></i><p style="color: #ff4d4d;">DESCANSO</p></div>`;
                 return;
             }
+        }
+
+        if (pro.vacaciones_inicio && pro.vacaciones_fin
+            && fechaInput >= pro.vacaciones_inicio
+            && fechaInput <= pro.vacaciones_fin) {
+            grid.innerHTML = `<div class="no-schedule-msg"><i class="fa-solid fa-umbrella-beach"></i><p>PROFESIONAL NO DISPONIBLE</p></div>`;
+            return;
         }
 
         const duracionReal = parseInt(window.duracionServicio) || 30;
@@ -516,11 +545,12 @@
                 const chip = document.createElement("div");
                 chip.className = "hora-chip";
                 const labelBloques = numBloques > 1 ? `<br><small style="font-size:0.5rem; color:var(--gold); font-weight:800;">${numBloques} BLOQUES</small>` : '';
-                const horaTxt = formatoHora12(minToHora(currentMin));
+                const horaGuardar = minToHora(currentMin);
+                const horaTxt = formatoHora12(horaGuardar);
                 chip.innerHTML = `<span>${horaTxt}</span>${labelBloques}`;
                 const hFin = minToHora(horaFinMin);
                 chip.onclick = () => {
-                    horaSeleccionada = horaTxt;
+                    horaSeleccionada = horaGuardar;
                     window.horaFinSeleccionada = hFin;
                     document.querySelectorAll(".hora-chip").forEach(c => c.classList.remove("selected"));
                     chip.classList.add("selected");
@@ -536,20 +566,20 @@
 
         // --- CARGAR PROFESIONALES Y SERVICIOS ---
         async function loadBarbers() {
-            const { data: pros, error } = await supabase
-                .from("profesionales")
-                .select("*")
-                .eq("id_tienda", tiendaId);
+            const { data: pros, error } = await supabase.rpc("obtener_profesionales_reserva", {
+                p_tienda: tiendaId
+            });
 
             if (error) {
                 console.error("Error cargando profesionales:", error);
                 return;
             }
 
+            profesionalesReserva = Array.isArray(pros) ? pros : [];
             const container = document.getElementById("pro-list");
             container.innerHTML = "";
-            if (pros && pros.length > 0) {
-                pros.forEach(p => {
+            if (profesionalesReserva.length > 0) {
+                profesionalesReserva.forEach(p => {
                     const div = document.createElement("div");
                     div.className = "pro-card";
                     div.onclick = () => {
@@ -571,9 +601,17 @@
         }
 
         async function loadServices(bId) {
-            const { data: svs } = await supabase.from("servicios").select("*").eq("id_barbero", bId);
+            const { data: svs, error } = await supabase.rpc("obtener_servicios_reserva", {
+                p_tienda: tiendaId,
+                p_barbero: bId
+            });
             const container = document.getElementById("service-list");
             container.innerHTML = "";
+            if (error) {
+                console.error("Error cargando servicios:", error);
+                container.innerHTML = "<p style='text-align:center; opacity:0.5;'>No se pudieron cargar los servicios.</p>";
+                return;
+            }
             if (svs) {
                 svs.forEach(s => {
                     const div = document.createElement("div");
@@ -705,14 +743,9 @@ if (!p) {
 
             // Cargar tienda
             console.log("🏪 Buscando tienda con referencia:", tiendaRef);
-            let query = supabase.from("tiendas").select("*");
-            if (tiendaRef.includes("-")) {
-                query = query.eq("id", tiendaRef);
-            } else {
-                query = query.eq("slug", tiendaRef);
-            }
-
-            const { data: tienda, error } = await query.single();
+            const { data: tienda, error } = await supabase.rpc("obtener_tienda_reserva", {
+                p_referencia: tiendaRef
+            });
             console.log("📦 Tienda encontrada:", tienda);
             console.log("❌ Error tienda:", error);
 
@@ -1057,6 +1090,7 @@ if (resDate) {
         const duracionServicioFinal = window.duracionServicio || 30;
         const { data: citasExistentes } = await supabase
             .rpc("obtener_horarios_ocupados", {
+                p_id_tienda: tiendaId,
                 p_id_barbero: barberId,
                 p_fecha: date
             });
@@ -1100,11 +1134,9 @@ if (resDate) {
 .single();
 
         if (!error) {
-            const { data: profesional } = await supabase
-                .from("profesionales")
-                .select("nombre_empleado")
-                .eq("id_barbero", barberId)
-                .single();
+            const profesional = profesionalesReserva.find(
+                item => String(item.id_barbero) === String(barberId)
+            );
 
             await enviarCorreoConfirmacion({
     email: finalEmail,
@@ -1113,7 +1145,7 @@ if (resDate) {
     servicio: nombreServicioSel,
     profesional: profesional?.nombre_empleado || "Nuestro equipo",
     fecha: date,
-    hora: horaSeleccionadaLocal,
+    hora: formatoHora12(horaSeleccionadaLocal),
     valor: formatDinero.format(precioSeleccionado),
     citaId: nuevaCita.id_cita
 });
@@ -1123,7 +1155,16 @@ if (resDate) {
         } else {
             btn.disabled = false;
             btn.innerText = user ? "Confirmar Reserva" : "Finalizar y Unirme";
-            showAlert("Error al reservar: " + error.message);
+            const esCruce = error?.code === "23P01"
+                || error?.code === "23505"
+                || /citas_no_superpuestas|citas_unique_idx/i.test(error?.message || "");
+            const esBloqueo = /cliente está bloqueado para reservar/i.test(error?.message || "");
+            showAlert(esCruce
+                ? "⚠️ Este horario acaba de ser reservado. Elige otro turno."
+                : esBloqueo
+                    ? "No es posible completar esta reserva. Comunícate directamente con la tienda."
+                    : "Error al reservar: " + error.message);
+            if (esCruce) await generarHorariosDisponibles();
         }
     }
 
@@ -1145,10 +1186,7 @@ if (resDate) {
 
         try {
             const { data: citas, error } = await supabase
-                .from("citas")
-                .select("*, profesionales!inner(nombre_empleado)")
-                .eq("user_id", user.id)
-                .order("fecha", { ascending: false });
+                .rpc("obtener_mis_citas_reserva");
 
             if (error) {
                 console.error("Error al cargar citas:", error);
@@ -1168,7 +1206,8 @@ if (resDate) {
             }
 
             // 1. Obtener la fecha de hoy para comparar
-            const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Bogota' });
+            const ahoraBogota = obtenerFechaHoraBogota();
+            const hoy = ahoraBogota.fecha;
 
             // 2. Clasificar las citas en 3 listas diferentes
             const citasActivas = [];
@@ -1178,7 +1217,7 @@ if (resDate) {
             citas.forEach(c => {
                 if (c.estado === 'CANCELADA') {
                     citasCanceladas.push(c);
-                } else if (c.fecha >= hoy) {
+                } else if (c.fecha > hoy || (c.fecha === hoy && horaToMin(c.hora_fin || c.hora_inicio) > ahoraBogota.minutos)) {
                     citasActivas.push(c);
                 } else {
                     citasFinalizadas.push(c);

@@ -39,6 +39,7 @@ export function iniciarAgenda({
   const sesion = tiendaInfo.sesion || {};
   const esEmpleado = !sesion.es_propietario && String(sesion.rol || "").toUpperCase() === "EMPLEADO";
   const idProfesionalForzado = esEmpleado ? sesion.id_profesional : null;
+  const puedeGestionarAgenda = Boolean(sesion.es_propietario || sesion.permisos?.agenda_gestionar);
 
   // 🎨 RENDER
   function renderizar() {
@@ -153,12 +154,20 @@ export function iniciarAgenda({
 
   // ❌ MODAL CANCELAR
   window.confirmarCancelacion = async (idCita) => {
+    if (!puedeGestionarAgenda) {
+      mostrarToast("No tienes permiso para modificar citas.", "error");
+      return;
+    }
     setState("citaACancelar", idCita);
 
     document.getElementById("confirmCancelModal").style.display = "flex";
   };
 
   window.confirmarNoAsistencia = async (idCita, nombreCliente = "el cliente") => {
+    if (!puedeGestionarAgenda) {
+      mostrarToast("No tienes permiso para modificar citas.", "error");
+      return;
+    }
     const confirmar = window.confirm(
       `¿Confirmas que ${nombreCliente} no asistió? La cita aparecerá como ingreso no facturado en Liquidaciones.`,
     );
@@ -196,6 +205,10 @@ export function iniciarAgenda({
 
   // ➕ ABRIR MODAL (CON SERVICIOS REALES)
   window.abrirModalReserva = async (idBarbero, horaInicio, horaFin) => {
+    if (!puedeGestionarAgenda) {
+      mostrarToast("Tu usuario puede consultar la agenda, pero no crear citas.", "error");
+      return;
+    }
     const profesional = getState("listaBarberos").find(
       (b) => String(b.id_barbero) === String(idBarbero),
     );
@@ -289,6 +302,10 @@ export function iniciarAgenda({
 
   // ✅ CONFIRMAR RESERVA
   async function confirmarReserva() {
+    if (!puedeGestionarAgenda) {
+      mostrarToast("No tienes permiso para crear citas.", "error");
+      return;
+    }
     const nombreInput = document.getElementById("res_nombre");
 
     const telInput = document.getElementById("res_tel");
@@ -371,6 +388,15 @@ export function iniciarAgenda({
         tipo: "ocupado",
       }));
 
+    if (profesional?.almuerzo_inicio && Number(profesional.almuerzo_minutos) > 0) {
+      const inicio = horaToMin(normalizarHora(profesional.almuerzo_inicio));
+      bloques.push({ inicio, fin: inicio + Number(profesional.almuerzo_minutos), tipo: "almuerzo" });
+    }
+    if (profesional?.break_inicio && Number(profesional.break_minutos) > 0) {
+      const inicio = horaToMin(normalizarHora(profesional.break_inicio));
+      bloques.push({ inicio, fin: inicio + Number(profesional.break_minutos), tipo: "descanso" });
+    }
+
     console.table(bloques);
 
     console.groupEnd();
@@ -433,7 +459,11 @@ export function iniciarAgenda({
     if (error) {
       console.error(error);
 
-      alert("❌ Error al reservar");
+      const esCruce = error?.code === "23P01" || /citas_no_superpuestas/i.test(error?.message || "");
+      alert(esCruce
+        ? "⚠️ Ese horario acaba de ser ocupado. La agenda se actualizará."
+        : `❌ Error al reservar: ${error.message}`);
+      if (esCruce) await cargarCitasDelDia();
 
       return;
     }

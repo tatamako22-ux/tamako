@@ -1202,9 +1202,13 @@ html{
 .landing-v2 .hero-left p { max-width:590px; margin:27px 0 0; color:#aaa; font-size:clamp(.96rem,1.3vw,1.12rem); line-height:1.75; }
 .landing-v2 .hero-buttons { justify-content:flex-start; margin-top:32px; gap:11px; }
 .landing-v2 .btn-primary,
-.landing-v2 .btn-secondary { min-height:52px; display:inline-flex; align-items:center; justify-content:center; padding:0 23px; border-radius:13px; font-size:.72rem; font-weight:700; letter-spacing:.05em; text-decoration:none; }
+.landing-v2 .btn-secondary,
+.landing-v2 .btn-portfolio { min-height:52px; display:inline-flex; align-items:center; justify-content:center; padding:0 23px; border-radius:13px; font-size:.72rem; font-weight:700; letter-spacing:.05em; text-decoration:none; }
 .landing-v2 .btn-primary { color:#090909; background:linear-gradient(135deg,#f3ce74,#bf953f); border:1px solid #e6bd5c; box-shadow:0 14px 36px rgba(191,149,63,.16); }
 .landing-v2 .btn-secondary { color:#ddd; background:#0d0d0d; border:1px solid rgba(255,255,255,.13); }
+.landing-v2 .btn-portfolio { gap:9px; color:#e8bd5d; background:rgba(191,149,63,.08); border:1px solid rgba(232,189,93,.42); }
+.landing-v2 .btn-portfolio:hover { color:#090909; background:linear-gradient(135deg,#f3ce74,#bf953f); border-color:#e6bd5c; }
+.landing-v2 .btn-portfolio .download-mark { font-size:1rem; line-height:1; transform:translateY(-1px); }
 .landing-v2 .hero-trust { display:flex; flex-wrap:wrap; gap:9px 22px; margin-top:27px; color:#777; font-size:.67rem; }
 .landing-v2 .hero-trust span { position:relative; padding-left:13px; }
 .landing-v2 .hero-trust span::before { content:""; position:absolute; top:.42em; left:0; width:5px; height:5px; border-radius:50%; background:var(--gold); }
@@ -1319,7 +1323,8 @@ html{
   .landing-v2 .hero-left p { font-size:.9rem; line-height:1.65; }
   .landing-v2 .hero-buttons { display:grid; grid-template-columns:1fr; width:100%; }
   .landing-v2 .btn-primary,
-  .landing-v2 .btn-secondary { width:100%; }
+  .landing-v2 .btn-secondary,
+  .landing-v2 .btn-portfolio { width:100%; }
   .landing-v2 .hero-trust { display:grid; gap:9px; }
   .landing-v2 .product-label { max-width:86%; font-size:.5rem; }
   .landing-v2 .benefits-grid,
@@ -1421,6 +1426,10 @@ html{
             <div class="hero-buttons">
                 <a href="pages/registro.html" class="btn-primary">Crear mi tienda gratis</a>
                 <a href="#producto" class="btn-secondary">Conocer la plataforma</a>
+                <a href="output/pdf/portafolio-comercial-tamaku.pdf" class="btn-portfolio" download="Portafolio-Comercial-TAMAKU.pdf" aria-label="Descargar portafolio comercial de TAMAKU en PDF">
+                    <span class="download-mark" aria-hidden="true">&#8595;</span>
+                    Descargar portafolio
+                </a>
             </div>
             <div class="hero-trust">
                 <span><strong>7 días</strong> de prueba</span>

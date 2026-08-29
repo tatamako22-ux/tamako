@@ -3,6 +3,33 @@ import { supabase } from "../config/supabaseClient.js";
 const cacheCategorias = new Map();
 const normalizarTelefono = (valor) => String(valor || "").replace(/\D/g, "").slice(-10);
 
+function desplazarFechaISO(fechaISO, dias) {
+  const fecha = new Date(`${fechaISO}T12:00:00`);
+  fecha.setDate(fecha.getDate() + dias);
+  return fecha.toLocaleDateString("sv-SE");
+}
+
+function clavesCliente(cita) {
+  const claves = [];
+  if (cita.user_id) claves.push(`usuario:${cita.user_id}`);
+  const telefono = normalizarTelefono(cita.telefono_cliente);
+  if (telefono.length >= 7 && !/^0+$/.test(telefono)) claves.push(`telefono:${telefono}`);
+  const email = String(cita.email_cliente || "").trim().toLowerCase();
+  if (email.includes("@")) claves.push(`email:${email}`);
+  return claves;
+}
+
+function esMismoCliente(citaA, citaB) {
+  const clavesA = new Set(clavesCliente(citaA));
+  return clavesCliente(citaB).some((clave) => clavesA.has(clave));
+}
+
+function diferenciaDias(fechaA, fechaB) {
+  const a = new Date(`${fechaA}T12:00:00`);
+  const b = new Date(`${fechaB}T12:00:00`);
+  return Math.round(Math.abs(b - a) / 86400000);
+}
+
 async function obtenerCategoriasClientes(idTienda) {
   const guardada = cacheCategorias.get(idTienda);
   if (guardada && Date.now() - guardada.creada < 120000) return guardada.datos;
@@ -82,6 +109,7 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
                 nombre_cliente,
                 telefono_cliente,
                 email_cliente,
+                fecha,
                 hora_inicio,
                 hora_fin,
                 estado,
@@ -118,11 +146,21 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
       throw error;
     }
 
-    const [categorias, resultadoBloqueos] = await Promise.all([
+    const desdeRepetidas = desplazarFechaISO(fecha, -7);
+    const hastaRepetidas = desplazarFechaISO(fecha, 7);
+    const [categorias, resultadoBloqueos, resultadoCitasCercanas] = await Promise.all([
       obtenerCategoriasClientes(idTienda),
       supabase.from("clientes_bloqueados").select("telefono_cliente,tipo_bloqueo,id_barbero").eq("id_tienda", idTienda),
+      supabase
+        .from("citas")
+        .select("id_cita,user_id,nombre_cliente,telefono_cliente,email_cliente,fecha,hora_inicio,estado,id_barbero")
+        .eq("id_tienda", idTienda)
+        .gte("fecha", desdeRepetidas)
+        .lte("fecha", hastaRepetidas)
+        .in("estado", ["PENDIENTE", "CONFIRMADA"]),
     ]);
     if (resultadoBloqueos.error) console.warn("No se pudieron consultar los bloqueos de clientes:", resultadoBloqueos.error);
+    if (resultadoCitasCercanas.error) console.warn("No se pudieron comprobar reservas cercanas:", resultadoCitasCercanas.error);
     const bloqueosPorTelefono = new Map();
     (resultadoBloqueos.data || []).forEach((bloqueo) => {
       const telefono = normalizarTelefono(bloqueo.telefono_cliente);
@@ -139,12 +177,25 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
         const tipo = String(bloqueo.tipo_bloqueo || "").toLowerCase();
         return ["global", "total"].includes(tipo) || (["profesional", "parcial"].includes(tipo) && String(bloqueo.id_barbero) === String(cita.id_barbero));
       });
+      const reservasCercanas = (resultadoCitasCercanas.data || [])
+        .filter((otra) => String(otra.id_cita) !== String(cita.id_cita))
+        .filter((otra) => esMismoCliente(cita, otra))
+        .map((otra) => ({
+          id_cita: otra.id_cita,
+          fecha: otra.fecha,
+          hora_inicio: otra.hora_inicio,
+          dias_diferencia: diferenciaDias(cita.fecha || fecha, otra.fecha),
+        }))
+        .filter((otra) => otra.dias_diferencia <= 7)
+        .sort((a, b) => a.dias_diferencia - b.dias_diferencia || String(a.fecha).localeCompare(String(b.fecha)));
       return {
         ...cita,
         visitas_cliente: visitas,
         categoria_cliente: visitas >= 5 ? "VIP" : visitas === 1 ? "NUEVO" : "FRECUENTE",
         cliente_bloqueado: Boolean(bloqueoAplicable),
         bloqueo_cliente_alcance: ["global", "total"].includes(String(bloqueoAplicable?.tipo_bloqueo || "").toLowerCase()) ? "Toda la tienda" : "Este profesional",
+        reserva_repetida: reservasCercanas.length > 0,
+        reservas_cercanas: reservasCercanas,
       };
     });
   } catch (error) {

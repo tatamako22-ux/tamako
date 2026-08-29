@@ -116,6 +116,14 @@ function formatoHora12(hora) {
   const hora12 = h % 12 || 12;
   return `${hora12}:${String(m).padStart(2, "0")} ${periodo}`;
 }
+
+function formatearFechaCorta(fechaISO) {
+  if (!fechaISO) return "fecha cercana";
+  return new Intl.DateTimeFormat("es-CO", {
+    day: "numeric",
+    month: "short",
+  }).format(new Date(`${fechaISO}T12:00:00`));
+}
 // 🎨 CREAR TARJETA DE CITA (Adaptada para citas y bloques disponibles)
 function crearTarjetaCita(cita, esMovil = false) {
   const evento = document.createElement("div");
@@ -127,6 +135,9 @@ function crearTarjetaCita(cita, esMovil = false) {
     : cita.facturas;
   const esFacturada = Boolean(factura?.id_factura);
   const esNoAsistio = String(cita.estado || "").toUpperCase() === "NO_ASISTIO";
+  const reservaCercana = Array.isArray(cita.reservas_cercanas)
+    ? cita.reservas_cercanas[0]
+    : null;
 
   evento.className = esDisponible
     ? "calendar-event disponible"
@@ -179,6 +190,7 @@ function crearTarjetaCita(cita, esMovil = false) {
           ${esDisponible ? "Espacio Disponible" : cita.nombre_cliente || "Cliente"}
         </div>
         ${esDisponible ? "" : `<div class="event-client-category category-${String(cita.categoria_cliente || "NUEVO").toLowerCase()}"><i class="fa-solid ${cita.categoria_cliente === "VIP" ? "fa-crown" : cita.categoria_cliente === "FRECUENTE" ? "fa-repeat" : "fa-user-plus"}"></i> ${cita.categoria_cliente || "NUEVO"}${cita.visitas_cliente ? ` · ${cita.visitas_cliente} visita${cita.visitas_cliente === 1 ? "" : "s"}` : ""}</div>`}
+        ${cita.reserva_repetida && reservaCercana ? `<div class="event-repeat-warning" title="Este cliente tiene otra reserva activa a menos de ocho días"><i class="fa-solid fa-eye"></i><span>Revisar reserva repetida</span><small>${reservaCercana.dias_diferencia === 0 ? "Otra cita el mismo día" : `Otra cita el ${formatearFechaCorta(reservaCercana.fecha)}`}</small></div>` : ""}
         ${cita.cliente_bloqueado ? `<div class="event-client-blocked"><i class="fa-solid fa-ban"></i> Cliente bloqueado <small>${cita.bloqueo_cliente_alcance}</small></div>` : ""}
         <div class="event-service">
   ${

@@ -11,7 +11,7 @@ import {
   obtenerConteoCitasRango,
   cancelarCita,
   marcarCitaNoAsistida,
-} from "../../services/agenda.service.js";
+} from "../../services/agenda.service.js?v=6";
 
 import {
   formatearFecha,

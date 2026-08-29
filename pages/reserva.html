@@ -7,7 +7,8 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/reserva.css?v=8">
+    <link rel="stylesheet" href="../assets/css/reserva.css?v=9">
+    <link rel="stylesheet" href="../assets/css/galeria-publica.css?v=1">
     <link rel="stylesheet" href="../assets/css/legal.css?v=1">
     <!-- Conexión PWA -->
     <link rel="manifest" href="../manifest.json">
@@ -238,6 +239,8 @@
     </div>
 
     <!-- ALERTA PERSONALIZADA -->
+    <script type="module" src="../assets/js/reserva/galeria-publica.js?v=1"></script>
+
     <div id="custom-alert" class="modal" style="display:none; position: fixed; inset: 0; justify-content: center; align-items: center; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border: none; z-index: 20000; padding: 20px;">
         <div class="header-card" style="max-width: 320px; width: 100%; text-align: center; padding: 35px 25px; box-shadow: var(--nm-out);">
             <i class="fa-solid fa-circle-exclamation" style="font-size: 2.5rem; color: var(--gold); margin-bottom: 20px; display: block;"></i>
@@ -593,8 +596,10 @@
                     div.innerHTML = `
                         ${p.foto_url ? `<img src="${p.foto_url}" class="pro-img" alt="${p.nombre_empleado || 'Profesional'}" loading="lazy" decoding="async">` : `<div class="pro-img pro-img-placeholder"><i class="fa-solid fa-user"></i></div>`}
                         <div class="pro-name">${p.nombre_empleado}</div>
+                        <button type="button" class="btn-ver-trabajos" hidden data-tienda="${tiendaId}" data-barbero="${p.id_barbero}" data-nombre="${p.nombre_empleado}"><i class="fa-regular fa-images"></i> Ver trabajos</button>
                     `;
                     container.appendChild(div);
+                    window.TamakuGaleriaPublica?.preparar(div.querySelector('.btn-ver-trabajos'));
                 });
             } else {
                 container.innerHTML = "<p style='text-align:center; opacity:0.5;'>No hay profesionales disponibles en esta sede.</p>";

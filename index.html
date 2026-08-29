@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#050505">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1386,6 +1386,7 @@ html{
       console.log("✅ Conexión TAMAKU lista.");
     </script>
 <link rel="stylesheet" href="assets/css/notifications.css?v=1">
+<link rel="stylesheet" href="assets/css/mobile-compat.css?v=1">
 <script src="assets/js/core/notifications.js?v=1" defer></script>
 </head>
 
@@ -1439,7 +1440,7 @@ html{
         </div>
         <div class="hero-right" id="producto">
             <div class="product-label"><i>●</i> PANEL OPERATIVO EN TIEMPO REAL</div>
-            <img src="assets/images/dashboard-tamaku.png" alt="Panel de gestión TAMAKU para negocios de belleza">
+            <img src="assets/images/dashboard-tamaku.png" alt="Panel de gestión TAMAKU para negocios de belleza" fetchpriority="high" decoding="async">
         </div>
 
     </div>

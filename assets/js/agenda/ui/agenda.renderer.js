@@ -97,6 +97,7 @@ function crearHeaderBarbero(barbero) {
         }"
         class="barber-photo"
         alt="${barbero.nombre_empleado || "Profesional"}"
+        decoding="async"
       />
       <div class="barber-info">
         <div class="barber-name">

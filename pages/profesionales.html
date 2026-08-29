@@ -232,6 +232,7 @@
     </style>
 <link rel="stylesheet" href="../assets/css/profesionales.css?v=4">
 <link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
 <script src="../assets/js/core/notifications.js?v=1" defer></script>
 </head>
 <body>
@@ -749,7 +750,7 @@
                         </div>
                     </div>
                     <div class="barber-avatar"><div>
-                        ${p.foto_url ? `<img src="${p.foto_url}">` : `<i class="fa-solid fa-user" style="font-size:3rem; color:#222;"></i>`}
+                        ${p.foto_url ? `<img src="${p.foto_url}" alt="Foto del profesional" loading="lazy" decoding="async">` : `<i class="fa-solid fa-user" style="font-size:3rem; color:#222;"></i>`}
                     </div></div>
                     <h3 class="barber-name">${p.nombre_empleado || 'Sin nombre'}</h3>
                     <div class="puesto-tag">PUESTO ${p.puesto_asignado || 1}</div>

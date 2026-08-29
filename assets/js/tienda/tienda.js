@@ -24,7 +24,7 @@ function renderProductos() {
   const lista = productos.filter((p) => p.activo).filter((p) => !categoria || p.categoria_id === categoria).filter((p) => `${p.nombre} ${p.descripcion || ""}`.toLowerCase().includes(texto));
   $("#catalogoProductos").innerHTML = lista.length ? lista.map((p) => `
     <article class="producto-card ${p.stock < 1 ? "agotado" : ""}">
-      <div class="producto-imagen">${p.imagen_url ? `<img src="${escapar(p.imagen_url)}" alt="${escapar(p.nombre)}" loading="lazy">` : `<i class="fa-solid fa-box-open"></i>`}${p.destacado ? `<span>Destacado</span>` : ""}</div>
+      <div class="producto-imagen">${p.imagen_url ? `<img src="${escapar(p.imagen_url)}" alt="${escapar(p.nombre)}" loading="lazy" decoding="async">` : `<i class="fa-solid fa-box-open"></i>`}${p.destacado ? `<span>Destacado</span>` : ""}</div>
       <div class="producto-info"><small>${escapar(p.marketplace_categorias?.nombre || "Productos")}</small><h3>${escapar(p.nombre)}</h3><p>${escapar(p.descripcion || "Producto profesional para tu negocio.")}</p><div><strong>${dinero.format(p.precio)}</strong><em>${p.stock > 0 ? `${p.stock} disponibles` : "Agotado"}</em></div><button type="button" class="agregar-producto" data-id="${p.id}" ${p.stock < 1 ? "disabled" : ""}><i class="fa-solid fa-cart-plus"></i> Agregar</button></div>
     </article>`).join("") : `<div class="tienda-vacio"><i class="fa-solid fa-magnifying-glass"></i><h3>No encontramos productos</h3><p>Prueba con otra categoría o búsqueda.</p></div>`;
 }

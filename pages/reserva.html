@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>TAMAKÚ | KLEOS Experiencia Élite</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="../assets/css/pwa.css?v=5">
     
 <link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
 <script src="../assets/js/core/notifications.js?v=1" defer></script>
 <script src="../assets/js/core/legal-consent.js?v=1" defer></script>
 </head>
@@ -590,7 +591,7 @@
                         loadServices(p.id_barbero);
                     };
                     div.innerHTML = `
-                        ${p.foto_url ? `<img src="${p.foto_url}" class="pro-img" alt="${p.nombre_empleado || 'Profesional'}">` : `<div class="pro-img pro-img-placeholder"><i class="fa-solid fa-user"></i></div>`}
+                        ${p.foto_url ? `<img src="${p.foto_url}" class="pro-img" alt="${p.nombre_empleado || 'Profesional'}" loading="lazy" decoding="async">` : `<div class="pro-img pro-img-placeholder"><i class="fa-solid fa-user"></i></div>`}
                         <div class="pro-name">${p.nombre_empleado}</div>
                     `;
                     container.appendChild(div);

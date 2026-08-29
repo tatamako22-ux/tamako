@@ -11,7 +11,7 @@ import {
   obtenerConteoCitasRango,
   cancelarCita,
   marcarCitaNoAsistida,
-} from "../../services/agenda.service.js?v=6";
+} from "../../services/agenda.service.js?v=7";
 
 import {
   formatearFecha,
@@ -689,6 +689,10 @@ export function iniciarAgenda({
   window.addEventListener("cambiar-fecha-agenda", async (e) => {
     console.log("🔥 EVENTO RECIBIDO EN CONTROLLER:", e.detail);
 
+    if (e.detail.idBarbero && selectorBarbero?.querySelector(`option[value="${e.detail.idBarbero}"]`)) {
+      selectorBarbero.value = e.detail.idBarbero;
+    }
+
     const nuevaFecha = new Date(e.detail.fecha + "T00:00:00");
 
     console.log("📅 NUEVA FECHA CREADA:", nuevaFecha);
@@ -698,6 +702,16 @@ export function iniciarAgenda({
     console.log("📌 STATE DESPUÉS:", getState("fechaSeleccionada"));
 
     await actualizarFecha();
+
+    if (e.detail.idCita) {
+      window.setTimeout(() => {
+        const tarjeta = document.querySelector(`[data-id-cita="${e.detail.idCita}"]`);
+        if (!tarjeta) return;
+        tarjeta.scrollIntoView({ behavior: "smooth", block: "center" });
+        tarjeta.classList.add("event-highlight-target");
+        window.setTimeout(() => tarjeta.classList.remove("event-highlight-target"), 2800);
+      }, 180);
+    }
   });
   eventos();
 

@@ -124,6 +124,66 @@ function formatearFechaCorta(fechaISO) {
     month: "short",
   }).format(new Date(`${fechaISO}T12:00:00`));
 }
+
+function escaparHtml(valor) {
+  return String(valor ?? "").replace(/[&<>'"]/g, (caracter) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "'": "&#39;",
+    '"': "&quot;",
+  })[caracter]);
+}
+
+function abrirDetalleReservasCercanas(cita) {
+  let modal = document.getElementById("repeatBookingModal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "repeatBookingModal";
+    modal.className = "repeat-booking-modal";
+    modal.innerHTML = `<div class="repeat-booking-dialog" role="dialog" aria-modal="true" aria-labelledby="repeatBookingTitle"><button type="button" class="repeat-booking-close" aria-label="Cerrar">&times;</button><div class="repeat-booking-heading"><span><i class="fa-solid fa-eye"></i> ALERTA PREVENTIVA</span><h2 id="repeatBookingTitle">Reservas cercanas del cliente</h2><p>La reserva está permitida. Revisa si se trata de una reprogramación o de servicios diferentes.</p></div><div class="repeat-booking-list"></div></div>`;
+    document.body.appendChild(modal);
+    modal.querySelector(".repeat-booking-close").addEventListener("click", () => modal.classList.remove("visible"));
+    modal.addEventListener("click", (evento) => {
+      if (evento.target === modal) modal.classList.remove("visible");
+    });
+  }
+
+  const reservas = [
+    {
+      id_cita: cita.id_cita,
+      fecha: cita.fecha,
+      hora_inicio: cita.hora_inicio,
+      hora_fin: cita.hora_fin,
+      id_barbero: cita.id_barbero,
+      profesional_nombre: cita.profesional_nombre || "Profesional actual",
+      actual: true,
+    },
+    ...(cita.reservas_cercanas || []),
+  ];
+  const lista = modal.querySelector(".repeat-booking-list");
+  lista.innerHTML = reservas.map((reserva) => `
+    <article class="repeat-booking-item${reserva.actual ? " current" : ""}">
+      <div class="repeat-booking-date"><strong>${reserva.actual ? "Cita seleccionada" : "Reserva relacionada"}</strong><span>${escaparHtml(formatearFechaCorta(reserva.fecha))}</span></div>
+      <div class="repeat-booking-meta"><span><i class="fa-regular fa-clock"></i> ${escaparHtml(formatoHora12(reserva.hora_inicio))}${reserva.hora_fin ? ` - ${escaparHtml(formatoHora12(reserva.hora_fin))}` : ""}</span><span><i class="fa-solid fa-scissors"></i> ${escaparHtml(reserva.profesional_nombre)}</span></div>
+      <button type="button" class="repeat-booking-go" data-fecha="${escaparHtml(reserva.fecha)}" data-barbero="${escaparHtml(reserva.id_barbero)}" data-cita="${escaparHtml(reserva.id_cita)}">Ir a esta cita <i class="fa-solid fa-arrow-right"></i></button>
+    </article>
+  `).join("");
+  lista.querySelectorAll(".repeat-booking-go").forEach((boton) => {
+    boton.addEventListener("click", () => {
+      modal.classList.remove("visible");
+      window.dispatchEvent(new CustomEvent("cambiar-fecha-agenda", {
+        detail: {
+          fecha: boton.dataset.fecha,
+          idBarbero: boton.dataset.barbero,
+          idCita: boton.dataset.cita,
+        },
+      }));
+    });
+  });
+  modal.classList.add("visible");
+  modal.querySelector(".repeat-booking-close").focus();
+}
 // 🎨 CREAR TARJETA DE CITA (Adaptada para citas y bloques disponibles)
 function crearTarjetaCita(cita, esMovil = false) {
   const evento = document.createElement("div");
@@ -142,6 +202,7 @@ function crearTarjetaCita(cita, esMovil = false) {
   evento.className = esDisponible
     ? "calendar-event disponible"
     : `calendar-event${esFacturada ? " facturada" : ""}${esNoAsistio ? " no-show" : ""}`;
+  if (cita.id_cita) evento.dataset.idCita = cita.id_cita;
 
   if (esMovil) {
     evento.style.position = "relative";
@@ -190,7 +251,7 @@ function crearTarjetaCita(cita, esMovil = false) {
           ${esDisponible ? "Espacio Disponible" : cita.nombre_cliente || "Cliente"}
         </div>
         ${esDisponible ? "" : `<div class="event-client-category category-${String(cita.categoria_cliente || "NUEVO").toLowerCase()}"><i class="fa-solid ${cita.categoria_cliente === "VIP" ? "fa-crown" : cita.categoria_cliente === "FRECUENTE" ? "fa-repeat" : "fa-user-plus"}"></i> ${cita.categoria_cliente || "NUEVO"}${cita.visitas_cliente ? ` · ${cita.visitas_cliente} visita${cita.visitas_cliente === 1 ? "" : "s"}` : ""}</div>`}
-        ${cita.reserva_repetida && reservaCercana ? `<div class="event-repeat-warning" title="Este cliente tiene otra reserva activa a menos de ocho días"><i class="fa-solid fa-eye"></i><span>Revisar reserva repetida</span><small>${reservaCercana.dias_diferencia === 0 ? "Otra cita el mismo día" : `Otra cita el ${formatearFechaCorta(reservaCercana.fecha)}`}</small></div>` : ""}
+        ${cita.reserva_repetida && reservaCercana ? `<button type="button" class="event-repeat-warning" title="Ver las reservas cercanas de este cliente"><i class="fa-solid fa-eye"></i><span>Revisar reserva repetida</span><small>${reservaCercana.dias_diferencia === 0 ? "Otra cita el mismo día" : `Otra cita el ${formatearFechaCorta(reservaCercana.fecha)}`}</small></button>` : ""}
         ${cita.cliente_bloqueado ? `<div class="event-client-blocked"><i class="fa-solid fa-ban"></i> Cliente bloqueado <small>${cita.bloqueo_cliente_alcance}</small></div>` : ""}
         <div class="event-service">
   ${
@@ -248,6 +309,11 @@ title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
     }
   `;
 
+  evento.querySelector(".event-repeat-warning")?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    abrirDetalleReservasCercanas(cita);
+  });
+
   return evento;
 }
 
@@ -285,7 +351,7 @@ function renderModoMovil({
 
     const citasOcupadas = citasDelDia.filter(
       (c) => String(c.id_barbero) === String(barbero.id_barbero),
-    );
+    ).map((c) => ({ ...c, profesional_nombre: barbero.nombre_empleado || "Profesional" }));
 
     const horarioDia = obtenerHorarioDelDia(barbero, fechaSeleccionada);
 
@@ -373,7 +439,7 @@ function renderModoEscritorio({
     // CORRECCIÓN 3: Filtrar las citas de manera aislada por CADA profesional recorrido
     const citasOcupadas = citasDelDia.filter(
       (c) => String(c.id_barbero) === String(barbero.id_barbero),
-    );
+    ).map((c) => ({ ...c, profesional_nombre: barbero.nombre_empleado || "Profesional" }));
 
     const horarioDia = obtenerHorarioDelDia(barbero, fechaSeleccionada);
 

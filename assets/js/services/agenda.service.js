@@ -153,7 +153,7 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
       supabase.from("clientes_bloqueados").select("telefono_cliente,tipo_bloqueo,id_barbero").eq("id_tienda", idTienda),
       supabase
         .from("citas")
-        .select("id_cita,user_id,nombre_cliente,telefono_cliente,email_cliente,fecha,hora_inicio,estado,id_barbero")
+        .select("id_cita,user_id,nombre_cliente,telefono_cliente,email_cliente,fecha,hora_inicio,hora_fin,estado,id_barbero,profesionales(nombre_empleado)")
         .eq("id_tienda", idTienda)
         .gte("fecha", desdeRepetidas)
         .lte("fecha", hastaRepetidas)
@@ -177,17 +177,21 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
         const tipo = String(bloqueo.tipo_bloqueo || "").toLowerCase();
         return ["global", "total"].includes(tipo) || (["profesional", "parcial"].includes(tipo) && String(bloqueo.id_barbero) === String(cita.id_barbero));
       });
-      const reservasCercanas = (resultadoCitasCercanas.data || [])
+      const citaEstaActiva = ["PENDIENTE", "CONFIRMADA"].includes(String(cita.estado || "").toUpperCase());
+      const reservasCercanas = citaEstaActiva ? (resultadoCitasCercanas.data || [])
         .filter((otra) => String(otra.id_cita) !== String(cita.id_cita))
         .filter((otra) => esMismoCliente(cita, otra))
         .map((otra) => ({
           id_cita: otra.id_cita,
           fecha: otra.fecha,
           hora_inicio: otra.hora_inicio,
+          hora_fin: otra.hora_fin,
+          id_barbero: otra.id_barbero,
+          profesional_nombre: otra.profesionales?.nombre_empleado || "Profesional",
           dias_diferencia: diferenciaDias(cita.fecha || fecha, otra.fecha),
         }))
         .filter((otra) => otra.dias_diferencia <= 7)
-        .sort((a, b) => a.dias_diferencia - b.dias_diferencia || String(a.fecha).localeCompare(String(b.fecha)));
+        .sort((a, b) => a.dias_diferencia - b.dias_diferencia || String(a.fecha).localeCompare(String(b.fecha))) : [];
       return {
         ...cita,
         visitas_cliente: visitas,

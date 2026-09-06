@@ -142,7 +142,7 @@ function abrirDetalleReservasCercanas(cita) {
     modal = document.createElement("div");
     modal.id = "repeatBookingModal";
     modal.className = "repeat-booking-modal";
-    modal.innerHTML = `<div class="repeat-booking-dialog" role="dialog" aria-modal="true" aria-labelledby="repeatBookingTitle"><button type="button" class="repeat-booking-close" aria-label="Cerrar">&times;</button><div class="repeat-booking-heading"><span><i class="fa-solid fa-eye"></i> ALERTA PREVENTIVA</span><h2 id="repeatBookingTitle">Reservas cercanas del cliente</h2><p>La reserva está permitida. Revisa si se trata de una reprogramación o de servicios diferentes.</p></div><div class="repeat-booking-list"></div></div>`;
+    modal.innerHTML = `<div class="repeat-booking-dialog" role="dialog" aria-modal="true" aria-labelledby="repeatBookingTitle"><button type="button" class="repeat-booking-close" aria-label="Cerrar">&times;</button><div class="repeat-booking-heading"><span><i class="fa-solid fa-eye"></i> ALERTA PREVENTIVA</span><h2 id="repeatBookingTitle">Reservas del cliente desde hoy</h2><p>El cliente tiene más de una reserva pendiente o confirmada desde hoy en adelante. Revisa si se trata de una reprogramación o de servicios diferentes.</p></div><div class="repeat-booking-list"></div></div>`;
     document.body.appendChild(modal);
     modal.querySelector(".repeat-booking-close").addEventListener("click", () => modal.classList.remove("visible"));
     modal.addEventListener("click", (evento) => {
@@ -252,7 +252,7 @@ function crearTarjetaCita(cita, esMovil = false) {
           ${esDisponible ? "Espacio Disponible" : cita.nombre_cliente || "Cliente"}
         </div>
         ${esDisponible ? "" : `<div class="event-client-category category-${String(cita.categoria_cliente || "NUEVO").toLowerCase()}"><i class="fa-solid ${cita.categoria_cliente === "VIP" ? "fa-crown" : cita.categoria_cliente === "FRECUENTE" ? "fa-repeat" : "fa-user-plus"}"></i> ${cita.categoria_cliente || "NUEVO"}${cita.visitas_cliente ? ` · ${cita.visitas_cliente} visita${cita.visitas_cliente === 1 ? "" : "s"}` : ""}</div>`}
-        ${cita.reserva_repetida && reservaCercana ? `<button type="button" class="event-repeat-warning" title="Ver las reservas cercanas de este cliente"><i class="fa-solid fa-eye"></i><span>Revisar reserva repetida</span><small>${reservaCercana.dias_diferencia === 0 ? "Otra cita el mismo día" : `Otra cita el ${formatearFechaCorta(reservaCercana.fecha)}`}</small></button>` : ""}
+        ${cita.reserva_repetida && reservaCercana ? `<button type="button" class="event-repeat-warning" title="Ver las reservas de este cliente desde hoy"><i class="fa-solid fa-eye"></i><span>Revisar reserva repetida</span><small>${reservaCercana.dias_diferencia === 0 ? "Otra cita el mismo día" : `Otra cita el ${formatearFechaCorta(reservaCercana.fecha)}`}</small></button>` : ""}
         ${cita.cliente_bloqueado ? `<div class="event-client-blocked"><i class="fa-solid fa-ban"></i> Cliente bloqueado <small>${cita.bloqueo_cliente_alcance}</small></div>` : ""}
         <div class="event-service">
   ${

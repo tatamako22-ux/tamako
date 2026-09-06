@@ -3,12 +3,6 @@ import { supabase } from "../config/supabaseClient.js";
 const cacheCategorias = new Map();
 const normalizarTelefono = (valor) => String(valor || "").replace(/\D/g, "").slice(-10);
 
-function desplazarFechaISO(fechaISO, dias) {
-  const fecha = new Date(`${fechaISO}T12:00:00`);
-  fecha.setDate(fecha.getDate() + dias);
-  return fecha.toLocaleDateString("sv-SE");
-}
-
 function clavesCliente(cita) {
   const claves = [];
   if (cita.user_id) claves.push(`usuario:${cita.user_id}`);
@@ -146,8 +140,7 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
       throw error;
     }
 
-    const desdeRepetidas = desplazarFechaISO(fecha, -7);
-    const hastaRepetidas = desplazarFechaISO(fecha, 7);
+    const hoy = new Date().toLocaleDateString("sv-SE");
     const [categorias, resultadoBloqueos, resultadoCitasCercanas] = await Promise.all([
       obtenerCategoriasClientes(idTienda),
       supabase.from("clientes_bloqueados").select("telefono_cliente,tipo_bloqueo,id_barbero").eq("id_tienda", idTienda),
@@ -155,8 +148,7 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
         .from("citas")
         .select("id_cita,user_id,nombre_cliente,telefono_cliente,email_cliente,fecha,hora_inicio,hora_fin,estado,id_barbero,profesionales(nombre_empleado)")
         .eq("id_tienda", idTienda)
-        .gte("fecha", desdeRepetidas)
-        .lte("fecha", hastaRepetidas)
+        .gte("fecha", hoy)
         .in("estado", ["PENDIENTE", "CONFIRMADA"]),
     ]);
     if (resultadoBloqueos.error) console.warn("No se pudieron consultar los bloqueos de clientes:", resultadoBloqueos.error);
@@ -177,7 +169,7 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
         const tipo = String(bloqueo.tipo_bloqueo || "").toLowerCase();
         return ["global", "total"].includes(tipo) || (["profesional", "parcial"].includes(tipo) && String(bloqueo.id_barbero) === String(cita.id_barbero));
       });
-      const citaEstaActiva = ["PENDIENTE", "CONFIRMADA"].includes(String(cita.estado || "").toUpperCase());
+      const citaEstaActiva = (cita.fecha || fecha) >= hoy && ["PENDIENTE", "CONFIRMADA"].includes(String(cita.estado || "").toUpperCase());
       const reservasCercanas = citaEstaActiva ? (resultadoCitasCercanas.data || [])
         .filter((otra) => String(otra.id_cita) !== String(cita.id_cita))
         .filter((otra) => esMismoCliente(cita, otra))
@@ -190,7 +182,6 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
           profesional_nombre: otra.profesionales?.nombre_empleado || "Profesional",
           dias_diferencia: diferenciaDias(cita.fecha || fecha, otra.fecha),
         }))
-        .filter((otra) => otra.dias_diferencia <= 7)
         .sort((a, b) => a.dias_diferencia - b.dias_diferencia || String(a.fecha).localeCompare(String(b.fecha))) : [];
       return {
         ...cita,

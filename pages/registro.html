@@ -607,10 +607,10 @@ form {
   .registration-v2 .register-card { padding:22px 14px; }
 }
 </style>
-<link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<link rel="stylesheet" href="../assets/css/notifications.css?v=2">
 <link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
 <link rel="stylesheet" href="../assets/css/legal.css?v=1">
-<script src="../assets/js/core/notifications.js?v=1" defer></script>
+<script src="../assets/js/core/notifications.js?v=2"></script>
 <script src="../assets/js/core/legal-consent.js?v=1" defer></script>
 </head>
 <body class="registration-v2">
@@ -688,7 +688,7 @@ form {
                 <button type="button" class="password-toggle" data-password-target="password" aria-label="Mostrar contraseña" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/></svg></button>
             </div>
         </div>
-        
+
         <div class="form-group">
             <label for="confirmPassword">Confirmar contraseña</label>
             <div class="password-field">
@@ -783,7 +783,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     const aceptaMarketing = document.getElementById("aceptaMarketingTienda").checked;
 
     if (!aceptaDatos || !aceptaTerminos) {
-        alert("Debes leer y aceptar la Política de Tratamiento de Datos y los Términos y Condiciones para crear la tienda.");
+        window.TamakuUI.notify("Debes leer y aceptar la Política de Tratamiento de Datos y los Términos y Condiciones para crear la tienda.");
         submitButton.disabled = false;
         btnText.innerText = "CREAR MI TIENDA";
         submitButton.style.opacity = "1";
@@ -867,7 +867,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 
         if (error) {
             console.error("Error iniciando el registro:", error);
-            alert(`No fue posible iniciar el registro: ${error.message}`);
+            window.TamakuUI.notify(`No fue posible iniciar el registro: ${error.message}`);
             submitButton.disabled = false;
             btnText.innerText = "CREAR MI TIENDA";
             submitButton.style.opacity = "1";
@@ -940,7 +940,7 @@ document.getElementById("otpCode").addEventListener("input", function(){
     const email = document.getElementById("email").value.trim().toLowerCase();
 
     if(!email){
-    alert("Primero debes registrarte con tu correo.");
+    window.TamakuUI.notify("Primero debes registrarte con tu correo.");
     verifyBtn.disabled = false;
     verifyBtn.innerText = "VERIFICAR CÓDIGO";
     verifyBtn.style.opacity = "1";
@@ -955,7 +955,7 @@ document.getElementById("otpCode").addEventListener("input", function(){
     if (!user) {
         const code = document.getElementById("otpCode").value.replace(/\D/g, "");
         if(!/^\d{6,8}$/.test(code)){
-            alert("Ingresa el código numérico que recibiste por correo");
+            window.TamakuUI.notify("Ingresa el código numérico que recibiste por correo");
             verifyBtn.disabled = false;
             verifyBtn.innerText = "VERIFICAR CÓDIGO";
             verifyBtn.style.opacity = "1";
@@ -970,7 +970,7 @@ document.getElementById("otpCode").addEventListener("input", function(){
 
         if(error){
             console.error("Error verificando el código de registro:", error);
-            alert(`No fue posible verificar el código: ${error.message || "código incorrecto o vencido"}`);
+            window.TamakuUI.notify(`No fue posible verificar el código: ${error.message || "código incorrecto o vencido"}`);
             verifyBtn.disabled = false;
             verifyBtn.innerText = "VERIFICAR CÓDIGO";
             verifyBtn.style.opacity = "1";
@@ -980,7 +980,7 @@ document.getElementById("otpCode").addEventListener("input", function(){
     }
 
 if (!user) {
-    alert("Error obteniendo usuario autenticado.");
+    window.TamakuUI.notify("Error obteniendo usuario autenticado.");
     verifyBtn.disabled = false;
     verifyBtn.innerText = "VERIFICAR CÓDIGO";
     verifyBtn.style.opacity = "1";
@@ -1003,7 +1003,7 @@ if (registroReanudado) {
         });
         if (loginError) {
             console.error("No fue posible configurar ni validar la contraseña:", passwordError, loginError);
-            alert("El correo fue verificado, pero no fue posible configurar la contraseña: " + passwordError.message);
+            window.TamakuUI.notify("El correo fue verificado, pero no fue posible configurar la contraseña: " + passwordError.message);
             verifyBtn.disabled = false;
             verifyBtn.innerText = "VERIFICAR CÓDIGO";
             verifyBtn.style.opacity = "1";
@@ -1021,7 +1021,7 @@ const { data: perfilExistente, error: perfilConsultaError } = await supabaseClie
 
 if (!perfilConsultaError && perfilExistente?.tienda_id) {
     localStorage.setItem("tamakoSession", "active");
-    alert("Tu cuenta ya tiene una tienda. Te llevaremos al panel principal.");
+    await window.TamakuUI.alert({ titulo: "Tu tienda ya está lista", mensaje: "Tu cuenta ya tiene una tienda. Te llevaremos al panel principal.", textoConfirmar: "Ir al panel" });
     window.location.href = "dashboard.html";
     return;
 }
@@ -1064,7 +1064,7 @@ if (!tiendaInsertada) {
 }
 
 if (insertError) {
-    alert("Error al guardar la tienda: " + insertError.message);
+    window.TamakuUI.notify("Error al guardar la tienda: " + insertError.message);
     verifyBtn.disabled = false;
     verifyBtn.innerText = "VERIFICAR CÓDIGO";
     verifyBtn.style.opacity = "1";
@@ -1084,7 +1084,7 @@ const { error: perfilError } = await supabaseClient
     }]);
 
 if (perfilError) {
-    alert("Error al crear perfil: " + perfilError.message);
+    window.TamakuUI.notify("Error al crear perfil: " + perfilError.message);
     verifyBtn.disabled = false;
     verifyBtn.innerText = "VERIFICAR CÓDIGO";
     verifyBtn.style.opacity = "1";
@@ -1137,7 +1137,7 @@ document.getElementById("resendOtp").addEventListener("click", async function(){
     return;
 }
 
-    alert("Nuevo código enviado 📩");
+    window.TamakuUI.notify("Nuevo código enviado 📩");
     resendBtn.innerText = "Reenviar código";
     resendBtn.disabled = false;
 });

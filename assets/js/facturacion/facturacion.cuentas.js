@@ -88,14 +88,14 @@ export const FacturacionCuentas = {
     const tipo = tipoInput?.value || "OTRO";
     const saldoInicial = Number(saldoInput?.value) || 0;
 
-    if (!tienda.id) return alert("No se encontró la tienda activa.");
+    if (!tienda.id) return window.TamakuUI.notify("No se encontró la tienda activa.");
     if (!nombre) {
       nombreInput?.focus();
-      return alert("Escribe el nombre de la cuenta.");
+      return window.TamakuUI.notify("Escribe el nombre de la cuenta.");
     }
     if (saldoInicial < 0) {
       saldoInput?.focus();
-      return alert("El saldo inicial no puede ser negativo.");
+      return window.TamakuUI.notify("El saldo inicial no puede ser negativo.");
     }
 
     try {
@@ -115,10 +115,10 @@ export const FacturacionCuentas = {
       this.cerrarModal();
       await this.cargarCuentas();
       window.dispatchEvent(new CustomEvent("cuenta-financiera-actualizada"));
-      alert("Cuenta creada correctamente.");
+      window.TamakuUI.notify("Cuenta creada correctamente.");
     } catch (error) {
       console.error("Error creando cuenta:", error);
-      alert(`No se pudo crear la cuenta: ${error.message}`);
+      window.TamakuUI.notify(`No se pudo crear la cuenta: ${error.message}`);
     } finally {
       this.btnGuardar.disabled = false;
       this.btnGuardar.textContent = "Crear Cuenta";
@@ -286,10 +286,10 @@ export const FacturacionCuentas = {
       this.cerrarGestion();
       await this.cargarCuentas();
       window.dispatchEvent(new CustomEvent("cuenta-financiera-actualizada"));
-      alert("Cuenta actualizada correctamente.");
+      window.TamakuUI.notify("Cuenta actualizada correctamente.");
     } catch (error) {
       console.error("Error actualizando cuenta:", error);
-      alert(`No se pudo actualizar la cuenta: ${error.message}`);
+      window.TamakuUI.notify(`No se pudo actualizar la cuenta: ${error.message}`);
     } finally {
       boton.disabled = false;
       boton.textContent = "Guardar cambios";
@@ -317,10 +317,10 @@ export const FacturacionCuentas = {
       this.cerrarGestion();
       await this.cargarCuentas();
       window.dispatchEvent(new CustomEvent("cuenta-financiera-actualizada"));
-      alert("Cuenta eliminada de los métodos de pago activos.");
+      window.TamakuUI.notify("Cuenta eliminada de los métodos de pago activos.");
     } catch (error) {
       console.error("Error eliminando cuenta:", error);
-      alert(`No se pudo eliminar la cuenta: ${error.message}`);
+      window.TamakuUI.notify(`No se pudo eliminar la cuenta: ${error.message}`);
     } finally {
       boton.disabled = false;
     }

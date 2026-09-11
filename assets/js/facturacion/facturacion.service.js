@@ -1,3 +1,4 @@
+import { readAllPages } from "../core/read-pages.js";
 import { supabase } from "../config/supabaseClient.js";
 
 function exigirTienda(idTienda) {
@@ -343,7 +344,7 @@ export const FacturacionService = {
   async getFacturas(idTienda) {
     exigirTienda(idTienda);
 
-    const { data, error } = await supabase
+    const data = await readAllPages(() => supabase
       .from("facturas")
       .select(`
         id_factura,
@@ -360,9 +361,8 @@ export const FacturacionService = {
         perfiles_clientes(nombre_completo)
       `)
       .eq("id_tienda", idTienda)
-      .order("fecha_emision", { ascending: false });
+      .order("fecha_emision", { ascending: false }).order("id_factura"));
 
-    if (error) throw error;
     return data || [];
   },
 

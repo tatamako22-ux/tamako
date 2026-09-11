@@ -15,7 +15,7 @@
             margin: 0;
             overflow-x: hidden;
         }
-        
+
         .sidebar { 
             position: fixed; 
             top: 0; 
@@ -63,7 +63,7 @@
 
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-size: 0.65rem; color: #777; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; font-weight: 600; }
-        
+
         input, select {
             width: 100%; background: #0f0f0f; border: 1px solid rgba(191,149,63,0.1);
             padding: 14px; color: white; border-radius: 15px; outline: none; font-family: 'Montserrat'; font-size: 0.85rem;
@@ -118,13 +118,13 @@
             body { display: block !important; }
             .sidebar { display: none !important; }
             .mobile-tab-bar { display: flex !important; }
-            
+
             .main-content { 
                 margin-left: 0 !important;
                 width: 100% !important;
                 padding: 100px 16px 180px !important; 
             } 
-            
+
             .agenda-header { 
                 position: fixed; top: 0; left: 0; right: 0; 
                 background: rgba(5,5,5,0.95); 
@@ -134,7 +134,7 @@
                 margin-bottom: 0;
             }
             .agenda-header h1 { font-size: 1.1rem; text-align: center; }
-            
+
             .settings-wrapper {
                 grid-template-columns: 1fr !important;
             }
@@ -143,9 +143,9 @@
         }
     </style>
 <link rel="stylesheet" href="../assets/css/ajustes.css?v=5">
-<link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<link rel="stylesheet" href="../assets/css/notifications.css?v=2">
 <link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
-<script src="../assets/js/core/notifications.js?v=1" defer></script>
+<script src="../assets/js/core/notifications.js?v=2"></script>
 </head>
 <body>
 
@@ -327,7 +327,7 @@
             plusIcon.style.display = 'block';
             document.getElementById('shopName').value = "";
             document.getElementById('shopAddress').value = "";
-            
+
             const { data, error } = await supabase.from("tiendas").select("*")
                 .eq("id", tiendaInfo.id).eq("user_id", tiendaInfo.user_id).single();
             if (error || !data) {
@@ -425,7 +425,7 @@
 
             // VALIDACIÓN VACÍOS
             if (!fecha || !ini || !fin) {
-                alert("Completa todos los campos en horarios especiales");
+                window.TamakuUI.notify("Completa todos los campos en horarios especiales");
                 return;
             }
 
@@ -439,7 +439,7 @@
 
             // VALIDAR ORDEN
             if (horaToMin(ini) >= horaToMin(fin)) {
-                alert(`Error en ${fecha}: hora inicio mayor que fin`);
+                window.TamakuUI.notify(`Error en ${fecha}: hora inicio mayor que fin`);
                 return;
             }
 
@@ -457,9 +457,9 @@
             .eq("user_id", tiendaInfo.user_id);
 
         if (error) {
-            alert("Error guardando horarios especiales");
+            window.TamakuUI.notify("Error guardando horarios especiales");
         } else {
-            alert("Horarios especiales guardados correctamente");
+            window.TamakuUI.notify("Horarios especiales guardados correctamente");
             await init();
         }
     };
@@ -474,13 +474,13 @@
 
         // VALIDACIÓN
         if (!ini || !fin) {
-            alert(`Completa el horario de ${d}`);
+            window.TamakuUI.notify(`Completa el horario de ${d}`);
             error = true;
             return;
         }
 
         if (horaToMin(ini) >= horaToMin(fin)) {
-            alert(`Error en ${d}: la hora de inicio debe ser menor que la de cierre`);
+            window.TamakuUI.notify(`Error en ${d}: la hora de inicio debe ser menor que la de cierre`);
             error = true;
             return;
         }
@@ -497,13 +497,13 @@
                 .eq("user_id", tiendaInfo.user_id);
 
             if (dbError) {
-                alert("Error al guardar horario");
+                window.TamakuUI.notify("Error al guardar horario");
             } else {
                 window.horarioTienda = obj; 
                 // ACTUALIZAR LOCALSTORAGE
                 tiendaInfo.horario_general = obj;
                 localStorage.setItem("tamaku_tienda", JSON.stringify(tiendaInfo));
-                alert("Horario guardado correctamente");
+                window.TamakuUI.notify("Horario guardado correctamente");
                 await init();
             }
         }; // <--- ESTA LLAVE TE FALTABA PARA CERRAR EL BOTÓN
@@ -523,16 +523,16 @@
             }).eq("id", tiendaInfo.id).eq("user_id", tiendaInfo.user_id);
 
             if (error) {
-                alert("Error: " + error.message);
+                window.TamakuUI.notify("Error: " + error.message);
             } else {
                 // ACTUALIZAMOS EL OBJETO GLOBAL PARA QUE NO SE REVIERTA
                 tiendaInfo.nombre = nombre;
                 tiendaInfo.direccion = direccion;
                 tiendaInfo.logo_url = logo;
-                
+
                 localStorage.setItem("tamaku_tienda", JSON.stringify(tiendaInfo));
-                
-                alert("Identidad guardada y sincronizada");
+
+                window.TamakuUI.notify("Identidad guardada y sincronizada");
                 await init();
                 // Forzamos una pequeña recarga interna de los campos
                 document.getElementById('shopName').value = nombre;
@@ -589,13 +589,13 @@
 
                 // VALIDACIÓN VACÍOS
                 if (!desde || !hasta) {
-                    alert("Completa las fechas en cierres");
+                    window.TamakuUI.notify("Completa las fechas en cierres");
                     return;
                 }
 
                 // VALIDAR ORDEN DE FECHAS
                 if (new Date(desde) > new Date(hasta)) {
-                    alert("La fecha 'desde' no puede ser mayor que 'hasta'");
+                    window.TamakuUI.notify("La fecha 'desde' no puede ser mayor que 'hasta'");
                     return;
                 }
 
@@ -613,12 +613,12 @@
                 .eq("user_id", tiendaInfo.user_id);
 
             if (error) {
-                alert("Error guardando cierres");
+                window.TamakuUI.notify("Error guardando cierres");
             } else {
                 // ACTUALIZAR LOCALSTORAGE
                 tiendaInfo.cierres_temporales = data;
                 localStorage.setItem("tamaku_tienda", JSON.stringify(tiendaInfo));
-                alert("Cierres guardados correctamente");
+                window.TamakuUI.notify("Cierres guardados correctamente");
                 await init();
             }
         };
@@ -639,11 +639,11 @@
                 .eq("id", tiendaInfo.id).eq("user_id", tiendaInfo.user_id);
 
             if (error) {
-            alert("Error al guardar: " + error.message);
+            window.TamakuUI.notify("Error al guardar: " + error.message);
             } else {
                 const tiendaActualizada = { ...tiendaInfo, ...datos };
                 localStorage.setItem("tamaku_tienda", JSON.stringify(tiendaActualizada));
-                alert("¡Configuración guardada con éxito!");
+                window.TamakuUI.notify("¡Configuración guardada con éxito!");
 
                 await init(); // 🔥 RECARGA REAL DESDE SUPABASE
             }

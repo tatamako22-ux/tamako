@@ -143,7 +143,7 @@ export const FacturacionCaja = {
   },
 
   abrirModalMovimiento(tipo) {
-    if (!this.cajaActual) return alert("Primero debes abrir una caja.");
+    if (!this.cajaActual) return window.TamakuUI.notify("Primero debes abrir una caja.");
     this.tipoMovimiento = tipo === "EGRESO" ? "EGRESO" : "INGRESO";
     const esIngreso = this.tipoMovimiento === "INGRESO";
     const visual = document.getElementById("movimientoTipoVisual");
@@ -183,9 +183,9 @@ export const FacturacionCaja = {
     const monto = Number(document.getElementById("movimientoMonto").value);
     const boton = document.getElementById("confirmarMovimientoCaja");
 
-    if (!concepto) return alert("Escribe el concepto del movimiento.");
+    if (!concepto) return window.TamakuUI.notify("Escribe el concepto del movimiento.");
     if (!Number.isFinite(monto) || monto <= 0)
-      return alert("El monto debe ser mayor a cero.");
+      return window.TamakuUI.notify("El monto debe ser mayor a cero.");
 
     try {
       boton.disabled = true;
@@ -200,10 +200,10 @@ export const FacturacionCaja = {
       this.cerrarModal("modalMovimientoCaja");
       await this.cargar();
       window.dispatchEvent(new CustomEvent("movimiento-financiero"));
-      alert(`${this.tipoMovimiento === "INGRESO" ? "Ingreso" : "Egreso"} registrado correctamente.`);
+      window.TamakuUI.notify(`${this.tipoMovimiento === "INGRESO" ? "Ingreso" : "Egreso"} registrado correctamente.`);
     } catch (error) {
       console.error("Error registrando movimiento:", error);
-      alert(`No se pudo registrar el movimiento: ${error.message}`);
+      window.TamakuUI.notify(`No se pudo registrar el movimiento: ${error.message}`);
     } finally {
       boton.disabled = false;
       boton.textContent = "Registrar movimiento";
@@ -257,7 +257,7 @@ export const FacturacionCaja = {
       }
       this.mostrarModal("modalAbrirCaja");
     } catch (error) {
-      alert(`No se pudieron cargar las cuentas: ${error.message}`);
+      window.TamakuUI.notify(`No se pudieron cargar las cuentas: ${error.message}`);
     }
   },
 
@@ -268,7 +268,7 @@ export const FacturacionCaja = {
     const baseInicial = Number(document.getElementById("cajaBase").value);
     const notas = document.getElementById("cajaNotasApertura").value;
 
-    if (!idCuenta) return alert("Crea o selecciona una cuenta de efectivo.");
+    if (!idCuenta) return window.TamakuUI.notify("Crea o selecciona una cuenta de efectivo.");
 
     try {
       boton.disabled = true;
@@ -276,10 +276,10 @@ export const FacturacionCaja = {
       await FacturacionService.abrirCaja({ idTienda: tienda.id, idCuenta, baseInicial, notas });
       this.cerrarModal("modalAbrirCaja");
       await this.cargar();
-      alert("Caja abierta correctamente.");
+      window.TamakuUI.notify("Caja abierta correctamente.");
     } catch (error) {
       console.error("Error abriendo caja:", error);
-      alert(error.code === "23505" ? "Esta cuenta ya tiene una caja abierta." : `No se pudo abrir la caja: ${error.message}`);
+      window.TamakuUI.notify(error.code === "23505" ? "Esta cuenta ya tiene una caja abierta." : `No se pudo abrir la caja: ${error.message}`);
     } finally {
       boton.disabled = false;
       boton.textContent = "Confirmar apertura";
@@ -311,7 +311,7 @@ export const FacturacionCaja = {
     const notas = document.getElementById("cajaNotasCierre").value;
 
     if (!Number.isFinite(saldoContado) || saldoContado < 0)
-      return alert("Ingresa un efectivo contado válido.");
+      return window.TamakuUI.notify("Ingresa un efectivo contado válido.");
 
     try {
       boton.disabled = true;
@@ -320,10 +320,10 @@ export const FacturacionCaja = {
       this.cerrarModal("modalCerrarCaja");
       this.cajaActual = null;
       await this.cargar();
-      alert("Caja cerrada correctamente.");
+      window.TamakuUI.notify("Caja cerrada correctamente.");
     } catch (error) {
       console.error("Error cerrando caja:", error);
-      alert(`No se pudo cerrar la caja: ${error.message}`);
+      window.TamakuUI.notify(`No se pudo cerrar la caja: ${error.message}`);
     } finally {
       boton.disabled = false;
       boton.textContent = "Cerrar turno";

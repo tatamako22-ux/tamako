@@ -7,6 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Cinzel:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/global.css"><link rel="stylesheet" href="../assets/css/menu.css?v=13"><link rel="stylesheet" href="../assets/css/liquidaciones.css?v=5"><link rel="stylesheet" href="../assets/css/brand-theme.css?v=4"><link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
   <script src="../assets/js/core/menu.js?v=16" defer></script>
+<link rel="stylesheet" href="../assets/css/notifications.css?v=2">
+<script src="../assets/js/core/notifications.js?v=2"></script>
 </head>
 <body>
   <aside class="sidebar"></aside>
@@ -19,7 +21,7 @@
   </main>
   <nav class="mobile-tab-bar"></nav>
   <div id="modalPagoProfesional" class="liq-modal" hidden><form id="formPagoProfesional"><header><div><span>REGISTRAR EGRESO</span><h2 id="pagoProfesionalNombre">Pago al profesional</h2></div><button id="cerrarPagoProfesional" type="button" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></header><div class="liq-form-grid"><label>Periodo desde<input id="pagoDesde" type="date" required></label><label>Periodo hasta<input id="pagoHasta" type="date" required></label></div><label>Monto<input id="pagoMontoProfesional" type="number" min="1" required></label><label>Cuenta de salida<select id="pagoCuenta" required></select></label><label>Referencia<input id="pagoReferencia" maxlength="100" placeholder="Transferencia, comprobante..."></label><label>Notas<textarea id="pagoNotas" rows="2"></textarea></label><button class="liq-primary" type="submit">Registrar pago</button></form></div>
-  <div id="liqToast" class="liq-toast" role="status" aria-live="polite"></div>
-  <script type="module" src="../assets/js/liquidaciones/liquidaciones.js?v=6"></script>
+
+  <script type="module" src="../assets/js/liquidaciones/liquidaciones.js?v=notices2"></script>
 </body>
 </html>

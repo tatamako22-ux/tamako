@@ -67,11 +67,11 @@ export const FacturacionInsumos = {
 
   async guardar() {
     const costo = Number($("insumoCosto").value), cantidad = Number($("insumoCantidad").value);
-    if (!$("insumoNombre").value.trim() || costo <= 0 || cantidad <= 0) return alert("Completa nombre, cantidad y costo correctamente.");
+    if (!$("insumoNombre").value.trim() || costo <= 0 || cantidad <= 0) return window.TamakuUI.notify("Completa nombre, cantidad y costo correctamente.");
     try {
       await FacturacionService.crearInsumo({ id_tienda: getTienda().id, nombre: $("insumoNombre").value.trim(), proveedor: $("insumoProveedor").value.trim() || null, cantidad, unidad: $("insumoUnidad").value, costo_total: costo, notas: $("insumoNotas").value.trim() || null });
       $("formInsumo").reset(); $("insumoCantidad").value = 1; this.cerrar("modalNuevoInsumo"); await this.cargar();
-    } catch (error) { alert(`No se pudo registrar el insumo: ${error.message}`); }
+    } catch (error) { window.TamakuUI.notify(`No se pudo registrar el insumo: ${error.message}`); }
   },
 
   async abrirPago(id) {
@@ -82,18 +82,18 @@ export const FacturacionInsumos = {
       const cuentas = await FacturacionService.getCuentasFinancieras(getTienda().id); select.replaceChildren();
       cuentas.forEach((c) => { const o = document.createElement("option"); o.value = c.id; o.textContent = `${c.nombre} · Disponible ${moneda.format(c.saldo_actual)}`; o.disabled = Number(c.saldo_actual) < Number(this.insumoPago.costo_total); select.appendChild(o); });
       if (!cuentas.length) select.innerHTML = '<option value="">No hay cuentas activas</option>';
-    } catch (error) { alert(`No se pudieron cargar las cuentas: ${error.message}`); this.cerrar("modalPagarInsumo"); }
+    } catch (error) { window.TamakuUI.notify(`No se pudieron cargar las cuentas: ${error.message}`); this.cerrar("modalPagarInsumo"); }
   },
 
   async pagar() {
     const cuenta = $("pagarInsumoCuenta").value, boton = $("confirmarPagarInsumo");
-    if (!this.insumoPago || !cuenta) return alert("Selecciona una cuenta con saldo suficiente.");
-    if (!confirm(`¿Registrar el pago de ${moneda.format(this.insumoPago.costo_total)}?`)) return;
-    try { boton.disabled = true; boton.textContent = "Pagando..."; await FacturacionService.pagarInsumo({ idInsumo: this.insumoPago.id, idCuenta: cuenta }); this.cerrar("modalPagarInsumo"); this.insumoPago = null; await this.cargar(); window.dispatchEvent(new CustomEvent("movimiento-financiero")); alert("Insumo pagado y egreso registrado."); } catch (error) { alert(`No se pudo pagar: ${error.message}`); } finally { boton.disabled = false; boton.textContent = "Confirmar pago"; }
+    if (!this.insumoPago || !cuenta) return window.TamakuUI.notify("Selecciona una cuenta con saldo suficiente.");
+    if (!(await window.TamakuUI.confirm(`¿Registrar el pago de ${moneda.format(this.insumoPago.costo_total)}?`))) return;
+    try { boton.disabled = true; boton.textContent = "Pagando..."; await FacturacionService.pagarInsumo({ idInsumo: this.insumoPago.id, idCuenta: cuenta }); this.cerrar("modalPagarInsumo"); this.insumoPago = null; await this.cargar(); window.dispatchEvent(new CustomEvent("movimiento-financiero")); window.TamakuUI.notify("Insumo pagado y egreso registrado."); } catch (error) { window.TamakuUI.notify(`No se pudo pagar: ${error.message}`); } finally { boton.disabled = false; boton.textContent = "Confirmar pago"; }
   },
 
   async eliminar(id) {
-    if (!confirm("¿Eliminar este insumo pendiente?")) return;
-    try { await FacturacionService.eliminarInsumo(getTienda().id, id); await this.cargar(); } catch (error) { alert(`No se pudo eliminar: ${error.message}`); }
+    if (!(await window.TamakuUI.confirm("¿Eliminar este insumo pendiente?"))) return;
+    try { await FacturacionService.eliminarInsumo(getTienda().id, id); await this.cargar(); } catch (error) { window.TamakuUI.notify(`No se pudo eliminar: ${error.message}`); }
   },
 };

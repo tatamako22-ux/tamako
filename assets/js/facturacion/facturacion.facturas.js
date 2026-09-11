@@ -1,3 +1,5 @@
+import { optionalSummary } from "../services/performance.service.js";
+import { renderPager } from "../core/pager.js";
 import { FacturacionService } from "./facturacion.service.js";
 
 const moneda = new Intl.NumberFormat("es-CO", {
@@ -24,10 +26,17 @@ function puedeEditar(factura) {
 
 export const FacturacionFacturas = {
   facturas: [],
+  pagina: 0,
+  remoto: false,
+  datosCargados: false,
+  versionCarga: 0,
   facturaEnEdicion: null,
 
   async init() {
     window.addEventListener("factura-creada", () => this.cargar());
+    const pager = document.createElement('div');
+    pager.id = 'facturasPaginacion';
+    document.getElementById('listaFacturas')?.after(pager);
     this.asignarFiltros();
     this.asignarEdicion();
     await this.cargar();
@@ -51,12 +60,17 @@ export const FacturacionFacturas = {
       boton.setAttribute("aria-expanded", String(abrir));
     });
     ["buscarFactura", "filtrarEstadoFactura", "filtrarMetodoFactura"].forEach((id) =>
-      document.getElementById(id)?.addEventListener("input", () => this.aplicarFiltros()),
+      document.getElementById(id)?.addEventListener("input", () => {
+        ++this.versionCarga;
+        clearTimeout(this.busquedaPendiente);
+        this.busquedaPendiente = setTimeout(() => { this.pagina = 0; this.aplicarFiltros(); }, 300);
+      }),
     );
     document.getElementById("limpiarFiltrosFacturas")?.addEventListener("click", () => {
       document.getElementById("buscarFactura").value = "";
       document.getElementById("filtrarEstadoFactura").value = "";
       document.getElementById("filtrarMetodoFactura").value = "";
+      this.pagina = 0;
       this.aplicarFiltros();
     });
   },
@@ -66,15 +80,43 @@ export const FacturacionFacturas = {
     const tienda = getTienda();
     if (!contenedor || !tienda.id) return;
 
+    const version = ++this.versionCarga;
     contenedor.innerHTML = '<div class="facturas-estado">Cargando facturas...</div>';
 
     try {
+      const resumen = await optionalSummary('tamaku_facturas_pagina_v1', {
+        p_tienda: tienda.id, p_offset: this.pagina * 50, p_limite: 50,
+        p_busqueda: document.getElementById('buscarFactura')?.value.trim() || '',
+        p_estado: document.getElementById('filtrarEstadoFactura')?.value || '',
+        p_metodo: document.getElementById('filtrarMetodoFactura')?.value || ''
+      });
+      if (version !== this.versionCarga) return;
+      if (resumen) {
+        this.remoto = true;
+        if (this.pagina > 0 && this.pagina * 50 >= resumen.total) {
+          this.pagina = Math.max(0, Math.ceil(resumen.total / 50) - 1);
+          return this.cargar();
+        }
+        this.facturas = resumen.items;
+        this.datosCargados = true;
+        for (const [id, valor] of Object.entries(resumen.metrics)) {
+          document.getElementById(id).textContent = ['ventasHoy','totalMes'].includes(id) ? moneda.format(valor) : valor;
+        }
+        this.actualizarMetodos(resumen.metodos.map(metodo_pago => ({ metodo_pago })));
+        this.renderizar(contenedor, resumen.items, resumen.metrics.cantidadFacturas > 0);
+        this.paginacion(resumen.total);
+        return;
+      }
+      this.remoto = false;
       const facturas = await FacturacionService.getFacturas(tienda.id);
+      if (version !== this.versionCarga) return;
       this.facturas = facturas;
+      this.datosCargados = true;
       this.actualizarIndicadores(facturas);
       this.actualizarMetodos(facturas);
       this.aplicarFiltros();
     } catch (error) {
+      if (version !== this.versionCarga) return;
       console.error("Error cargando facturas:", error);
       contenedor.innerHTML =
         '<div class="facturas-estado facturas-error">No se pudieron cargar las facturas.</div>';
@@ -96,6 +138,7 @@ export const FacturacionFacturas = {
   },
 
   aplicarFiltros() {
+    if (this.remoto || !this.datosCargados) return this.cargar();
     const contenedor = document.getElementById("listaFacturas");
     if (!contenedor) return;
     const texto = document.getElementById("buscarFactura")?.value.trim().toLowerCase() || "";
@@ -107,7 +150,16 @@ export const FacturacionFacturas = {
         (!estado || String(factura.estado).toUpperCase() === estado) &&
         (!metodo || factura.metodo_pago === metodo);
     });
-    this.renderizar(contenedor, filtradas, this.facturas.length > 0);
+    this.pagina = Math.min(this.pagina, Math.max(0, Math.ceil(filtradas.length / 50) - 1));
+    this.renderizar(contenedor, filtradas.slice(this.pagina * 50, (this.pagina + 1) * 50), this.facturas.length > 0);
+    this.paginacion(filtradas.length);
+  },
+
+  paginacion(total) {
+    renderPager(document.getElementById('facturasPaginacion'), this.pagina, Number(total), 50, pagina => {
+      this.pagina = pagina;
+      this.aplicarFiltros();
+    });
   },
 
   actualizarIndicadores(facturas) {
@@ -177,7 +229,7 @@ export const FacturacionFacturas = {
   },
 
   async abrirEdicion(factura) {
-    if (String(factura.estado).toUpperCase() !== "PAGADA") return alert("Solo se puede corregir el método de una factura pagada.");
+    if (String(factura.estado).toUpperCase() !== "PAGADA") return window.TamakuUI.notify("Solo se puede corregir el método de una factura pagada.");
     this.facturaEnEdicion = factura;
     document.getElementById("editarFacturaCliente").textContent = factura.perfiles_clientes?.nombre_completo || "Cliente ocasional";
     document.getElementById("editarFacturaTotal").textContent = moneda.format(Number(factura.total) || 0);
@@ -198,7 +250,7 @@ export const FacturacionFacturas = {
       });
       if (!metodos.length) select.innerHTML = '<option value="">No hay métodos activos</option>';
     } catch (error) {
-      alert(`No se pudieron cargar los métodos: ${error.message}`);
+      window.TamakuUI.notify(`No se pudieron cargar los métodos: ${error.message}`);
       this.cerrarEdicion();
     }
   },
@@ -212,9 +264,9 @@ export const FacturacionFacturas = {
   async guardarEdicion() {
     const idMetodoNuevo = document.getElementById("editarFacturaMetodo")?.value;
     const boton = document.getElementById("btnGuardarEditarFactura");
-    if (!this.facturaEnEdicion || !idMetodoNuevo) return alert("Selecciona el método correcto.");
-    if (String(idMetodoNuevo) === String(this.facturaEnEdicion.id_metodo_pago)) return alert("Selecciona un método diferente al registrado actualmente.");
-    if (!confirm("¿Confirmas la corrección? El dinero se moverá a la cuenta financiera seleccionada.")) return;
+    if (!this.facturaEnEdicion || !idMetodoNuevo) return window.TamakuUI.notify("Selecciona el método correcto.");
+    if (String(idMetodoNuevo) === String(this.facturaEnEdicion.id_metodo_pago)) return window.TamakuUI.notify("Selecciona un método diferente al registrado actualmente.");
+    if (!(await window.TamakuUI.confirm("¿Confirmas la corrección? El dinero se moverá a la cuenta financiera seleccionada."))) return;
     try {
       boton.disabled = true;
       boton.textContent = "Corrigiendo...";
@@ -223,10 +275,10 @@ export const FacturacionFacturas = {
       await this.cargar();
       window.dispatchEvent(new CustomEvent("factura-corregida"));
       window.dispatchEvent(new CustomEvent("factura-creada"));
-      alert("Método de pago corregido y saldos actualizados correctamente.");
+      window.TamakuUI.notify("Método de pago corregido y saldos actualizados correctamente.");
     } catch (error) {
       console.error("Error corrigiendo factura:", error);
-      alert(`No se pudo corregir la factura: ${error.message}`);
+      window.TamakuUI.notify(`No se pudo corregir la factura: ${error.message}`);
     } finally {
       boton.disabled = false;
       boton.textContent = "Guardar corrección";

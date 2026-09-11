@@ -174,7 +174,7 @@
             transform: scale(0.98);
             background: rgba(191,149,63,0.05);
         }
-        
+
         .tabs-horarios {
             display: flex;
             gap: 10px;
@@ -202,7 +202,7 @@
         .panel-horario.active {
             display: block;
         }
-        
+
         /* Loading overlay */
         .loading-overlay {
             position: fixed;
@@ -231,13 +231,13 @@
         }
     </style>
 <link rel="stylesheet" href="../assets/css/profesionales.css?v=5">
-<link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<link rel="stylesheet" href="../assets/css/notifications.css?v=2">
 <link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
-<script src="../assets/js/core/notifications.js?v=1" defer></script>
+<script src="../assets/js/core/notifications.js?v=2"></script>
 </head>
 <body>
 
-    <div id="toast">✦ OPERACIÓN EXITOSA</div>
+
     <div id="errorModal" class="modal-overlay" style="z-index: 9999;">
         <div class="confirm-box" style="border-color: var(--danger);">
             <i class="fa-solid fa-circle-exclamation" style="font-size: 2.5rem; color: var(--danger); margin-bottom: 20px;"></i>
@@ -261,7 +261,7 @@
             </div>
         </div>
     </div>
-    
+
     <div id="callModal" class="modal-overlay">
         <div class="confirm-box" style="border-color: var(--gold);">
             <i id="callIcon" class="fa-solid fa-phone-volume" style="font-size: 2.5rem; color: var(--gold); margin-bottom: 20px;"></i>
@@ -273,16 +273,16 @@
             </div>
         </div>
     </div>
-    
+
     <div id="configModal" class="modal-overlay">
         <div class="modal-card">
             <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom: 25px;">Configuración de <span id="nombreStaffConfig"></span></h2>
-            
+
             <div class="tabs-horarios">
                 <button class="tab-horario active" onclick="cambiarTabHorario('general')">⚙️ General</button>
                 <button class="tab-horario" onclick="cambiarTabHorario('especiales')">📅 Horarios por Día</button>
             </div>
-            
+
             <!-- Panel General -->
             <div id="panelGeneral" class="panel-horario active">
                 <div class="input-group">
@@ -293,7 +293,7 @@
                     </div>
                     <small style="color:#666; font-size:0.6rem;">Horario base para días sin configuración especial</small>
                 </div>
-                
+
                 <div class="input-group">
                     <label>Hora Almuerzo</label>
                     <select id="configAlmuerzo" onchange="toggleAlmuerzo()">
@@ -307,7 +307,7 @@
                     <label>Inicio Almuerzo</label>
                     <input type="time" id="horaAlmuerzoInicio" value="13:00">
                 </div>
-                
+
                 <div class="input-group">
                     <label>Modo de Agenda</label>
                     <select id="modoAgenda" onchange="toggleModoAgenda()">
@@ -319,7 +319,7 @@
                     <label>Duración de Intervalo (min)</label>
                     <input type="number" id="intervaloTurno" placeholder="Ej. 30">
                 </div>
-                
+
                 <div class="input-group">
                     <label>Break (Descanso corto)</label>
                     <div style="display:flex; gap:10px;">
@@ -332,7 +332,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="input-group">
                     <label>Descanso Semanal (Día fijo)</label>
                     <select id="configDescanso">
@@ -346,7 +346,7 @@
                         <option value="Domingo">Domingo</option>
                     </select>
                 </div>
-                
+
                 <div class="input-group">
                     <label>Vacaciones / Licencias</label>
                     <div style="display:flex; gap:10px;">
@@ -355,7 +355,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Panel Horarios Especiales por Día -->
             <div id="panelEspeciales" class="panel-horario">
                 <div class="horarios-especiales">
@@ -366,7 +366,7 @@
                     </small>
                 </div>
             </div>
-            
+
             <button class="btn-gold" onclick="guardarConfig()">💾 Guardar Todos los Cambios</button>
             <button onclick="cerrarModales()" style="background:transparent; border:none; color:#555; margin-top:15px; cursor:pointer; font-weight:700;">CANCELAR</button>
         </div>
@@ -392,7 +392,7 @@
             <button onclick="document.getElementById('modalFormServicio').style.display='none'" style="background:transparent; border:none; color:#555; margin-top:15px; cursor:pointer;">CANCELAR</button>
         </div>
     </div>
-    
+
     <div id="modalEditarServicio" class="modal-overlay" style="z-index: 3500;">
         <div class="modal-card" style="max-width: 400px; border-color: var(--gold);">
             <h3 style="font-family:'Cinzel'; color:var(--gold); margin-bottom: 25px;">Editar Servicio</h3>
@@ -414,7 +414,7 @@
             <button onclick="document.getElementById('modalEditarServicio').style.display='none'" style="background:transparent; border:none; color:#555; margin-top:15px; cursor:pointer; font-weight:700;">CANCELAR</button>
         </div>
     </div>
-    
+
     <div id="modalConfirmBloques" class="modal-overlay" style="z-index: 4000;">
         <div class="confirm-box" style="border-color: var(--gold); max-width: 380px;">
             <i class="fa-solid fa-layer-group" style="font-size: 2.5rem; color: var(--gold); margin-bottom: 20px;"></i>
@@ -428,7 +428,7 @@
     </div>
 
     <aside class="sidebar"></aside>
-    
+
     <nav class="mobile-tab-bar"></nav>
 
     <main class="main-content">
@@ -481,7 +481,7 @@
     // === OBTENER TIENDA REAL DEL LOCALSTORAGE ===
     // ============================================
     let tiendaInfo = await requireTiendaInfo();
-    
+
     function cargarTiendaDeSesion() {
         const stored = localStorage.getItem("tamaku_tienda");
         if (stored) {
@@ -493,10 +493,10 @@
             return false;
         }
     }
-    
+
     // Cargar la tienda al inicio
     if (!tiendaInfo) throw new Error("No existe una tienda válida para esta sesión");
-    
+
     // Variables globales
     let horarioTienda = {};
     let staffLocal = []; 
@@ -523,7 +523,7 @@
         const mins = minutosTotales % 60;
         return `${horas.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
     }
-    
+
     function showToast(msj) { 
         TamakuUI.success(msj);
     }
@@ -531,7 +531,7 @@
     function showError(msj) {
         TamakuUI.error(msj);
     }
-    
+
     function showLoading(show) {
         const loader = document.getElementById("loadingOverlay");
         if (loader) {
@@ -550,7 +550,7 @@
             cont.style.display = (val === "0") ? "none" : "flex";
         }
     };
-    
+
     window.toggleModoAgenda = () => {
         const modo = document.getElementById("modoAgenda").value;
         const cont = document.getElementById("intervaloContainer");
@@ -562,7 +562,7 @@
     window.cambiarTabHorario = (tab) => {
         document.querySelectorAll('.tab-horario').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.panel-horario').forEach(p => p.classList.remove('active'));
-        
+
         if (tab === 'general') {
             document.querySelector('.tab-horario:first-child').classList.add('active');
             document.getElementById('panelGeneral').classList.add('active');
@@ -575,13 +575,13 @@
     function generarUHDiasEspeciales(horariosActuales) {
         const container = document.getElementById('horariosDiasContainer');
         if (!container) return;
-        
+
         container.innerHTML = '';
-        
+
         DIAS_SEMANA.forEach(dia => {
             const diaKey = dia.toLowerCase();
             const horarioDia = horariosActuales?.[diaKey] || { activo: false, inicio: '09:00', fin: '18:00' };
-            
+
             const row = document.createElement('div');
             row.className = 'dia-horario-row';
             row.innerHTML = `
@@ -594,23 +594,23 @@
                 <span>a</span>
                 <input type="time" id="dia_${diaKey}_fin" value="${horarioDia.fin || '18:00'}">
             `;
-            
+
             const chk = row.querySelector(`#dia_${diaKey}_activo`);
             const inpInicio = row.querySelector(`#dia_${diaKey}_inicio`);
             const inpFin = row.querySelector(`#dia_${diaKey}_fin`);
-            
+
             const toggleInputs = () => {
                 inpInicio.disabled = !chk.checked;
                 inpFin.disabled = !chk.checked;
             };
-            
+
             chk.addEventListener('change', toggleInputs);
             toggleInputs();
-            
+
             container.appendChild(row);
         });
     }
-    
+
     function obtenerHorariosEspeciales() {
         const especiales = {};
         DIAS_SEMANA.forEach(dia => {
@@ -618,23 +618,23 @@
             const activo = document.getElementById(`dia_${diaKey}_activo`)?.checked || false;
             const inicio = document.getElementById(`dia_${diaKey}_inicio`)?.value || '09:00';
             const fin = document.getElementById(`dia_${diaKey}_fin`)?.value || '18:00';
-            
+
             if (activo) {
                 especiales[diaKey] = { activo, inicio, fin };
             }
         });
         return especiales;
     }
-    
+
     function obtenerHorarioDelDia(profesional, dia) {
         const diaKey = dia.toLowerCase();
         const horariosEspeciales = profesional.horario_semanal || {};
         const horarioEspecial = horariosEspeciales[diaKey];
-        
+
         if (horarioEspecial?.activo && horarioEspecial.inicio && horarioEspecial.fin) {
             return { inicio: horarioEspecial.inicio, fin: horarioEspecial.fin };
         }
-        
+
         return { inicio: profesional.horario_inicio, fin: profesional.horario_fin };
     }
 
@@ -654,11 +654,11 @@
     function generarDisponibilidad(p) {
         const ahora = new Date();
         const horaActual = ahora.getHours() * 60 + ahora.getMinutes();
-        
+
         const dias = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
         const hoyNombre = dias[ahora.getDay()];
         const horarioHoy = obtenerHorarioDelDia(p, hoyNombre);
-        
+
         const inicio = horaToMin(horarioHoy.inicio);
         const fin = horaToMin(horarioHoy.fin);
 
@@ -705,25 +705,25 @@
             console.error("No hay tienda para cargar profesionales");
             return;
         }
-        
+
         showLoading(true);
-        
+
         const { data, error } = await supabase
             .from("profesionales")
             .select("*")
             .eq("id_tienda", tiendaInfo.id);
 
         showLoading(false);
-        
+
         if (error) {
             console.error("Error cargando profesionales:", error);
-            showToast("Error cargando datos");
+            showError("Error cargando datos");
             return;
         }
 
         staffLocal = data || [];
         const grid = document.getElementById("profesionales-grid");
-        
+
         if (!data || data.length === 0) {
             grid.innerHTML = `<div style="text-align:center; padding:50px; opacity:0.5; font-family:'Cinzel';">✦ ${tiendaInfo.nombre.toUpperCase()} SIN STAFF</div>`;
             return;
@@ -731,7 +731,7 @@
 
         const cardsHTML = data.map(p => {
             const disponibilidadHTML = generarDisponibilidad(p);
-            
+
             let claseDisponibilidad = "status-unavailable";
             if (disponibilidadHTML.includes("Disponible")) {
                 claseDisponibilidad = "status-available";
@@ -774,17 +774,17 @@
             showError("No hay profesional seleccionado");
             return;
         }
-        
+
         const profesionalValido = staffLocal.find(p => p.id_barbero == barberoActivoID);
         if (!profesionalValido || profesionalValido.id_tienda !== tiendaInfo.id) {
             showError("❌ No tienes permiso para modificar este profesional");
             return;
         }
-        
+
         const modo = document.getElementById("modoAgenda").value;
         const intervaloRaw = parseInt(document.getElementById("intervaloTurno")?.value);
         const horariosEspeciales = obtenerHorariosEspeciales();
-        
+
         const payload = {
             horario_inicio: document.getElementById("configInicio").value,
             horario_fin: document.getElementById("configFin").value,
@@ -804,7 +804,7 @@
             showError("⚠️ Define la jornada laboral completa.");
             return;
         }
-        
+
         if (horaToMin(payload.horario_inicio) >= horaToMin(payload.horario_fin)) {
             showError("❌ El horario de inicio debe ser menor al de cierre.");
             return;
@@ -847,7 +847,7 @@
             if (modalidad === "PORCENTAJE" && (porcentaje < 0 || porcentaje > 100)) return showError("El porcentaje debe estar entre 0 y 100.");
             if (modalidad === "MENSUALIDAD" && mensualidad <= 0) return showError("Ingresa una mensualidad mayor a cero.");
         }
-        
+
         const btn = document.getElementById("btnGuardar");
         btn.innerText = "PROCESANDO..."; 
         btn.disabled = true;
@@ -889,13 +889,13 @@
             } else {
                 res = await supabase.from("profesionales").insert([payload]);
             }
-            
+
             if (res.error) throw res.error;
 
             showToast("✦ STAFF ACTUALIZADO");
             cerrarModales();
             setTimeout(() => cargarProfesionales(), 500);
-            
+
         } catch (e) { 
             showError("Error: " + e.message); 
         } finally { 
@@ -911,12 +911,12 @@
             showError("Profesional no encontrado");
             return;
         }
-        
+
         if (p.id_tienda !== tiendaInfo.id) {
             showError("❌ No puedes editar profesionales de otra tienda");
             return;
         }
-        
+
         document.getElementById("editID").value = p.id_barbero;
         document.getElementById("nombreProf").value = p.nombre_empleado;
         document.getElementById("telProf").value = p.telefono_empleado;
@@ -955,17 +955,17 @@
             showError("No hay profesional seleccionado");
             return;
         }
-        
+
         const profesionalValido = staffLocal.find(p => p.id_barbero == barberoActivoID);
         if (!profesionalValido || profesionalValido.id_tienda !== tiendaInfo.id) {
             showError("❌ No puedes agregar servicios a profesionales de otra tienda");
             return;
         }
-        
+
         const nombre = document.getElementById("servNombre").value.trim();
         const precio = document.getElementById("servPrecio").value;
         const duracionManual = parseInt(document.getElementById("servDuracion").value);
-        
+
         if(!nombre || !precio || !duracionManual) {
             showError("⚠️ Completa todos los campos");
             return;
@@ -993,7 +993,7 @@
             showError("Error: " + error.message);
         }
     };
-    
+
     window.eliminarServicio = async (id) => { 
         if (!(await TamakuUI.confirm({
             titulo: "¿Eliminar servicio?",
@@ -1007,10 +1007,10 @@
         showLoading(false);
         await abrirModalServicios(); 
     };
-    
+
     window.abrirModalServicios = async () => {
         if (!barberoActivoID) return;
-        
+
         const profesionalValido = staffLocal.find(p => p.id_barbero == barberoActivoID);
         if (!profesionalValido || profesionalValido.id_tienda !== tiendaInfo.id) {
             showError("❌ No puedes ver servicios de profesionales de otra tienda");
@@ -1057,7 +1057,7 @@
         }
         document.getElementById("modalServicios").style.display = "flex";
     };
-    
+
     window.editarServicio = (servicio) => {
         document.getElementById("editServId").value = servicio.id_servicio;
         document.getElementById("editServNombre").value = servicio.nombre_servicio;
@@ -1065,7 +1065,7 @@
         document.getElementById("editServDuracion").value = servicio.duracion_minutos;
         document.getElementById("modalEditarServicio").style.display = "flex";
     };
-    
+
     window.actualizarServicio = async () => {
         const id = document.getElementById("editServId").value;
         const nombre = document.getElementById("editServNombre").value.toUpperCase();
@@ -1092,7 +1092,7 @@
             showError("Error: " + error.message);
         }
     };
-    
+
     window.actualizarLeyenda = (minutos, elementId) => {
         const el = document.getElementById(elementId);
         if (!el) return;
@@ -1111,19 +1111,19 @@
     // ========== EVENTOS ==========
     document.getElementById("btnEliminarFinal").onclick = async () => {
         if (!window.idParaBorrar) return;
-        
+
         const profesionalAEliminar = staffLocal.find(p => p.id_barbero == window.idParaBorrar);
         if (!profesionalAEliminar || profesionalAEliminar.id_tienda !== tiendaInfo.id) {
             showError("❌ No puedes eliminar profesionales de otra tienda");
             cerrarModales();
             return;
         }
-        
+
         showLoading(true);
         const { error } = await supabase.from("profesionales").delete()
             .eq("id_barbero", window.idParaBorrar).eq("id_tienda", tiendaInfo.id);
         showLoading(false);
-        
+
         if (!error) { 
             showToast("✦ STAFF REMOVIDO"); 
             cerrarModales(); 
@@ -1145,14 +1145,14 @@
             window.idParaBorrar = btnDelete.getAttribute('data-id'); 
             document.getElementById("confirmModal").style.display = "flex"; 
         }
-        
+
         if (btnPhone) { 
             const tel = btnPhone.getAttribute('data-tel'); 
             document.getElementById("callSubtitle").innerText = `Llamar a ${btnPhone.getAttribute('data-nombre')}\nTel: ${tel}`; 
             document.getElementById("btnCallAction").href = `tel:${tel}`; 
             document.getElementById("callModal").style.display = "flex"; 
         }
-        
+
         if (btnSos) { 
             const urg = btnSos.getAttribute('data-urg'); 
             document.getElementById("callSubtitle").innerText = `EMERGENCIA: ${btnSos.getAttribute('data-nombre')}\nLlamar a: ${urg || 'N/A'}`; 
@@ -1160,20 +1160,20 @@
             document.getElementById("callIcon").style.color = "var(--danger)"; 
             document.getElementById("callModal").style.display = "flex"; 
         }
-        
+
         if (btnEdit) prepararEdicion(btnEdit.getAttribute('data-id'));
-        
+
         if (btnGear) { 
             barberoActivoID = btnGear.getAttribute('data-id'); 
             const nombre = btnGear.getAttribute('data-nombre');
-            
+
             const p = staffLocal.find(item => item.id_barbero == barberoActivoID);
-            
+
             if (!p) {
                 showError("Profesional no encontrado");
                 return;
             }
-            
+
             if (p.id_tienda !== tiendaInfo.id) {
                 showError(`❌ No tienes permiso para configurar a "${nombre}".`);
                 return;
@@ -1203,13 +1203,13 @@
         if (btnServices) { 
             barberoActivoID = btnServices.getAttribute('data-id'); 
             const nombre = btnServices.getAttribute('data-nombre');
-            
+
             const p = staffLocal.find(item => item.id_barbero == barberoActivoID);
             if (!p || p.id_tienda !== tiendaInfo.id) {
                 showError("❌ No puedes ver servicios de profesionales de otra tienda");
                 return;
             }
-            
+
             document.getElementById("nombreBarberoServicio").innerText = nombre.toUpperCase(); 
             abrirModalServicios(); 
         }
@@ -1221,22 +1221,22 @@
             window.location.href = "../index.html";
             return;
         }
-        
+
         const sedeElem = document.getElementById("sedeNombre");
         if(sedeElem && tiendaInfo.nombre) {
             sedeElem.innerText = `SEDE: ${tiendaInfo.nombre.toUpperCase()}`;
         }
-        
+
         await cargarHorarioTienda();
         await cargarProfesionales();
-        
+
         supabase.channel('staff-changes')
             .on('postgres_changes', 
                 { event: '*', schema: 'public', table: 'profesionales', filter: `id_tienda=eq.${tiendaInfo.id}` }, 
                 () => { cargarProfesionales(); }
             )
             .subscribe();
-            
+
         console.log(`✅ Sistema Staff de ${tiendaInfo.nombre} inicializado correctamente`);
     }
 

@@ -9,7 +9,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="../manifest.json">
 
-<title>TAMAKU | Plataforma Premium para Negocios de Belleza</title>
+<title>Planes y precios de Tamaku | Software para negocios de belleza</title>
+<meta name="description" content="Compara los planes Básico, Pro y Premium de Tamaku para gestionar tu negocio de belleza. Consulta funciones y límites. Prueba gratis 7 días sin tarjeta.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.tamaku.co/pages/servicios.html">
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -99,7 +102,7 @@ body::after{
     box-shadow:
         0 0 10px rgba(191,149,63,.6),
         0 0 25px rgba(191,149,63,.4);
-    
+
     transform:scaleX(0);
     transform-origin:center;
     animation: lineReveal 1.2s ease-out forwards;
@@ -1148,9 +1151,9 @@ html{
   .services-v2 .services-cta a { width:100%; justify-content:center; }
 }
 </style>
-<link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<link rel="stylesheet" href="../assets/css/notifications.css?v=2">
 <link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
-<script src="../assets/js/core/notifications.js?v=1" defer></script>
+<script src="../assets/js/core/notifications.js?v=2"></script>
 </head>
 
 <body class="services-v2">
@@ -1235,7 +1238,7 @@ html{
                 <tr><td>Usuarios</td><td>3</td></tr>
                 <tr><td>Precio</td><td>$59.900</td></tr>
             </table>
-            
+
             <button class="btn-acceder-premium" onclick="window.location.href='registro.html?plan=pro'">ELEGIR PLAN</button>
         </div>
 
@@ -1269,7 +1272,7 @@ html{
     <div class="modal-content">
     <span class="close-btn" onclick="cerrarLogin()">&times;</span>
     <h1 style="font-family:'Cinzel'; color:#111; margin-bottom:25px; letter-spacing: 10px; font-size: 2rem;">ENTRAR</h1>
-    
+
     <label class="label-input">Usuario</label>
     <div class="field">
         <svg class="input-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -1277,7 +1280,7 @@ html{
         </svg>
         <input type="email" placeholder="CORREO ELECTRÓNICO" class="input-field" autocomplete="off">
     </div>
-    
+
     <label class="label-input">Contraseña</label>
     <div class="field">
         <svg class="input-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -1333,7 +1336,7 @@ html{
             const modalContent = document.querySelector('.modal-content');
             modalContent.classList.add('shake');
             setTimeout(() => modalContent.classList.remove('shake'), 400);
-            alert("Por favor, completa todos los campos.");
+            window.TamakuUI.notify("Por favor, completa todos los campos.");
             return;
         }
 

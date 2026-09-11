@@ -254,7 +254,7 @@ export const FacturacionReportes = {
 
   exportarCSV() {
     if (!this.datos.movimientos.length && !this.datos.facturas.length)
-      return alert("No hay datos para exportar en este periodo.");
+      return window.TamakuUI.notify("No hay datos para exportar en este periodo.");
 
     const filas = [["TIPO", "FECHA", "CONCEPTO", "CUENTA / METODO", "VALOR", "ESTADO"]];
     this.datos.facturas.forEach((factura) => filas.push([

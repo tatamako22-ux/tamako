@@ -1,3 +1,4 @@
+import { createLatestLoader } from "../../core/latest-load.js";
 import {
   agendaState,
   setState,
@@ -11,7 +12,7 @@ import {
   obtenerConteoCitasRango,
   cancelarCita,
   marcarCitaNoAsistida,
-} from "../../services/agenda.service.js?v=7";
+} from "../../services/agenda.service.js?v=8";
 
 import {
   formatearFecha,
@@ -58,27 +59,33 @@ export function iniciarAgenda({
     });
   }
 
-  // 📅 CARGAR CITAS
-  async function cargarCitasDelDia() {
-    const fecha = getState("fechaSeleccionada").toLocaleDateString("sv-SE");
-
-    const idBarbero = idProfesionalForzado || selectorBarbero?.value;
-
-    if (!idBarbero) return;
-
-    const fechaHasta = new Date(getState("fechaSeleccionada"));
-    fechaHasta.setDate(fechaHasta.getDate() + 6);
-    const hasta = fechaHasta.toLocaleDateString("sv-SE");
+  let ultimaCarga = 0;
+  let realtimeConectado = false;
+  const cargaAgenda = createLatestLoader(async ({ fecha, idBarbero, hasta }) => {
     const [citas, conteoSemana] = await Promise.all([
       obtenerCitas({ idTienda: tiendaInfo.id, fecha, idBarbero }),
       obtenerConteoCitasRango({ idTienda: tiendaInfo.id, desde: fecha, hasta, idBarbero }),
     ]);
+    return { citas, conteoSemana };
+  }, ({ citas, conteoSemana }) => {
     setState("citasDelDia", citas);
     setState("conteoCitasSemana", conteoSemana);
-
+    ultimaCarga = Date.now();
     renderizar();
-  }
+  }, (error) => {
+    console.error("No se pudo actualizar la agenda:", error);
+    mostrarToast("No se pudo actualizar la agenda. Intenta de nuevo.", "error");
+  });
 
+  function cargarCitasDelDia() {
+    const seleccionada = getState("fechaSeleccionada");
+    const fecha = seleccionada.toLocaleDateString("sv-SE");
+    const idBarbero = idProfesionalForzado || selectorBarbero?.value;
+    if (!idBarbero) return Promise.resolve();
+    const fechaHasta = new Date(seleccionada);
+    fechaHasta.setDate(fechaHasta.getDate() + 6);
+    return cargaAgenda.request({ fecha, idBarbero, hasta: fechaHasta.toLocaleDateString("sv-SE") });
+  }
   // 📆 ACTUALIZAR FECHA
   async function actualizarFecha() {
     console.log(
@@ -168,9 +175,9 @@ export function iniciarAgenda({
       mostrarToast("No tienes permiso para modificar citas.", "error");
       return;
     }
-    const confirmar = window.confirm(
+    const confirmar = (await window.TamakuUI.confirm(
       `¿Confirmas que ${nombreCliente} no asistió? La cita aparecerá como ingreso no facturado en Liquidaciones.`,
-    );
+    ));
     if (!confirmar) return;
 
     const ok = await marcarCitaNoAsistida(idCita, tiendaInfo.id);
@@ -191,7 +198,7 @@ export function iniciarAgenda({
     const ok = await cancelarCita(idCita, tiendaInfo.id);
 
     if (!ok) {
-      alert("❌ Error al cancelar");
+      window.TamakuUI.notify("❌ Error al cancelar");
 
       return;
     }
@@ -315,13 +322,13 @@ export function iniciarAgenda({
     const telefono = telInput.value.replace(/\D/g, "");
 
     if (!nombre) {
-      alert("⚠️ Ingresa el nombre del cliente");
+      window.TamakuUI.notify("⚠️ Ingresa el nombre del cliente");
 
       return;
     }
 
     if (telefono.length !== 10) {
-      alert("⚠️ El teléfono debe tener exactamente 10 números.");
+      window.TamakuUI.notify("⚠️ El teléfono debe tener exactamente 10 números.");
 
       telInput.focus();
 
@@ -423,7 +430,7 @@ export function iniciarAgenda({
     console.log("RESULTADO calcularCita:", resultado);
 
     if (!resultado) {
-      alert("⚠️ Horario inválido");
+      window.TamakuUI.notify("⚠️ Horario inválido");
 
       return;
     }
@@ -460,7 +467,7 @@ export function iniciarAgenda({
       console.error(error);
 
       const esCruce = error?.code === "23P01" || /citas_no_superpuestas/i.test(error?.message || "");
-      alert(esCruce
+      window.TamakuUI.notify(esCruce
         ? "⚠️ Ese horario acaba de ser ocupado. La agenda se actualizará."
         : `❌ Error al reservar: ${error.message}`);
       if (esCruce) await cargarCitasDelDia();
@@ -547,7 +554,7 @@ export function iniciarAgenda({
       )
 
       .subscribe((estado) => {
-        console.log("Estado Realtime de Agenda:", estado);
+        realtimeConectado = estado === "SUBSCRIBED";
       });
 
     return canal;
@@ -560,7 +567,7 @@ export function iniciarAgenda({
 
   function programarActualizacion() {
     clearTimeout(temporizadorActualizacion);
-    temporizadorActualizacion = setTimeout(cargarCitasDelDia, 350);
+    temporizadorActualizacion = setTimeout(() => { if (document.visibilityState === "visible") cargarCitasDelDia(); }, 350);
   }
 
   function iniciarActualizacionAutomatica() {
@@ -568,7 +575,7 @@ export function iniciarAgenda({
       ? 30000
       : 15000;
     intervaloActualizacion = setInterval(() => {
-      if (document.visibilityState === "visible") cargarCitasDelDia();
+      if (document.visibilityState === "visible" && Date.now() - ultimaCarga >= (realtimeConectado ? 60000 : intervaloRespaldo)) cargarCitasDelDia();
     }, intervaloRespaldo);
 
     document.addEventListener("visibilitychange", () => {
@@ -719,9 +726,11 @@ export function iniciarAgenda({
   iniciarActualizacionAutomatica();
   cargarAgenda();
 
-  window.addEventListener("pagehide", () => {
+  window.addEventListener("pagehide", (event) => {
+    if (event.persisted) return; // La pagina puede volver desde la cache de navegacion.
     clearTimeout(temporizadorActualizacion);
     clearInterval(intervaloActualizacion);
+    cargaAgenda.dispose();
     supabase.removeChannel(canalRealtime);
-  }, { once: true });
+  });
 }

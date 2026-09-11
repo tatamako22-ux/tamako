@@ -66,7 +66,18 @@ async function validarSuscripcion(idTienda) {
   return Array.isArray(data) ? data[0] || null : data;
 }
 
-export async function requireTiendaInfo({ redirect = true } = {}) {
+const validacionesPendientes = new Map();
+export function requireTiendaInfo({ redirect = true } = {}) {
+  // Menu y pantalla arrancan a la vez: comparten solo la validacion en curso.
+  // No se cachea la autorizacion resuelta ni se omiten revisiones posteriores.
+  if (!validacionesPendientes.has(redirect)) {
+    const tarea = validarTiendaInfo({ redirect }).finally(() => validacionesPendientes.delete(redirect));
+    validacionesPendientes.set(redirect, tarea);
+  }
+  return validacionesPendientes.get(redirect);
+}
+
+async function validarTiendaInfo({ redirect = true } = {}) {
   try {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) throw authError || new Error("Sesión no válida");

@@ -1,23 +1,9 @@
+import { readAllPages } from "../core/read-pages.js";
+import { optionalSummary } from "./performance.service.js";
+import { normalizarTelefono, indexarCitas, citasDelCliente } from "./client-identity.js";
 import { supabase } from "../config/supabaseClient.js";
 
 const cacheCategorias = new Map();
-const normalizarTelefono = (valor) => String(valor || "").replace(/\D/g, "").slice(-10);
-
-function clavesCliente(cita) {
-  const claves = [];
-  if (cita.user_id) claves.push(`usuario:${cita.user_id}`);
-  const telefono = normalizarTelefono(cita.telefono_cliente);
-  if (telefono.length >= 7 && !/^0+$/.test(telefono)) claves.push(`telefono:${telefono}`);
-  const email = String(cita.email_cliente || "").trim().toLowerCase();
-  if (email.includes("@")) claves.push(`email:${email}`);
-  return claves;
-}
-
-function esMismoCliente(citaA, citaB) {
-  const clavesA = new Set(clavesCliente(citaA));
-  return clavesCliente(citaB).some((clave) => clavesA.has(clave));
-}
-
 function diferenciaDias(fechaA, fechaB) {
   const a = new Date(`${fechaA}T12:00:00`);
   const b = new Date(`${fechaB}T12:00:00`);
@@ -28,12 +14,14 @@ async function obtenerCategoriasClientes(idTienda) {
   const guardada = cacheCategorias.get(idTienda);
   if (guardada && Date.now() - guardada.creada < 120000) return guardada.datos;
 
-  const { data, error } = await supabase
-    .from("citas")
-    .select("telefono_cliente")
-    .eq("id_tienda", idTienda);
-  if (error) throw error;
-
+  const resumen = await optionalSummary("tamaku_visitas_clientes_v1", { p_tienda: idTienda });
+  if (resumen !== null) {
+    const visitas = new Map(Object.entries(resumen).map(([telefono, total]) => [telefono, Number(total)]));
+    cacheCategorias.set(idTienda, { creada: Date.now(), datos: visitas });
+    return visitas;
+  }
+  const data = await readAllPages(() => supabase.from("citas")
+    .select("telefono_cliente").eq("id_tienda", idTienda).order("id_cita"));
   const visitas = new Map();
   (data || []).forEach((cita) => {
     const telefono = normalizarTelefono(cita.telefono_cliente);
@@ -144,12 +132,12 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
     const [categorias, resultadoBloqueos, resultadoCitasCercanas] = await Promise.all([
       obtenerCategoriasClientes(idTienda),
       supabase.from("clientes_bloqueados").select("telefono_cliente,tipo_bloqueo,id_barbero").eq("id_tienda", idTienda),
-      supabase
+      readAllPages(() => supabase
         .from("citas")
         .select("id_cita,user_id,nombre_cliente,telefono_cliente,email_cliente,fecha,hora_inicio,hora_fin,estado,id_barbero,profesionales(nombre_empleado)")
         .eq("id_tienda", idTienda)
         .gte("fecha", hoy)
-        .in("estado", ["PENDIENTE", "CONFIRMADA"]),
+        .in("estado", ["PENDIENTE", "CONFIRMADA"]).order("id_cita")).then(data => ({ data })),
     ]);
     if (resultadoBloqueos.error) console.warn("No se pudieron consultar los bloqueos de clientes:", resultadoBloqueos.error);
     if (resultadoCitasCercanas.error) console.warn("No se pudieron comprobar reservas cercanas:", resultadoCitasCercanas.error);
@@ -161,6 +149,7 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
       lista.push(bloqueo);
       bloqueosPorTelefono.set(telefono, lista);
     });
+    const indiceCitas = indexarCitas(resultadoCitasCercanas.data || []);
     return (data || []).map((cita) => {
       const telefono = normalizarTelefono(cita.telefono_cliente);
       const visitas = categorias.get(telefono) || 1;
@@ -170,9 +159,7 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
         return ["global", "total"].includes(tipo) || (["profesional", "parcial"].includes(tipo) && String(bloqueo.id_barbero) === String(cita.id_barbero));
       });
       const citaEstaActiva = (cita.fecha || fecha) >= hoy && ["PENDIENTE", "CONFIRMADA"].includes(String(cita.estado || "").toUpperCase());
-      const reservasCercanas = citaEstaActiva ? (resultadoCitasCercanas.data || [])
-        .filter((otra) => String(otra.id_cita) !== String(cita.id_cita))
-        .filter((otra) => esMismoCliente(cita, otra))
+      const reservasCercanas = citaEstaActiva ? citasDelCliente(indiceCitas, cita)
         .map((otra) => ({
           id_cita: otra.id_cita,
           fecha: otra.fecha,
@@ -195,26 +182,30 @@ export async function obtenerCitas({ idTienda, fecha, idBarbero }) {
     });
   } catch (error) {
     console.error("❌ Error obteniendo citas:", error);
-
-    return [];
+    throw error;
   }
 }
 
 export async function obtenerConteoCitasRango({ idTienda, desde, hasta, idBarbero }) {
   try {
-    let query = supabase.from("citas").select("fecha")
+    const resumen = await optionalSummary("tamaku_conteo_agenda_v1", {
+      p_tienda: idTienda, p_desde: desde, p_hasta: hasta, p_profesional: idBarbero || null,
+    });
+    if (resumen !== null) return resumen;
+    const data = await readAllPages(() => {
+      let query = supabase.from("citas").select("fecha")
       .eq("id_tienda", idTienda).gte("fecha", desde).lte("fecha", hasta)
       .neq("estado", "CANCELADA");
-    if (idBarbero) query = query.eq("id_barbero", idBarbero);
-    const { data, error } = await query;
-    if (error) throw error;
+      if (idBarbero) query = query.eq("id_barbero", idBarbero);
+      return query.order("id_cita");
+    });
     return (data || []).reduce((conteo, cita) => {
       conteo[cita.fecha] = (conteo[cita.fecha] || 0) + 1;
       return conteo;
     }, {});
   } catch (error) {
     console.error("Error obteniendo conteo semanal:", error);
-    return {};
+    throw error;
   }
 }
 

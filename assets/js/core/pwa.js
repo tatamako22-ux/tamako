@@ -34,7 +34,7 @@ class TamakuPWA {
       <section id="tamakuPWA" class="tamaku-pwa-widget" role="dialog" aria-modal="false" aria-labelledby="pwaTitle">
         <button id="pwaCloseBtn" class="pwa-close" type="button" aria-label="Cerrar aviso de instalación"><span class="pwa-x" aria-hidden="true">×</span><span class="pwa-close-label">Cerrar</span></button>
         <div class="pwa-summary">
-          <img src="/assets/images/icon-192.png" alt="" class="pwa-icon">
+          <img src="/assets/images/icon-192-optimized.png" alt="" class="pwa-icon">
           <div class="pwa-info"><span class="pwa-kicker">ACCESO RÁPIDO</span><h4 id="pwaTitle" class="pwa-title">Instala TAMAKU</h4><p class="pwa-desc">Entra a tu negocio desde la pantalla principal.</p></div>
           <button id="pwaInstallBtn" class="pwa-btn" type="button">Instalar</button>
         </div>

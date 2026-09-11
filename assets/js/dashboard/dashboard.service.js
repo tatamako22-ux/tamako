@@ -1,4 +1,5 @@
 import { supabase } from "../config/supabaseClient.js";
+import { readAllPages } from "../core/read-pages.js";
 
 function fechaLocal(fecha = new Date()) {
   const year = fecha.getFullYear();
@@ -61,7 +62,8 @@ export async function obtenerDatosDashboard(tiendaInfo) {
         .eq("fecha", fechaLocal())
         .order("hora_inicio", { ascending: true });
 
-  let facturasQuery = supabase
+  const facturasQuery = () => {
+    let query = supabase
         .from("facturas")
         .select(`
           id_factura, id_cita, fecha_emision, total, estado,
@@ -72,7 +74,10 @@ export async function obtenerDatosDashboard(tiendaInfo) {
         .eq("id_tienda", idTienda)
         .gte("fecha_emision", desde.toISOString())
         .lte("fecha_emision", finDia(hoy).toISOString())
-        .order("fecha_emision", { ascending: true });
+        .order("fecha_emision", { ascending: true }).order("id_factura");
+    if (!esPropietario && idProfesional) query = query.eq("id_barbero", idProfesional);
+    return query;
+  };
 
   let cancelacionesQuery = supabase
         .from("citas")
@@ -91,7 +96,6 @@ export async function obtenerDatosDashboard(tiendaInfo) {
 
   if (!esPropietario && idProfesional) {
     citasQuery = citasQuery.eq("id_barbero", idProfesional);
-    facturasQuery = facturasQuery.eq("id_barbero", idProfesional);
     cancelacionesQuery = cancelacionesQuery.eq("id_barbero", idProfesional);
   }
 
@@ -133,7 +137,7 @@ export async function obtenerDatosDashboard(tiendaInfo) {
   const [citasResult, facturasResult, cancelacionesResult, cajaResult, cierresResult, reglasResult, profesionalResult] =
     await Promise.all([
       citasQuery,
-      facturasQuery,
+      readAllPages(facturasQuery).then(data => ({ data })),
       cancelacionesQuery,
       cajaQuery,
       cierresQuery,
@@ -181,7 +185,7 @@ export async function obtenerDatosDashboard(tiendaInfo) {
   };
 }
 
-export function suscribirDashboard(idTienda, onCambio) {
+export function suscribirDashboard(idTienda, onCambio, onEstado = () => {}) {
   const canal = supabase
     .channel(`dashboard-${idTienda}`)
     .on(
@@ -199,7 +203,7 @@ export function suscribirDashboard(idTienda, onCambio) {
       { event: "*", schema: "public", table: "cajas_sesiones", filter: `id_tienda=eq.${idTienda}` },
       onCambio,
     )
-    .subscribe();
+    .subscribe(onEstado);
 
   return () => supabase.removeChannel(canal);
 }

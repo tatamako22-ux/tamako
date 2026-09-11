@@ -1,0 +1,72 @@
+// Ejecutar: node tests/performance-sql.mjs
+// Dependencia de prueba aislada: npm.cmd install --prefix tmp/performance-sql --no-save --ignore-scripts @electric-sql/pglite@0.5.8
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import { PGlite } from '../tmp/performance-sql/node_modules/@electric-sql/pglite/dist/index.js';
+const db=new PGlite();
+const A='00000000-0000-0000-0000-000000000001', B='00000000-0000-0000-0000-000000000002';
+const U='00000000-0000-0000-0000-000000000003';
+try {
+await db.exec(`
+create role authenticated; create role anon; create schema auth;
+create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true),'')::uuid $$;
+create table tiendas(id uuid primary key, user_id uuid);
+insert into tiendas values ('${A}','${U}'),('${B}','${B}');
+create function public.pertenece_a_tienda(p_id_tienda uuid) returns boolean language sql stable security definer set search_path=public as $$
+ select exists(select 1 from tiendas where id=p_id_tienda and user_id=auth.uid()); $$;
+create table profesionales(id_barbero uuid primary key, id_tienda uuid, nombre_empleado text);
+create table perfiles_clientes(id uuid primary key, nombre_completo text);
+create table clientes_bloqueados(id bigint primary key, id_tienda uuid, telefono_cliente text, tipo_bloqueo text, id_barbero uuid);
+create table citas(id_cita bigint primary key, id_tienda uuid, id_barbero uuid, telefono_cliente text, nombre_cliente text, email_cliente text, fecha date, valor_servicio numeric, estado text);
+create table facturas(id_factura bigint primary key, id_tienda uuid, id_cita bigint, id_barbero uuid, id_cliente uuid, id_metodo_pago uuid, fecha_emision timestamptz, metodo_pago text, destino_pago text, estado text, total numeric, notas text);
+insert into profesionales values ('${A}','${A}','Profesional A');
+insert into perfiles_clientes values ('${U}','Cliente A');
+insert into citas select i,'${A}','${A}', '300000'||lpad((i%61)::text,4,'0'), 'Cliente '||(i%61), 'cliente@test.co', (now() at time zone 'America/Bogota')::date,100,'PENDIENTE' from generate_series(1,1207) i;
+insert into citas values (2000,'${B}','${B}','9999999999','Privado B','privado@test.co',current_date,9999,'PENDIENTE');
+insert into clientes_bloqueados values (1,'${A}','3000000001','global',null);
+insert into facturas select i,'${A}',i,'${A}','${U}',null,now(),'Efectivo','TIENDA','PAGADA',100,null from generate_series(1,1207) i;
+insert into facturas values (2000,'${B}',2000,'${B}',null,null,now(),'Tarjeta','TIENDA','PAGADA',9999,null);
+grant usage on schema public,auth to authenticated,anon;
+grant select on all tables in schema public to authenticated;
+alter table citas enable row level security;
+alter table facturas enable row level security;
+alter table profesionales enable row level security;
+alter table clientes_bloqueados enable row level security;
+alter table perfiles_clientes enable row level security;
+create policy tenant on citas for select to authenticated using (public.pertenece_a_tienda(id_tienda));
+create policy tenant on facturas for select to authenticated using (public.pertenece_a_tienda(id_tienda));
+create policy tenant on profesionales for select to authenticated using (public.pertenece_a_tienda(id_tienda));
+create policy tenant on clientes_bloqueados for select to authenticated using (public.pertenece_a_tienda(id_tienda));
+create policy profile on perfiles_clientes for select to authenticated using(id=auth.uid());
+`);
+const sql=fs.readFileSync('supabase/rendimiento_resumenes_v1.sql','utf8');
+await db.exec(sql); await db.exec(sql);
+await db.exec(`set role authenticated; set request.jwt.claim.sub='${U}';`);
+const query=async sql=>(await db.query(sql)).rows[0].value;
+const customers=await query(`select public.tamaku_clientes_pagina_v1('${A}') value`);
+assert.equal(customers.items.length,50); assert.equal(customers.total,61);
+assert.equal(customers.metrics.totalClientes,61); assert.equal(customers.metrics.clientesVip,61);
+assert.equal(customers.metrics.totalBloqueados,1);
+const page2=await query(`select public.tamaku_clientes_pagina_v1('${A}','','todos',50,50) value`);
+assert.equal(page2.items.length,11);
+assert.equal(new Set([...customers.items,...page2.items].map(c=>c.telefono)).size,61);
+assert.equal([...customers.items,...page2.items].reduce((n,c)=>n+c.visitas,0),1207);
+assert.equal([...customers.items,...page2.items].reduce((n,c)=>n+c.gastado,0),120700);
+assert.equal([...customers.items,...page2.items].find(c=>c.telefono==='3000000001').bloqueos.length,1);
+const filtered=await query(`select public.tamaku_clientes_pagina_v1('${A}','3000000001') value`);
+assert.equal(filtered.total,1); assert.equal(filtered.metrics.totalClientes,61);
+const invoices=await query(`select public.tamaku_facturas_pagina_v1('${A}') value`);
+assert.equal(invoices.items.length,50); assert.equal(invoices.total,1207);
+assert.equal(invoices.metrics.ventasHoy,120700); assert.equal(invoices.metrics.totalMes,120700);
+const empty=await query(`select public.tamaku_facturas_pagina_v1('${A}','','PENDIENTE') value`);
+assert.equal(empty.total,0); assert.equal(empty.metrics.cantidadFacturas,1207);
+assert.equal((await query(`select public.tamaku_clientes_pagina_v1('${B}') value`)).total,0);
+assert.equal((await query(`select public.tamaku_facturas_pagina_v1('${B}') value`)).total,0);
+const visits=await query(`select public.tamaku_visitas_clientes_v1('${A}') value`);
+assert.equal(Object.values(visits).reduce((a,b)=>a+b,0),1207);
+const counts=await query(`select public.tamaku_conteo_agenda_v1('${A}',current_date-1,current_date+1,'${A}') value`);
+assert.equal(Object.values(counts).reduce((a,b)=>a+b,0),1207);
+await db.exec('reset role; set role anon;');
+await assert.rejects(query(`select public.tamaku_facturas_pagina_v1('${A}') value`), /permission denied/);
+console.log('PASS SQL: migracion reaplicable; 1207 citas/facturas; paginacion, busqueda, bloqueos y totales completos; aislamiento de dos tiendas con RLS; anon denegado.');
+} finally { await db.close(); }

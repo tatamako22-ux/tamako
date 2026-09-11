@@ -1,4 +1,4 @@
-import { iniciarAppAgenda } from "./core/agenda.bootstrap.js?v=7";
+import { iniciarAppAgenda } from "./core/agenda.bootstrap.js?v=notices2";
 
 export function initAgenda() {
   iniciarAppAgenda();

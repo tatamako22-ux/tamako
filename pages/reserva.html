@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>TAMAKÚ | KLEOS Experiencia Élite</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/reserva.css?v=9">
@@ -13,10 +13,10 @@
     <!-- Conexión PWA -->
     <link rel="manifest" href="../manifest.json">
     <link rel="stylesheet" href="../assets/css/pwa.css?v=5">
-    
-<link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+
+<link rel="stylesheet" href="../assets/css/notifications.css?v=2">
 <link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
-<script src="../assets/js/core/notifications.js?v=1" defer></script>
+<script src="../assets/js/core/notifications.js?v=2"></script>
 <script src="../assets/js/core/legal-consent.js?v=1" defer></script>
 </head>
 <body class="dark-mode">
@@ -86,7 +86,7 @@
             <section id="step-3" class="step-view">
                 <div class="btn-back" onclick="window.changeStep(2)"><i class="fa-solid fa-chevron-left"></i></div>
                 <div class="section-tag">03 / AGENDA TU TURNO</div>
-                
+
                 <div class="field-3d">
                     <label>Fecha Seleccionada</label>
                     <input type="date" id="res-date">
@@ -121,7 +121,7 @@
                         <label>Email</label>
                         <input type="email" id="res-email" placeholder="correo@ejemplo.com" oninput="this.value = this.value.toLowerCase()" required>
                     </div>
-                    
+
                     <div class="field-3d">
                     <!-- SE CAMBIÓ LA ETIQUETA PARA QUE SEA OBLIGATORIO -->
                     <label>CREAR CONTRASEÑA (MÍN. 6 CARACTERES)</label>
@@ -172,7 +172,7 @@
                 <i class="fa-solid fa-eye pass-toggle" onclick="togglePass('auth-pass', this)"></i>
             </div>
             <button type="button" class="btn-main" id="btn-auth-login" onclick="executeAuth()">INGRESAR</button>
-            
+
             <!-- NUEVO: Botón de recuperar contraseña -->
             <button type="button" onclick="recuperarClave()" style="width:100%; margin-top:20px; padding:8px; cursor:pointer; color:var(--gold); background:transparent; border:0; font-size:0.75rem; font-weight:600; text-decoration:underline; letter-spacing:1px;">¿Olvidaste tu contraseña?</button>
         </div>
@@ -180,7 +180,7 @@
         <div id="auth-profile-view" style="display:none; text-align:center;">
             <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom:10px;">MI PERFIL ÉLITE</h2>
             <p style="font-size:0.7rem; letter-spacing:3px; opacity:0.6; margin-bottom:30px;">MIEMBRO EXCLUSIVO</p>
-            
+
             <div class="field-3d" style="text-align:left;">
                 <label>EMAIL (NO EDITABLE)</label>
                 <input type="email" id="profile-email-input" readonly style="opacity: 0.7; cursor: not-allowed; background: rgba(0,0,0,0.2);">
@@ -193,7 +193,7 @@
                 <label>WHATSAPP</label>
                 <input type="tel" id="profile-phone-input" placeholder="Ej: 3001234567" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             </div>
-            
+
             <button class="btn-main" onclick="actualizarPerfil()" style="margin-bottom: 15px;">GUARDAR CAMBIOS</button>
             <button class="btn-main" style="border-color:#ff4d4d; color:#ff4d4d; background: transparent;" onclick="handleLogout()">CERRAR SESIÓN</button>
         </div>
@@ -228,7 +228,7 @@
             <div class="header-card" style="padding: 30px 20px; box-shadow: var(--nm-out);">
                 <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:5px;">MIS CITAS</h2>
                 <p style="font-size:0.6rem; text-align:center; opacity:0.6; letter-spacing:2px; margin-bottom:25px;">TUS RESERVAS ÉLITE</p>
-                
+
                 <div id="lista-citas" style="display: flex; flex-direction: column; gap: 15px;">
                     <!-- Aquí se cargarán dinámicamente -->
                 </div>
@@ -258,7 +258,7 @@
     let solicitudHorariosActual = 0;
     let profesionalesReserva = [];
     let recoveryEmail = "", recoveryMode = "codigo";
-    
+
     const params = new URLSearchParams(window.location.search);
     const tiendaRef = params.get("v");
 
@@ -358,7 +358,7 @@
     console.log("🔍 Buscando tienda:", tiendaRef);
 
     if (!tiendaRef) {
-        alert("Sede no identificada");
+        window.TamakuUI.notify("Sede no identificada");
         window.location.href = "../index.html";
     }
 
@@ -445,7 +445,7 @@
                 bloqueos.forEach(b => {
                     // Validamos si es global o total
                     if (b.tipo_bloqueo === "global" || b.tipo_bloqueo === "total") estaBloqueado = true;
-                    
+
                     // Validamos si es profesional o parcial, y que sea el mismo barbero
                     if ((b.tipo_bloqueo === "profesional" || b.tipo_bloqueo === "parcial") && b.id_barbero == barberId) estaBloqueado = true;
                 });
@@ -757,7 +757,7 @@ if (!p) {
 
             if (error || !tienda) {
                 console.error("❌ Error cargando tienda:", error);
-                alert("⚠️ Error: La sede '" + tiendaRef + "' no existe.");
+                window.TamakuUI.notify("⚠️ Error: La sede '" + tiendaRef + "' no existe.");
                 window.location.href = "../index.html";
                 return;
             }
@@ -1037,14 +1037,14 @@ if (resDate) {
                         }
                     }
                 });
-                
+
                 if (authError) {
                     showAlert("❌ Error de Registro: " + authError.message);
                     btn.disabled = false;
                     btn.innerText = "Finalizar y Unirme";
                     return;
                 }
-                
+
                 if (authData?.user) {
                     finalId = authData.user.id;
                     const { error: profileError } = await supabase
@@ -1056,9 +1056,9 @@ if (resDate) {
                             correo: email,
                             fecha_registro: new Date().toISOString()
                         }]);
-                        
+
                     if (profileError) console.error("Error al crear perfil:", profileError.message);
-                    
+
                     finalName = name;
                     finalPhone = phone;
                     finalEmail = email;
@@ -1068,7 +1068,7 @@ if (resDate) {
         }
         // --- VERIFICACIÓN DE USUARIO BLOQUEADO (EXCUSA DE TURNOS) ---
         btn.innerText = "VERIFICANDO DISPONIBILIDAD...";
-        
+
         const { data: bloqueos } = await supabase
             .from("clientes_bloqueados")
             .select("tipo_bloqueo, id_barbero")
@@ -1144,7 +1144,9 @@ if (resDate) {
                 item => String(item.id_barbero) === String(barberId)
             );
 
-            await enviarCorreoConfirmacion({
+            btn.innerText = "Reserva confirmada";
+            showAlert("¡Tu reserva está confirmada! Estamos enviando el correo de confirmación.");
+            const correoEnviado = await enviarCorreoConfirmacion({
     email: finalEmail,
     nombre: finalName,
     tiendaNombre: tiendaData.nombre,
@@ -1156,7 +1158,9 @@ if (resDate) {
     citaId: nuevaCita.id_cita
 });
 
-            showAlert("¡RESERVA ÉLITE EXITOSA! Revisa tu correo.");
+            showAlert(correoEnviado
+                ? "¡Reserva confirmada! Revisa tu correo."
+                : "Tu reserva está confirmada, pero no pudimos enviar el correo. Puedes consultarla en Mis citas.");
             setTimeout(() => location.reload(), 3000);
         } else {
             btn.disabled = false;
@@ -1246,7 +1250,7 @@ if (resDate) {
             // 4. Función reutilizable para diseñar cada tarjeta
             const crearCardCita = (c, esPasada, esCancelada) => {
                 const card = document.createElement("article");
-                
+
                 let estadoTexto = c.estado || "PENDIENTE";
                 let mostrarBotonCancelar = true;
                 let estadoClase = "upcoming";
@@ -1298,7 +1302,7 @@ if (resDate) {
             const renderizarLista = (tipo) => {
                 contenidoCitas.innerHTML = "";
                 let lista = [];
-                
+
                 if (tipo === 'activas') lista = citasActivas;
                 if (tipo === 'finalizadas') lista = citasFinalizadas;
                 if (tipo === 'canceladas') lista = citasCanceladas;
@@ -1321,7 +1325,7 @@ if (resDate) {
                     // Apagamos todos los botones
                     const tab = e.currentTarget;
                     btnTabs.forEach(b => b.classList.remove("active-tab"));
-                    
+
                     // Encendemos el botón que tocaste
                     tab.classList.add("active-tab");
 
@@ -1397,7 +1401,7 @@ if (notificar) {
         if (user && window.userFullName) {
             document.getElementById("auth-login-view").style.display = "none";
             document.getElementById("auth-profile-view").style.display = "block";
-            
+
             // Traemos exactamente los datos como están registrados
             document.getElementById("profile-email-input").value = user.email;
             document.getElementById("profile-name-input").value = window.userFullName.toUpperCase();
@@ -1437,7 +1441,7 @@ if (notificar) {
     // 2. Enviar el código de recuperación
     window.recuperarClave = async () => {
         const email = document.getElementById("auth-email").value.trim().toLowerCase();
-        
+
         if (!email) {
             showAlert("⚠️ Ingresa tu email en la casilla de arriba para enviarte el código.");
             return;
@@ -1468,7 +1472,7 @@ if (notificar) {
             showAlert("⚠️ Ingresa el código que recibiste en tu correo.");
             return;
         }
-        
+
         if (newPass.length < 6) {
             showAlert("⚠️ La contraseña debe tener al menos 6 caracteres.");
             return;
@@ -1587,7 +1591,7 @@ if (notificar) {
             }
         });
     });
-    
+
     window.actualizarPerfil = async () => {
         if (!user) return;
 
@@ -1614,7 +1618,7 @@ if (notificar) {
 
             window.userFullName = newName;
             window.userWhatsApp = newPhone;
-            
+
             document.getElementById("user-name-display").innerText = newName.toUpperCase();
             showAlert("✅ ¡Perfil actualizado con éxito!");
 
@@ -1646,6 +1650,6 @@ if (notificar) {
     init();
 </script>
 <!-- Motor PWA -->
-    <script src="../assets/js/core/pwa.js?v=5"></script>
+    <script src="../assets/js/core/pwa.js?v=6"></script>
 </body>
 </html>

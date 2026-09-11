@@ -1,9 +1,9 @@
-import { FacturacionModal } from "./facturacion.modal.js";
-import { FacturacionCuentas } from "./facturacion.cuentas.js?v=2";
-import { FacturacionFacturas } from "./facturacion.facturas.js?v=2";
+import { FacturacionModal } from "./facturacion.modal.js?v=notices2";
+import { FacturacionCuentas } from "./facturacion.cuentas.js?v=notices2";
+import { FacturacionFacturas } from "./facturacion.facturas.js?v=notices2";
 import { FacturacionCaja } from "./facturacion.caja.js";
-import { FacturacionReportes } from "./facturacion.reportes.js";
-import { FacturacionInsumos } from "./facturacion.insumos.js";
+import { FacturacionReportes } from "./facturacion.reportes.js?v=notices2";
+import { FacturacionInsumos } from "./facturacion.insumos.js?v=notices2";
 
 export const initFacturacion = async () => {
   console.log("Inicializando módulo de Facturación...");

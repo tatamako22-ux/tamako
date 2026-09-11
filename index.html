@@ -8,20 +8,37 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TAMAKU">
-<link rel="apple-touch-icon" href="assets/images/icon-192.png">
+<link rel="apple-touch-icon" href="assets/images/icon-192-optimized.png">
 
 <!-- ENLACE ACTIVO AL MANIFEST -->
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="assets/css/pwa.css?v=5">
 
-<title>TAMAKU | Agenda y software para peluquerías y barberías</title>
-<meta name="description" content="TAMAKU es un software de agenda de citas online y CRM para peluquerías, barberías, salones de belleza, estilistas, manicuristas, spas y centros de cosmetología en Colombia.">
+<title>Software para negocios de belleza | Agenda y CRM | Tamaku</title>
+<meta name="description" content="Gestiona agenda, clientes, equipo y ventas con Tamaku. Software para salones, peluquerías, barberías y spas en Colombia. Prueba gratis 7 días sin tarjeta.">
 <meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.tamaku.co/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_CO">
+<meta property="og:site_name" content="Tamaku">
+<meta property="og:url" content="https://www.tamaku.co/">
+<meta property="og:title" content="Tamaku | Agenda y CRM para negocios de belleza">
+<meta property="og:description" content="Conecta agenda, clientes, equipo y ventas en una sola plataforma. Prueba Tamaku gratis durante 7 días, sin tarjeta.">
+<meta property="og:image" content="https://www.tamaku.co/assets/images/dashboard-tamaku-optimized.jpg">
+<meta property="og:image:alt" content="Panel de gestión de Tamaku para negocios de belleza">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tamaku | Agenda y CRM para negocios de belleza">
+<meta name="twitter:description" content="Conecta agenda, clientes, equipo y ventas. Prueba gratis 7 días sin tarjeta.">
+<meta name="twitter:image" content="https://www.tamaku.co/assets/images/dashboard-tamaku-optimized.jpg">
+<meta name="twitter:image:alt" content="Panel de gestión de Tamaku para negocios de belleza">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
+  "@id": "https://www.tamaku.co/#software",
   "name": "TAMAKU",
+  "url": "https://www.tamaku.co/",
+  "publisher": { "@id": "https://www.tamaku.co/#organization" },
   "applicationCategory": "BusinessApplication",
   "applicationSubCategory": "Software de gestión para negocios de belleza",
   "operatingSystem": "Web",
@@ -38,6 +55,16 @@
     "Administración de servicios y equipo",
     "Ventas, caja y reportes"
   ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://www.tamaku.co/#organization",
+  "name": "Tamaku",
+  "url": "https://www.tamaku.co/",
+  "description": "Plataforma de gestión y CRM para negocios de belleza en Colombia."
 }
 </script>
 
@@ -129,7 +156,7 @@ body::after{
     box-shadow:
         0 0 10px rgba(191,149,63,.6),
         0 0 25px rgba(191,149,63,.4);
-    
+
     transform:scaleX(0);
     transform-origin:center;
     animation: lineReveal 1.2s ease-out forwards;
@@ -1216,7 +1243,7 @@ html{
 .landing-v2 .hero-right { position:relative; padding:28px 0 0 28px; }
 .landing-v2 .hero-right::before { content:""; position:absolute; inset:8% -8% -10% 8%; border-radius:50%; background:rgba(191,149,63,.12); filter:blur(65px); }
 .landing-v2 .hero-right::after { display:none; }
-.landing-v2 .hero-right img { position:relative; width:100%; max-width:760px; border:1px solid rgba(255,210,119,.24); border-radius:22px; box-shadow:0 35px 90px rgba(0,0,0,.66); transform:perspective(1300px) rotateY(-4deg) rotateX(1.5deg); animation:none; }
+.landing-v2 .hero-right img { position:relative; width:100%; height:auto; max-width:760px; border:1px solid rgba(255,210,119,.24); border-radius:22px; box-shadow:0 35px 90px rgba(0,0,0,.66); transform:perspective(1300px) rotateY(-4deg) rotateX(1.5deg); animation:none; }
 .landing-v2 .product-label { position:absolute; z-index:2; top:0; left:0; padding:10px 13px; border:1px solid rgba(255,255,255,.1); border-radius:10px; background:rgba(14,14,14,.92); color:#b8b8b8; font-size:.57rem; font-weight:700; letter-spacing:.12em; box-shadow:0 12px 28px rgba(0,0,0,.35); }
 .landing-v2 .product-label i { color:#55d889; font-style:normal; }
 .landing-v2 .content-section,
@@ -1354,7 +1381,7 @@ html{
 .landing-v2 #loginModal .close-btn { top:14px; right:17px; color:#777; font-size:1.7rem; }
 .landing-v2 #loginModal .login-brand { margin-bottom:25px; }
 .landing-v2 #loginModal .login-brand > span { display:block; margin-bottom:9px; color:#ffd277; font-size:.58rem; font-weight:700; letter-spacing:.2em; }
-.landing-v2 #loginModal .login-brand h1 { margin:0; color:#fff; font-family:'Playfair Display',serif; font-size:2.25rem; line-height:1; letter-spacing:-.04em; }
+.landing-v2 #loginModal .login-brand h2 { margin:0; color:#fff; font-family:'Playfair Display',serif; font-size:2.25rem; line-height:1; letter-spacing:-.04em; }
 .landing-v2 #loginModal .login-brand p { margin-top:10px; color:#777; font-size:.72rem; line-height:1.5; }
 .landing-v2 #loginModal .label-input { display:block; margin:0 0 7px; color:#85858a; font-size:.56rem; font-weight:700; letter-spacing:.11em; text-transform:uppercase; }
 .landing-v2 #loginModal .field { min-height:51px; margin-bottom:16px; padding:0 14px; border:1px solid rgba(255,255,255,.1); border-radius:12px; background:#101010; box-shadow:none; }
@@ -1371,7 +1398,7 @@ html{
 @media (max-width:520px) {
   .landing-v2 #loginModal { align-items:flex-end; padding:10px; }
   .landing-v2 #loginModal .modal-content { width:100%; padding:28px 19px calc(24px + env(safe-area-inset-bottom)); border-radius:22px 22px 16px 16px; }
-  .landing-v2 #loginModal .login-brand h1 { font-size:1.95rem; }
+  .landing-v2 #loginModal .login-brand h2 { font-size:1.95rem; }
 }
 </style>
 
@@ -1380,14 +1407,14 @@ html{
     // ID CORREGIDO: smibbddmwgdmqpwsuaqr
       var _url = "https://smibbddmwgdmqpwsuaqr.supabase.co"; 
       var _key = "sb_publishable_kQQ7ldmjql3V5Jbn9jvxYw_IAoSz1Uj";
-      
+
       // Inicialización garantizada
       window.supabase = supabase.createClient(_url, _key);
       console.log("✅ Conexión TAMAKU lista.");
     </script>
-<link rel="stylesheet" href="assets/css/notifications.css?v=1">
+<link rel="stylesheet" href="assets/css/notifications.css?v=2">
 <link rel="stylesheet" href="assets/css/mobile-compat.css?v=1">
-<script src="assets/js/core/notifications.js?v=1" defer></script>
+<script src="assets/js/core/notifications.js?v=2"></script>
 </head>
 
 <body id="top" class="landing-v2">
@@ -1405,7 +1432,7 @@ html{
     <a href="#beneficios">Beneficios</a>
     <a href="#quienes">Nosotros</a>
     <a href="#soluciones">Soluciones</a>
-    <a href="#planes">Servicios</a>
+    <a href="#planes">Planes</a>
     <a href="javascript:void(0)" class="btn-login" onclick="abrirLoginConLimpiador()">Iniciar sesión</a>
 </div>
 </nav>
@@ -1415,17 +1442,17 @@ html{
         <div class="hero-left">
             <span class="hero-eyebrow">GESTIÓN PARA NEGOCIOS DE BELLEZA</span>
             <h1>
-                Transforma tu negocio<br>
-                de belleza en una <span>empresa digital</span>
+                Agenda y CRM para<br>
+                <span>negocios de belleza</span>
             </h1>
 
             <p>
-                Gestiona clientes, agenda, ventas y control operativo 
-                desde una sola plataforma.
+                Conecta tus citas, clientes, equipo y ventas en una sola plataforma.
+                Gestiona tu salón, peluquería, barbería o spa en Colombia con más claridad y control.
             </p>
 
             <div class="hero-buttons">
-                <a href="pages/registro.html" class="btn-primary">Crear mi tienda gratis</a>
+                <a href="pages/registro.html" class="btn-primary">Probar 7 días gratis</a>
                 <a href="#producto" class="btn-secondary">Conocer la plataforma</a>
                 <a href="output/pdf/portafolio-comercial-tamaku.pdf" class="btn-portfolio" download="Portafolio-Comercial-TAMAKU.pdf" aria-label="Descargar portafolio comercial de TAMAKU en PDF">
                     <span class="download-mark" aria-hidden="true">&#8595;</span>
@@ -1440,7 +1467,7 @@ html{
         </div>
         <div class="hero-right" id="producto">
             <div class="product-label"><i>●</i> PANEL OPERATIVO EN TIEMPO REAL</div>
-            <img src="assets/images/dashboard-tamaku.png" alt="Panel de gestión TAMAKU para negocios de belleza" fetchpriority="high" decoding="async">
+            <img src="assets/images/dashboard-tamaku-optimized.jpg" alt="Panel de gestión TAMAKU para negocios de belleza" width="1536" height="1024" fetchpriority="high" decoding="async">
         </div>
 
     </div>
@@ -1456,76 +1483,56 @@ html{
 
     <div class="benefit-card">
         <div class="benefit-icon">👥</div>
-        <h3>Gestión de Clientes</h3>
-        <p>Base de datos completa con historial</p>
+        <h3>Clientes y CRM</h3>
+        <p>Consulta el historial de tus clientes y organiza su información en un solo lugar.</p>
     </div>
 
     <div class="benefit-card">
         <div class="benefit-icon">📅</div>
-        <h3>Agenda Inteligente</h3>
-        <p>Citas, recordatorios y sincronización</p>
+        <h3>Agenda y reservas</h3>
+        <p>Organiza citas, horarios y disponibilidad de tu equipo.</p>
     </div>
 
     <div class="benefit-card">
         <div class="benefit-icon">🌿</div>
-        <h3>Control de Servicios</h3>
-        <p>Catálogo, precios y comisiones</p>
+        <h3>Servicios y comisiones</h3>
+        <p>Mantén tu catálogo, precios y comisiones organizados.</p>
     </div>
 
     <div class="benefit-card">
         <div class="benefit-icon">📊</div>
-        <h3>Analytics & Reportes</h3>
-        <p>Decisiones basadas en datos</p>
+        <h3>Analítica y reportes</h3>
+        <p>Consulta los resultados del negocio para tomar decisiones con información.</p>
     </div>
 
     <div class="benefit-card">
         <div class="benefit-icon">💳</div>
-        <h3>Pagos & Facturación</h3>
-        <p>Integración con múltiples métodos</p>
+        <h3>Ventas y caja</h3>
+        <p>Registra ventas y movimientos para dar seguimiento a tu operación.</p>
     </div>
 
     <div class="benefit-card">
         <div class="benefit-icon">👤</div>
-        <h3>Equipo & Roles</h3>
-        <p>Control de personal y permisos</p>
+        <h3>Equipo y permisos</h3>
+        <p>Organiza profesionales y usuarios según su función en el negocio.</p>
     </div>
 
 </div>
 </section>
 <section id="quienes" class="content-section">
-    <h2 class="cinzel-title">¿Quiénes Somos?</h2>
+    <h2 class="cinzel-title">Tecnología para gestionar tu negocio de belleza</h2>
     <div class="gold-line-small"></div>
-
     <p class="section-text">
-        En <strong>Tamaku</strong> somos una empresa TechMade especializada en desarrollo tecnológico y soluciones digitales a la medida. 
-        Nacimos como una empresa familiar con una visión clara: transformar ideas en herramientas digitales que optimicen procesos, impulsen negocios y mejoren la vida de emprendedores y empresas.
+        <strong>Tamaku es una plataforma de gestión y CRM para negocios de belleza en Colombia.</strong>
+        Reúne agenda, clientes, equipo, ventas y reportes para que puedas seguir tu operación desde un solo lugar.
     </p>
-
     <p class="section-text" style="margin-top:25px;">
-        Desarrollamos aplicaciones móviles, software empresarial y plataformas digitales innovadoras que automatizan tareas, aumentan la productividad y reducen costos operativos. 
-        Nuestro enfoque está centrado en la eficiencia, la escalabilidad y la experiencia del usuario.
+        Entendemos que detrás de cada cita hay un cliente, un profesional y un negocio que necesita organización.
+        Por eso conectamos las tareas del día a día: desde la reserva y el historial del cliente hasta el control de ventas y los resultados.
     </p>
-
     <p class="section-text" style="margin-top:25px;">
-        Trabajamos con un equipo interdisciplinario de desarrolladores, diseñadores y estrategas digitales que colaboran de manera integral para crear soluciones personalizadas, adaptadas a cada cliente y sector.
-    </p>
-
-    <div style="margin-top:40px; max-width:800px;">
-        <p class="section-text" style="color:var(--gold); font-weight:600; letter-spacing:2px;">
-            Nuestras especialidades:
-        </p>
-        <p class="section-text" style="margin-top:15px;">
-            • Desarrollo de aplicaciones móviles (iOS y Android)<br>
-            • Desarrollo de software a la medida<br>
-            • Automatización de procesos empresariales<br>
-            • Transformación digital<br>
-            • Consultoría tecnológica<br>
-            • Implementación de soluciones digitales innovadoras
-        </p>
-    </div>
-
-    <p class="section-text" style="margin-top:40px; font-weight:500;">
-        En Tamaku no solo desarrollamos tecnología. Creamos soluciones que impulsan el crecimiento y fortalecen la competitividad empresarial.
+        Acompañamos la gestión de salones, peluquerías, barberías, estudios de uñas, spas y profesionales independientes.
+        Nuestra misión es ayudarte a trabajar con más claridad, atender mejor y tomar decisiones con información.
     </p>
 </section>
 <section id="soluciones" class="sales-section">
@@ -1561,7 +1568,7 @@ html{
             <span class="plan-tag">PARA COMENZAR</span>
             <h3>Plan Básico</h3>
             <p>Las herramientas esenciales para organizar tu operación.</p>
-            <strong>$29.900 <small>/ mes</small></strong>
+            <strong>$29.900 <small>COP / mes</small></strong>
             <ul><li>Agenda y reservas online</li><li>Clientes y servicios</li><li>Hasta 2 profesionales</li><li>1 usuario administrador</li></ul>
             <a href="pages/registro.html?plan=basico">Elegir Básico</a>
         </article>
@@ -1569,7 +1576,7 @@ html{
             <span class="plan-tag">NEGOCIOS EN CRECIMIENTO</span>
             <h3>Plan Pro</h3>
             <p>Control financiero y analítica para tomar mejores decisiones.</p>
-            <strong>$59.900 <small>/ mes</small></strong>
+            <strong>$59.900 <small>COP / mes</small></strong>
             <ul><li>Todo lo del Básico</li><li>Facturación, caja y reportes</li><li>Hasta 6 profesionales</li><li>Hasta 3 usuarios</li></ul>
             <a href="pages/registro.html?plan=pro">Elegir Pro</a>
         </article>
@@ -1577,7 +1584,7 @@ html{
             <span class="plan-tag">CONTROL COMPLETO</span>
             <h3>Plan Premium</h3>
             <p>Todos los módulos para equipos con una operación más exigente.</p>
-            <strong>$99.900 <small>/ mes</small></strong>
+            <strong>$99.900 <small>COP / mes</small></strong>
             <ul><li>Todo lo del Pro</li><li>Tienda e inventario</li><li>Hasta 20 profesionales</li><li>Hasta 10 usuarios</li></ul>
             <a href="pages/registro.html?plan=premium">Elegir Premium</a>
         </article>
@@ -1617,10 +1624,10 @@ html{
     <span class="close-btn" onclick="cerrarLogin()">&times;</span>
     <div class="login-brand">
         <span>ACCESO SEGURO</span>
-        <h1>Bienvenido de nuevo</h1>
+        <h2>Bienvenido de nuevo</h2>
         <p>Ingresa para continuar administrando tu negocio.</p>
     </div>
-    
+
     <label class="label-input">Usuario</label>
     <div class="field">
         <svg class="input-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -1628,7 +1635,7 @@ html{
         </svg>
         <input type="email" placeholder="CORREO ELECTRÓNICO" class="input-field" autocomplete="off">
     </div>
-    
+
     <label class="label-input">Contraseña</label>
 
         <div class="field">
@@ -1666,7 +1673,7 @@ html{
         abrirLogin();
         window.history.replaceState({}, document.title, window.location.pathname);
     }
-    
+
     // 🔥 ACTIVAR RECUPERACIÓN DE CONTRASEÑA
     procesarRecuperacionPassword();
     });
@@ -1683,7 +1690,7 @@ html{
     function cerrarLogin() {
         document.getElementById('loginModal').style.display = 'none';
     }
-    
+
     function mostrarError(mensaje) {
         const modal = document.querySelector('.modal-content');
         let errorDiv = document.getElementById("errorLogin");
@@ -1739,9 +1746,9 @@ html{
     const boton = document.getElementById('btnAcceder');
     const emailInput = document.querySelector('#loginModal input[type="email"]');
     const passwordInput = document.querySelector('#passwordInput');
-    
+
     if (!emailInput || !passwordInput) return;
-    
+
     const email = emailInput.value.trim();
     const password = passwordInput.value;
     const textoOriginal = '<span class="btn-text">ACCEDER</span>';
@@ -1836,7 +1843,7 @@ html{
 
     const sections = document.querySelectorAll("section");
     const navLinks = document.querySelectorAll(".nav-links a");
-    
+
     navLinks.forEach(link => {
         link.addEventListener("click", function (e) {
             const menu = document.querySelector(".nav-links");
@@ -1909,16 +1916,16 @@ html{
         mostrarError("Ingresa tu correo para recuperar contraseña");
         return;
     }
-    
+
     const boton = event?.target;
     if(boton) {
         boton.innerHTML = "<span class='loader'></span>";
         boton.disabled = true;
     }
-    
+
     // 🔥 URL CORREGIDA - Usa tu dominio real
     const { data, error } = await supabase.auth.resetPasswordForEmail(email);
-    
+
     if (error) {
         mostrarError("Error: " + error.message);
         if(boton) {
@@ -1949,12 +1956,12 @@ html{
             cerrarLogin();
             mostrarModalCodigoRecuperacion(email);
         }, 350);
-        
+
         if(boton) {
             boton.innerHTML = "RECUPERAR";
             boton.disabled = false;
         }
-        
+
         // Limpiar después de 6 segundos
         setTimeout(() => {
             if(successDiv) successDiv.remove();
@@ -2008,7 +2015,7 @@ async function confirmarCodigoRecuperacion(email) {
         cerrarCodigoRecuperacion();
         abrirLogin();
         document.querySelector('#loginModal input[type="email"]').value = email;
-        alert("Contraseña actualizada correctamente. Ya puedes iniciar sesión.");
+        window.TamakuUI.notify("Contraseña actualizada correctamente. Ya puedes iniciar sesión.");
     } catch (error) {
         errorCodigoRecuperacion(error.message || "El código es inválido o expiró.");
     } finally {
@@ -2033,7 +2040,7 @@ async function procesarRecuperacionPassword() {
     const accessToken = hashParams.get('access_token');
     const refreshToken = hashParams.get('refresh_token');
     const type = hashParams.get('type');
-    
+
     if (type === 'recovery' && accessToken) {
         const { error } = await supabase.auth.setSession({
             access_token: accessToken,
@@ -2044,7 +2051,7 @@ async function procesarRecuperacionPassword() {
             return;
         }
         window.history.replaceState({}, document.title, window.location.pathname);
-        
+
         // Mostrar modal para nueva contraseña
         mostrarModalResetPassword();
     }
@@ -2058,7 +2065,7 @@ function mostrarModalResetPassword() {
                 <span class="close-btn" onclick="cerrarResetModal()" style="font-size: 32px;">&times;</span>
                 <h2 style="color: #111; margin-bottom: 10px; font-family: 'Cinzel', serif; letter-spacing: 2px;">🔐 RESTABLECER</h2>
                 <p style="color: #666; margin-bottom: 25px; font-size: 0.85rem;">Crea una nueva contraseña segura</p>
-                
+
                 <div class="field">
                     <svg class="input-icon" viewBox="0 0 16 16" width="20" height="20">
                         <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
@@ -2066,7 +2073,7 @@ function mostrarModalResetPassword() {
                     <input type="password" id="newPassword" placeholder="NUEVA CONTRASEÑA" class="input-field" autocomplete="new-password">
                     <span onclick="toggleResetPassword(event)" style="cursor:pointer; font-size:14px; color:#999;">👁️</span>
                 </div>
-                
+
                 <div class="field">
                     <svg class="input-icon" viewBox="0 0 16 16" width="20" height="20">
                         <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
@@ -2074,34 +2081,34 @@ function mostrarModalResetPassword() {
                     <input type="password" id="confirmPassword" placeholder="CONFIRMAR CONTRASEÑA" class="input-field" autocomplete="new-password">
                     <span onclick="toggleConfirmPassword(event)" style="cursor:pointer; font-size:14px; color:#999;">👁️</span>
                 </div>
-                
+
                 <div id="requisitosPassword" style="font-size: 0.7rem; color: #888; margin: 10px 0; text-align: left;">
                     ⚠️ Mínimo 6 caracteres
                 </div>
-                
+
                 <button class="btn-acceder-premium" onclick="actualizarPassword()" style="margin-top: 15px;">
                     ACTUALIZAR CONTRASEÑA
                 </button>
             </div>
         </div>
     `;
-    
+
     // Remover modal existente si hay
     const existingModal = document.getElementById('resetModal');
     if (existingModal) existingModal.remove();
-    
+
     // Agregar nuevo modal
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
+
     // Validar requisitos en tiempo real
     const newPassInput = document.getElementById('newPassword');
     const confirmInput = document.getElementById('confirmPassword');
     const requisitosDiv = document.getElementById('requisitosPassword');
-    
+
     function validarPassword() {
         const newPass = newPassInput?.value || '';
         const confirm = confirmInput?.value || '';
-        
+
         if (newPass.length > 0 && newPass.length < 6) {
             requisitosDiv.innerHTML = '❌ La contraseña debe tener al menos 6 caracteres';
             requisitosDiv.style.color = '#ff4b2b';
@@ -2119,47 +2126,47 @@ function mostrarModalResetPassword() {
             requisitosDiv.style.color = '#888';
         }
     }
-    
+
     if (newPassInput) newPassInput.addEventListener('input', validarPassword);
     if (confirmInput) confirmInput.addEventListener('input', validarPassword);
 }
 async function actualizarPassword() {
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
-    
+
     if (!newPassword || !confirmPassword) {
         mostrarErrorModal("❌ Completa ambos campos");
         return;
     }
-    
+
     if (newPassword.length < 6) {
         mostrarErrorModal("❌ La contraseña debe tener al menos 6 caracteres");
         return;
     }
-    
+
     if (newPassword !== confirmPassword) {
         mostrarErrorModal("❌ Las contraseñas no coinciden");
         return;
     }
-    
+
     const boton = document.querySelector('#resetModal .btn-acceder-premium');
     const textoOriginal = boton?.innerHTML;
     if (boton) {
         boton.innerHTML = "<span class='loader'></span>";
         boton.disabled = true;
     }
-    
+
     try {
         const { error: updateError } = await supabase.auth.updateUser({
             password: newPassword
         });
-        
+
         if (updateError) throw updateError;
-        
-        alert("✅ ¡Contraseña actualizada con éxito! Ya puedes iniciar sesión.");
+
+        window.TamakuUI.notify("✅ ¡Contraseña actualizada con éxito! Ya puedes iniciar sesión.");
         cerrarResetModal();
         abrirLogin();
-        
+
     } catch (err) {
         console.error("Error:", err);
         mostrarErrorModal("❌ Error: " + (err.message || "El enlace pudo haber expirado. Solicita un nuevo correo."));
@@ -2175,7 +2182,7 @@ async function actualizarPassword() {
 function mostrarErrorModal(mensaje) {
     const modal = document.querySelector('#resetModal .modal-content');
     let errorDiv = document.getElementById('errorResetModal');
-    
+
     if (!errorDiv && modal) {
         errorDiv = document.createElement('div');
         errorDiv.id = 'errorResetModal';
@@ -2190,9 +2197,9 @@ function mostrarErrorModal(mensaje) {
         `;
         modal.insertBefore(errorDiv, modal.firstChild);
     }
-    
+
     if (errorDiv) errorDiv.textContent = mensaje;
-    
+
     setTimeout(() => {
         if (errorDiv) errorDiv.remove();
     }, 4000);
@@ -2237,6 +2244,6 @@ function toggleConfirmPassword(event) {
     }
 }
 </script>
-<script src="assets/js/core/pwa.js?v=5"></script>
+<script src="assets/js/core/pwa.js?v=6"></script>
 </body>
 </html>

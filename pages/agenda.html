@@ -15,9 +15,9 @@
 
     <link rel="stylesheet" href="../assets/css/menu.css?v=13">
     <link rel="stylesheet" href="../assets/css/agenda.css?v=8">
-<link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<link rel="stylesheet" href="../assets/css/notifications.css?v=2">
 <link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
-<script src="../assets/js/core/notifications.js?v=1" defer></script>
+<script src="../assets/js/core/notifications.js?v=2"></script>
 </head>
 
 <body>
@@ -233,7 +233,7 @@
             <h2 style="color: var(--gold-light, #ffd277); margin-bottom: 20px; font-size: 1.2rem; text-align:center;">✦ Editar Cliente ✦</h2>
             <input type="hidden" id="agendaEditIdCita">
             <input type="hidden" id="agendaEditTelOriginal">
-            
+
             <div style="margin-bottom: 15px; text-align: left;">
                 <label style="font-size: 0.65rem; color: #888; text-transform: uppercase; display: block; margin-bottom: 5px;">Nombre del Cliente</label>
                 <input type="text" id="agendaEditNombre" placeholder="Nombre completo" style="width:100%; padding:12px; background:#111; border:1px solid rgba(191,149,63,0.3); color:white; border-radius:12px; outline:none;">
@@ -250,13 +250,13 @@
         </div>
     </div>
     <!-- TOAST -->
-    <div id="toastAgenda" class="toast-agenda"></div>
+
     <!-- MENU -->
     <script src="../assets/js/core/menu.js?v=16" defer></script>
 
     <!-- AGENDA -->
     <script type="module">
-        import { initAgenda } from "../assets/js/agenda/index.js?v=7";
+        import { initAgenda } from "../assets/js/agenda/index.js?v=notices2";
         import { requireTiendaInfo } from "../assets/js/core/session.js";
         import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -289,7 +289,7 @@
             const nuevoTel = document.getElementById("agendaEditTel").value.replace(/\D/g, "").trim();
 
             if (!nuevoNombre || !nuevoTel) {
-                alert("Por favor completa el nombre y el teléfono.");
+                window.TamakuUI.notify("Por favor completa el nombre y el teléfono.");
                 return;
             }
 
@@ -321,9 +321,9 @@
 
             if (error) {
                 console.error("Error al sincronizar los datos del cliente:", error);
-                alert("Hubo un error al actualizar los datos.");
+                window.TamakuUI.notify("Hubo un error al actualizar los datos.");
             } else {
-                alert("¡Datos del cliente actualizados con éxito!");
+                window.TamakuUI.notify("¡Datos del cliente actualizados con éxito!");
                 window.cerrarModalAgendaEdit();
                 window.location.reload();
             }

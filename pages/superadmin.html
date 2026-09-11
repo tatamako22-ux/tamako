@@ -7,6 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/superadmin.css?v=5">
   <link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
+<link rel="stylesheet" href="../assets/css/notifications.css?v=2">
+<script src="../assets/js/core/notifications.js?v=2"></script>
 </head>
 <body>
   <aside class="sidebar-admin">
@@ -52,7 +54,7 @@
     <div class="acciones-sec"><button id="extenderPrueba">Dar días adicionales</button><button id="reactivarTienda">Reactivar acceso</button><button id="suspenderTienda">Apagar tienda</button></div>
     <section class="historial"><h3>Historial de pagos</h3><div id="historialPagos"></div></section>
   </aside>
-  <div id="adminToast" class="admin-toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
   <script>fechaPanel.textContent=new Date().toLocaleDateString('es-CO',{dateStyle:'full'})</script>
-  <script type="module" src="../assets/js/superadmin/superadmin.js?v=5"></script>
+  <script type="module" src="../assets/js/superadmin/superadmin.js?v=notices2"></script>
 </body></html>

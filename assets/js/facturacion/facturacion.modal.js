@@ -99,7 +99,7 @@ export const FacturacionModal = {
       this.agregarFilaItem();
     } catch (error) {
       console.error("Error preparando factura:", error);
-      alert(`No se pudo preparar la factura: ${error.message}`);
+      window.TamakuUI.notify(`No se pudo preparar la factura: ${error.message}`);
     }
   },
 
@@ -150,7 +150,7 @@ export const FacturacionModal = {
       });
     } catch (error) {
       console.error("Error cargando la cita:", error);
-      alert(`No se pudo cargar la cita: ${error.message}`);
+      window.TamakuUI.notify(`No se pudo cargar la cita: ${error.message}`);
     }
   },
 
@@ -238,7 +238,7 @@ export const FacturacionModal = {
       this.renderMetodos(metodos);
     } catch (error) {
       console.error("Error cambiando profesional:", error);
-      alert(`No se pudieron cargar sus servicios: ${error.message}`);
+      window.TamakuUI.notify(`No se pudieron cargar sus servicios: ${error.message}`);
     }
   },
 
@@ -324,11 +324,11 @@ export const FacturacionModal = {
       0,
     );
 
-    if (!tienda.id) return alert("No se encontró la tienda activa.");
-    if (!selectProfesional?.value) return alert("Selecciona un profesional.");
-    if (!opcionMetodo?.value) return alert("Selecciona un método de pago válido.");
+    if (!tienda.id) return window.TamakuUI.notify("No se encontró la tienda activa.");
+    if (!selectProfesional?.value) return window.TamakuUI.notify("Selecciona un profesional.");
+    if (!opcionMetodo?.value) return window.TamakuUI.notify("Selecciona un método de pago válido.");
     if (detalles.length === 0 || total <= 0)
-      return alert("Agrega al menos un servicio con un valor mayor a cero.");
+      return window.TamakuUI.notify("Agrega al menos un servicio con un valor mayor a cero.");
 
     const idCita = this.citaActual?.id_cita || this.citaActual?.id || null;
     const factura = {
@@ -354,17 +354,17 @@ export const FacturacionModal = {
           await FacturacionService.finalizarCita(idCita, tienda.id);
         } catch (errorCita) {
           console.error("Factura creada, pero no se finalizó la cita:", errorCita);
-          alert("La factura se creó, pero la cita no pudo marcarse como finalizada.");
+          window.TamakuUI.notify("La factura se creó, pero la cita no pudo marcarse como finalizada.");
         }
       }
 
       this.cerrar();
       window.dispatchEvent(new CustomEvent("factura-creada"));
-      alert("Factura creada correctamente.");
+      window.TamakuUI.notify("Factura creada correctamente.");
     } catch (error) {
       console.error("Error guardando factura:", error);
       const duplicada = error.code === "23505";
-      alert(duplicada ? "Esta cita ya fue facturada." : `No se pudo guardar la factura: ${error.message}`);
+      window.TamakuUI.notify(duplicada ? "Esta cita ya fue facturada." : `No se pudo guardar la factura: ${error.message}`);
     } finally {
       this.btnGuardar.disabled = false;
       this.btnGuardar.textContent = "Guardar Factura";

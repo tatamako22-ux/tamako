@@ -272,7 +272,7 @@ function crearTarjetaCita(cita, esMovil = false) {
         : ""
     }
     ${esDisponible ? "" : `<div class="event-phone">${cita.telefono_cliente || "Sin teléfono"}</div>`}
-    
+
     ${
       esDisponible
         ? ""
@@ -664,7 +664,7 @@ window.abrirWhatsappCita = function (cita) {
     : "";
 
   if (!telefono) {
-    alert("No hay número de teléfono");
+    window.TamakuUI.notify("No hay número de teléfono");
     return;
   }
 

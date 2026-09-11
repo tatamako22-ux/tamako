@@ -636,13 +636,13 @@
         }
     </style>
 <link rel="stylesheet" href="../assets/css/clientes.css?v=5">
-<link rel="stylesheet" href="../assets/css/notifications.css?v=1">
+<link rel="stylesheet" href="../assets/css/notifications.css?v=2">
 <link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
-<script src="../assets/js/core/notifications.js?v=1" defer></script>
+<script src="../assets/js/core/notifications.js?v=2"></script>
 </head>
 <body>
 
-    <div id="toast" class="toast">✦ <span id="toastMsg">CLIENTE REGISTRADO</span></div>
+
 
     <aside class="sidebar"></aside>
     <nav class="mobile-tab-bar"></nav>
@@ -731,6 +731,7 @@
                 <tbody id="tablaClientes"></tbody>
             </table>
         </div>
+        <div id="clientesPaginacion" aria-label="Paginación de clientes"></div>
     </main>
 
     <!-- MODAL -->
@@ -780,7 +781,7 @@
             <p style="text-align: center; color: #ccc; font-size: 0.8rem; margin-bottom: 20px;">
                 ¿Cómo deseas restringir a <strong id="nombreBloqueo" style="color: white;"></strong>?
             </p>
-            
+
             <div class="form-group">
                 <label>Nivel de Bloqueo</label>
                 <select id="tipoBloqueo" style="width: 100%; padding: 16px; background: #111; border: 1px solid #222; color: white; border-radius: 15px; outline: none; font-size: 0.9rem; font-family: 'Montserrat';">
@@ -820,6 +821,9 @@
         import { supabase } from "../assets/js/config/supabaseClient.js";
         import { requireTiendaInfo } from "../assets/js/core/session.js";
 
+        const { optionalSummary } = await import('../assets/js/services/performance.service.js');
+        const { readAllPages } = await import('../assets/js/core/read-pages.js');
+        const { renderPager } = await import('../assets/js/core/pager.js');
         const tiendaInfo = await requireTiendaInfo();
         if (!tiendaInfo) throw new Error("No existe una tienda válida para esta sesión");
 
@@ -889,7 +893,7 @@
             clienteParaBloquear = { telefono: telefono, nombre: nombre }; // Guardamos el cliente
             document.getElementById("modalBloqueo").style.display = "flex";
             document.getElementById("nombreBloqueo").innerText = nombre;
-            
+
             // Si cambian el select, mostramos u ocultamos la lista de profesionales
             document.getElementById("tipoBloqueo").onchange = function() {
                 const esParcial = this.value === "parcial";
@@ -899,7 +903,7 @@
             // Traer los profesionales exclusivos de esta tienda
             const selectProf = document.getElementById("profesionalBloqueo");
             selectProf.innerHTML = '<option value="">Cargando profesionales...</option>';
-            
+
             const { data, error } = await supabase
                 .from("profesionales")
                 .select("id_barbero, nombre_empleado")
@@ -925,14 +929,14 @@
         window.guardarBloqueo = async () => {
             const btn = document.querySelector("#modalBloqueo .btn-save");
             btn.innerText = "BLOQUEANDO...";
-            
+
             const tipoSeleccionado = document.getElementById("tipoBloqueo").value;
             const tipoBloqueo = tipoSeleccionado === "parcial" ? "profesional" : "global";
             const idBarbero = document.getElementById("profesionalBloqueo").value;
-            
+
             // Si es parcial y no seleccionó a nadie, frenamos
             if (tipoBloqueo === "profesional" && !idBarbero) {
-                alert("Por favor selecciona un profesional de la lista.");
+                window.TamakuUI.notify("Por favor selecciona un profesional de la lista.");
                 btn.innerText = "APLICAR BLOQUEO";
                 return;
             }
@@ -949,7 +953,7 @@
                 : consultaExistente.is("id_barbero", null);
             const { data: existente } = await consultaExistente.maybeSingle();
             if (existente) {
-                alert("Este cliente ya tiene aplicado ese mismo bloqueo.");
+                window.TamakuUI.notify("Este cliente ya tiene aplicado ese mismo bloqueo.");
                 btn.innerText = "APLICAR BLOQUEO";
                 return;
             }
@@ -966,13 +970,13 @@
 
             if (error) {
                 console.error("Error al bloquear:", error);
-                alert("Hubo un problema al aplicar el bloqueo.");
+                window.TamakuUI.notify("Hubo un problema al aplicar el bloqueo.");
             } else {
-                alert(clienteParaBloquear.nombre + (tipoBloqueo === "global" ? " fue bloqueado para toda la tienda." : " fue bloqueado únicamente para el profesional seleccionado."));
+                window.TamakuUI.notify(clienteParaBloquear.nombre + (tipoBloqueo === "global" ? " fue bloqueado para toda la tienda." : " fue bloqueado únicamente para el profesional seleccionado."));
                 cerrarModalBloqueo();
                 cargarClientes();
             }
-            
+
             btn.innerText = "APLICAR BLOQUEO";
         };
 
@@ -1056,12 +1060,14 @@
 
         // --- FUNCIONES DE LISTA DE BLOQUEADOS ---
         window.cargarBloqueados = async () => {
+            ++cargaClientesVersion;
+            document.getElementById('clientesPaginacion').hidden = true;
             const tbody = document.querySelector("#tablaClientes");
             const thead = document.querySelector("thead");
-            
+
             // Ocultamos los encabezados de la tabla VIP porque esta lista es más sencilla
             if (thead) thead.style.display = "none"; 
-            
+
             tbody.innerHTML = "<tr><td colspan='100%' style='text-align:center; padding: 30px;'>Buscando lista de bloqueados...</td></tr>";
 
             // Buscamos en la base de datos cruzando con la tabla de profesionales
@@ -1121,9 +1127,9 @@
                 .eq("id_tienda", tiendaInfo.id);
 
             if(error) {
-                alert("Hubo un error al intentar desbloquear.");
+                window.TamakuUI.notify("Hubo un error al intentar desbloquear.");
             } else {
-                alert(nombre + " ha sido desbloqueado y ya puede agendar de nuevo.");
+                window.TamakuUI.notify(nombre + " ha sido desbloqueado y ya puede agendar de nuevo.");
                 cargarBloqueados(); // Recargamos la lista automáticamente
             }
         };
@@ -1181,7 +1187,7 @@
         // Eliminación Masiva en Supabase
         window.eliminarSeleccionados = async () => {
             const seleccionados = Array.from(document.querySelectorAll(".cli-checkbox:checked")).map(chk => chk.value);
-            
+
             if (seleccionados.length === 0) return;
 
             if (!(await TamakuUI.confirm({
@@ -1249,11 +1255,40 @@
         window.filtroCategoriaActual = 'todos';
 
         // --- CARGAR CLIENTES DESDE CITAS ---
+        let paginaClientes = 0;
+        let modoResumenClientes = false;
+        let cargaClientesVersion = 0;
+        let totalPaginaClientes = 0;
         async function cargarClientes() {
+            const version = ++cargaClientesVersion;
+            try {
+                const resultado = await optionalSummary('tamaku_clientes_pagina_v1', {
+                    p_tienda: tiendaInfo.id, p_busqueda: document.getElementById('buscador').value.trim(),
+                    p_categoria: window.filtroCategoriaActual, p_offset: paginaClientes * 50, p_limite: 50
+                });
+                if (version !== cargaClientesVersion) return;
+                if (!resultado) { modoResumenClientes = false; return await cargarClientesLegacy(version); }
+                modoResumenClientes = true;
+                totalPaginaClientes = Number(resultado.total);
+                if (paginaClientes > 0 && paginaClientes * 50 >= totalPaginaClientes) {
+                    paginaClientes = Math.max(0, Math.ceil(totalPaginaClientes / 50) - 1);
+                    return cargarClientes();
+                }
+                window.listaClientesGlobal = resultado.items;
+                Object.entries(resultado.metrics).forEach(([id, value]) => { document.getElementById(id).textContent = value; });
+                renderizarLista();
+            } catch (error) {
+                if (version !== cargaClientesVersion) return;
+                console.error('No se pudieron cargar clientes:', error);
+                mostrarToast('No se pudieron actualizar los clientes. Intenta de nuevo.', true);
+            }
+        }
+        async function cargarClientesLegacy(version) {
             const [resultadoCitas, resultadoBloqueos] = await Promise.all([
-                supabase.from("citas").select("nombre_cliente, telefono_cliente, email_cliente, fecha, valor_servicio").eq("id_tienda", tiendaInfo.id).order("fecha", { ascending: false }),
+                readAllPages(() => supabase.from("citas").select("nombre_cliente, telefono_cliente, email_cliente, fecha, valor_servicio").eq("id_tienda", tiendaInfo.id).order("fecha", { ascending: false }).order("id_cita")).then(data => ({ data })),
                 supabase.from("clientes_bloqueados").select("id,telefono_cliente,tipo_bloqueo,id_barbero,profesionales(nombre_empleado)").eq("id_tienda", tiendaInfo.id)
             ]);
+            if (version !== cargaClientesVersion) return;
             const { data: citas, error } = resultadoCitas;
 
             if (error) {
@@ -1316,7 +1351,8 @@
         // --- FILTRAR POR CATEGORÍA DESDE LAS TARJETAS ---
         window.filtrarCategoria = (categoria) => {
             window.filtroCategoriaActual = categoria;
-            renderizarLista();
+            paginaClientes = 0;
+            if (modoResumenClientes) cargarClientes(); else renderizarLista();
         };
 
         // --- RENDERIZAR SEGÚN EL FILTRO ACTIVO ---
@@ -1325,17 +1361,28 @@
             let listaFiltrada = [...window.listaClientesGlobal];
 
             // Aplicar categoría seleccionada
-            if (window.filtroCategoriaActual === 'vip') {
+            if (!modoResumenClientes && window.filtroCategoriaActual === 'vip') {
                 listaFiltrada = listaFiltrada.filter(c => c.visitas >= 5);
-            } else if (window.filtroCategoriaActual === 'frecuentes') {
+            } else if (!modoResumenClientes && window.filtroCategoriaActual === 'frecuentes') {
                 listaFiltrada = listaFiltrada.filter(c => c.visitas < 5);
-            } else if (window.filtroCategoriaActual === 'nuevos') {
+            } else if (!modoResumenClientes && window.filtroCategoriaActual === 'nuevos') {
                 listaFiltrada = listaFiltrada.filter(c => {
                     const f = new Date(c.ultimaFecha);
                     return f.getMonth() === hoy.getMonth() && f.getFullYear() === hoy.getFullYear();
                 });
             }
 
+            const textoBusqueda = document.getElementById('buscador').value.trim().toLowerCase();
+            if (!modoResumenClientes) {
+                listaFiltrada = listaFiltrada.filter(c => (c.nombre + ' ' + c.telefono).toLowerCase().includes(textoBusqueda));
+                totalPaginaClientes = listaFiltrada.length;
+                paginaClientes = Math.min(paginaClientes, Math.max(0, Math.ceil(totalPaginaClientes / 50) - 1));
+                listaFiltrada = listaFiltrada.slice(paginaClientes * 50, (paginaClientes + 1) * 50);
+            }
+            renderPager(document.getElementById('clientesPaginacion'), paginaClientes, totalPaginaClientes, 50, pagina => {
+                paginaClientes = pagina;
+                if (modoResumenClientes || !window.listaClientesGlobal.length) cargarClientes(); else renderizarLista();
+            });
             const esMovil = window.innerWidth <= 900;
             const tbody = document.getElementById("tablaClientes");
             const thead = document.querySelector("thead");
@@ -1480,23 +1527,19 @@
                 });
             }
 
-            aplicarFiltro();
+            toggleSeleccionCliente();
         }
 
         // --- FILTRO DE BÚSQUEDA DEL BUSCADOR ---
-        function aplicarFiltro() {
-            const input = document.getElementById("buscador");
-            const filtro = input.value.toLowerCase().trim();
-            const elementos = document.querySelectorAll("#tablaClientes tr, #tablaClientes .mobile-card-vip");
-
-            elementos.forEach(elem => {
-                if (elem.querySelector && elem.querySelector('td[colspan]')) return;
-                const texto = elem.textContent.toLowerCase();
-                elem.style.display = texto.includes(filtro) ? "" : "none";
-            });
-        }
-
-        document.getElementById("buscador").addEventListener("input", aplicarFiltro);
+        let busquedaPendiente;
+        document.getElementById("buscador").addEventListener("input", () => {
+            clearTimeout(busquedaPendiente);
+            ++cargaClientesVersion;
+            busquedaPendiente = setTimeout(() => {
+                paginaClientes = 0;
+                if (modoResumenClientes || !window.listaClientesGlobal.length) cargarClientes(); else renderizarLista();
+            }, 300);
+        });
         document.addEventListener("keydown", (event) => {
             if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
                 event.preventDefault();

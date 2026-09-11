@@ -1,8 +1,9 @@
+import { createLatestLoader } from "../core/latest-load.js";
 import {
   obtenerDatosDashboard,
   suscribirDashboard,
   fechaLocal,
-} from "./dashboard.service.js?v=3";
+} from "./dashboard.service.js?v=4";
 import { renderModalCitas } from "./dashboard.modal.js";
 
 const dinero = new Intl.NumberFormat("es-CO", {
@@ -468,28 +469,22 @@ function mostrarError(error) {
 }
 
 export function initOverview(tiendaInfo) {
-  let cargando = false;
   let refrescoPendiente;
   let refrescoPeriodico;
-
-  const cargar = async ({ silencioso = false } = {}) => {
-    if (cargando) return;
-    cargando = true;
+  let realtimeConectado = false;
+  let ultimaCarga = 0;
+  const loader = createLatestLoader(() => obtenerDatosDashboard(tiendaInfo), (datos) => {
+    renderDashboard(datos);
+    ultimaCarga = Date.now();
+    document.getElementById("dashboardLoading")?.classList.add("is-hidden");
+  }, mostrarError);
+  const cargar = ({ silencioso = false } = {}) => {
     if (!silencioso) document.getElementById("dashboardLoading")?.classList.remove("is-hidden");
-    try {
-      const datos = await obtenerDatosDashboard(tiendaInfo);
-      renderDashboard(datos);
-    } catch (error) {
-      mostrarError(error);
-    } finally {
-      cargando = false;
-      document.getElementById("dashboardLoading")?.classList.add("is-hidden");
-    }
+    return loader.request();
   };
-
   const programarRefresco = () => {
     clearTimeout(refrescoPendiente);
-    refrescoPendiente = setTimeout(() => cargar({ silencioso: true }), 500);
+    refrescoPendiente = setTimeout(() => { if (document.visibilityState === "visible") cargar({ silencioso: true }); }, 500);
   };
 
   document.getElementById("btnRefrescarDashboard")?.addEventListener("click", () => cargar());
@@ -497,14 +492,16 @@ export function initOverview(tiendaInfo) {
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") programarRefresco();
   });
-  const desuscribir = suscribirDashboard(tiendaInfo.id, programarRefresco);
+  const desuscribir = suscribirDashboard(tiendaInfo.id, programarRefresco, (estado) => { realtimeConectado = estado === "SUBSCRIBED"; });
   refrescoPeriodico = setInterval(() => {
-    if (document.visibilityState === "visible") cargar({ silencioso: true });
-  }, 12000);
-  window.addEventListener("pagehide", () => {
+    if (document.visibilityState === "visible" && Date.now() - ultimaCarga >= (realtimeConectado ? 60000 : 30000)) cargar({ silencioso: true });
+  }, 15000);
+  window.addEventListener("pagehide", (event) => {
+    if (event.persisted) return;
     clearTimeout(refrescoPendiente);
     clearInterval(refrescoPeriodico);
+    loader.dispose();
     desuscribir();
-  }, { once: true });
+  });
   cargar();
 }

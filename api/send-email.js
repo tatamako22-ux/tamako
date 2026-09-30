@@ -18,27 +18,34 @@ export default async function handler(req, res) {
     citaId,
   } = req.body;
 
-  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASS) {
+  // SMTP configurable; conserva compatibilidad con la configuracion anterior.
+  const customSmtp = Boolean(process.env.SMTP_HOST);
+  const smtpUser = customSmtp ? process.env.SMTP_USER : process.env.GMAIL_USER;
+  const smtpPass = customSmtp ? process.env.SMTP_PASS : process.env.GMAIL_APP_PASS;
+  const sender = customSmtp ? process.env.MAIL_FROM : process.env.GMAIL_USER;
+  const smtpPort = Number(process.env.SMTP_PORT || 587);
+  if (!smtpUser || !smtpPass || !sender || !Number.isInteger(smtpPort) || smtpPort < 1 || smtpPort > 65535) {
     return res.status(500).json({ error: "El servicio de correo no está configurado." });
   }
   if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
     return res.status(400).json({ error: "El correo del destinatario no es válido." });
   }
   const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
+    host: process.env.SMTP_HOST || "smtp.gmail.com",
+    port: smtpPort,
+    secure: smtpPort === 465,
+    requireTLS: true,
     connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 20000,
     auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASS,
+      user: smtpUser,
+      pass: smtpPass,
     },
   });
 
   const mailOptions = {
-    from: `"TAMAKU" <${process.env.GMAIL_USER}>`,
+    from: { name: "TAMAKU", address: sender },
     to: email,
     subject: `✨ ${tiendaNombre} - Tu reserva ha sido confirmada ✨`,
     html: `

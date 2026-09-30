@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>TAMAKU | Clientes VIP</title>
+    <script src="../assets/js/core/brand-theme-bootstrap.js?v=1"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/menu.css?v=13">
     <style>
         /* --- VARIABLES GLOBALES --- */
         :root {
-            --gold: #bf953f;
-            --gold-light: #ffd277;
-            --card-bg: #0d0d0d;
+            --gold: var(--gold, #bf953f);
+            --gold-light: var(--gold-light, #ffd277);
+            --card-bg: var(--card-bg, #0d0d0d);
             --ios-blur: blur(12px);
             --shadow-gold: 0 0 25px rgba(191,149,63,0.15);
         }

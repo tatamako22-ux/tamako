@@ -1,9 +1,9 @@
         :root { 
-            --gold: #bf953f; 
-            --gold-light: #e6c87a; 
-            --bg: #050505;
-            --sidebar-bg: #0a0a0a;
-            --card-bg: rgba(255, 255, 255, 0.03); 
+            --gold: var(--gold, #bf953f); 
+            --gold-light: var(--gold-light, #e6c87a); 
+            --bg: var(--bg, #050505);
+            --sidebar-bg: var(--sidebar-bg, #0a0a0a);
+            --card-bg: var(--card-bg, rgba(255, 255, 255, 0.03)); 
             --ios-blur: blur(20px);
         }
 

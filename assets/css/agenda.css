@@ -3,12 +3,12 @@
    ========================================================= */
 
 :root{
-    --gold:#bf953f;
-    --gold-light:#f5d487;
-    --bg:#050505;
-    --card:#111;
-    --green:#00ff9c;
-    --red:#ff5c5c;
+    --gold:var(--gold,#bf953f);
+    --gold-light:var(--gold-light,#f5d487);
+    --bg:var(--bg,#050505);
+    --card:var(--card,#111);
+    --green:var(--green,#00ff9c);
+    --red:var(--red,#ff5c5c);
 }
 
 /* ========== BASE ========== */

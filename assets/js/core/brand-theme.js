@@ -5,15 +5,20 @@ export function aplicarMarcaTienda(tienda) {
   const principal = HEX.test(tienda.color_primario || "") ? tienda.color_primario : "#D1A13A";
   const secundario = HEX.test(tienda.color_secundario || "") ? tienda.color_secundario : "#F0CF79";
   const { r, g, b } = rgb(principal);
-  const estilos = document.body.style;
+  const root = document.documentElement;
+  const body = document.body;
+  const estilos = root.style;
+
   estilos.setProperty("--gold", principal);
   estilos.setProperty("--gold-light", secundario);
   estilos.setProperty("--accent", principal);
   estilos.setProperty("--accent-soft", `rgba(${r},${g},${b},.12)`);
   estilos.setProperty("--gold-border", `rgba(${r},${g},${b},.34)`);
   const claro = (tienda.tema_panel || tienda.tema_base) === "claro";
-  document.body.dataset.brandTheme = claro ? "claro" : "oscuro";
-  document.body.classList.toggle("tamaku-brand-light", claro);
+  if (body) {
+    body.dataset.brandTheme = claro ? "claro" : "oscuro";
+    body.classList.toggle("tamaku-brand-light", claro);
+  }
   estilos.setProperty("--bg", claro ? "#f4f3ef" : "#050505");
   estilos.setProperty("--panel", claro ? "#ffffff" : "#101010");
   estilos.setProperty("--surface", claro ? "#ffffff" : "#121212");

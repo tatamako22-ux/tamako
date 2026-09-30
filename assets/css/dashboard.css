@@ -1,12 +1,12 @@
 :root {
-  --dash-gold: #d0a13d;
-  --dash-gold-light: #f1ca68;
-  --dash-bg: #050505;
-  --dash-panel: #0c0c0c;
-  --dash-card: #111111;
-  --dash-border: rgba(208, 161, 61, 0.2);
-  --dash-muted: #858585;
-  --dash-text: #f7f7f7;
+  --dash-gold: var(--dash-gold, #d0a13d);
+  --dash-gold-light: var(--dash-gold-light, #f1ca68);
+  --dash-bg: var(--dash-bg, #050505);
+  --dash-panel: var(--dash-panel, #0c0c0c);
+  --dash-card: var(--dash-card, #111111);
+  --dash-border: var(--dash-border, rgba(208, 161, 61, 0.2));
+  --dash-muted: var(--dash-muted, #858585);
+  --dash-text: var(--dash-text, #f7f7f7);
 }
 
 * { box-sizing: border-box; }

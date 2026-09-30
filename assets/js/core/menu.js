@@ -189,7 +189,7 @@ function crearMenuMasMobile(pagina, tienda) {
       ${(tienda?.sesion?.es_propietario || tienda?.sesion?.id_profesional) ? `<a href="liquidaciones.html" class="${pagina === "liquidaciones.html" ? "active" : ""}"><i class="fa-solid fa-hand-holding-dollar"></i><div><strong>${tienda.sesion.es_propietario ? "Liquidaciones" : "Mis ganancias"}</strong><span>Producción, citas y pagos</span></div><i class="fa-solid fa-chevron-right"></i></a>` : ""}
       ${opcionMas(tienda, "usuarios_gestionar", "usuarios.html", pagina, "fa-user-shield", "Usuarios", "Accesos, roles y permisos")}
       ${opcionMas(tienda, "ajustes_ver", "comunicados.html", pagina, "fa-bullhorn", "Comunicados", "Avisos y promociones para clientes")}
-      ${opcionMas(tienda, "ajustes_ver", "ajustes.html", pagina, "fa-sliders", "Ajustes", "Identidad y reglas del negocio")}
+      ${opcionMas(tienda, "ajustes_ver", "ajustes.html", pagina, "fa-sliders", "Ajustes", "Configuración general del negocio")}
       ${tienda?.sesion?.es_propietario ? `<a href="mi-plan.html" class="${pagina === "mi-plan.html" ? "active" : ""}"><i class="fa-solid fa-gem"></i><div><strong>Mi plan</strong><span>Suscripción, vencimiento y pagos</span></div><i class="fa-solid fa-chevron-right"></i></a>` : ""}
       <button type="button" class="mobile-more-logout" onclick="toggleMobileMore(false); toggleLogout(true)"><i class="fa-solid fa-power-off"></i><div><strong>Cerrar sesión</strong><span>Salir de la administración</span></div><i class="fa-solid fa-chevron-right"></i></button>
     </nav>

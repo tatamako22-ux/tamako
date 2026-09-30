@@ -76,7 +76,28 @@ textarea {
 }
 
 @media (max-width: 900px) {
-  body { min-height: 100dvh; }
+  body {
+    display: block !important;
+    min-height: 100dvh;
+  }
+
+  body > .sidebar,
+  .sidebar {
+    display: none !important;
+  }
+
+  body > .main-content,
+  body > main,
+  .main-content,
+  main {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
 
   input:not([type="checkbox"]):not([type="radio"]),
   select,

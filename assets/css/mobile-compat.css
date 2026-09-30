@@ -12,6 +12,13 @@ body {
   max-width: 100%;
   min-width: 0;
   min-height: 100svh;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
+
+html {
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
 }
 
 img,

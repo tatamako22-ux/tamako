@@ -57,6 +57,18 @@ function activarFeedbackMovil() {
   }, { capture: true });
 }
 
+function fijarViewportMovil() {
+  const viewport = document.querySelector('meta[name="viewport"]');
+  if (!viewport) return;
+  const base = viewport.getAttribute("content") || "width=device-width, initial-scale=1.0, viewport-fit=cover";
+  const content = `${base.includes("maximum-scale") ? base.replace(/maximum-scale=\d+(?:\.\d+)?/gi, "maximum-scale=1") : `${base}, maximum-scale=1`}`;
+  const finalContent = content.includes("user-scalable")
+    ? content.replace(/user-scalable=(?:yes|no)/gi, "user-scalable=no")
+    : `${content}, user-scalable=no`;
+  viewport.setAttribute("content", finalContent);
+}
+
+fijarViewportMovil();
 activarFeedbackMovil();
 
 window.tamakuContextReady = Promise.all([import("./session.js"), import("./brand-theme.js")]).then(async ([session, marca]) => {

@@ -45,14 +45,24 @@ function renderMenuGlobal() {
                 <i class="fa-solid fa-users"></i> Clientes
             </a>
             <a href="profesionales.html" class="nav-item ${page === "profesionales.html" ? "active" : ""}">
-    <i class="fa-solid fa-user-tie"></i> Profesionales
-</a>
-
-<a href="facturacion.html" class="nav-item ${page === "facturacion.html" ? "active" : ""}">
-    <i class="fa-solid fa-file-invoice-dollar"></i> Facturación
-</a>
-
-<a href="ajustes.html" class="nav-item ${page === "ajustes.html" ? "active" : ""}">
+                <i class="fa-solid fa-user-tie"></i> Profesionales
+            </a>
+            <a href="galeria.html" class="nav-item ${page === "galeria.html" ? "active" : ""}">
+                <i class="fa-solid fa-images"></i> Galería
+            </a>
+            <a href="facturacion.html" class="nav-item ${page === "facturacion.html" ? "active" : ""}">
+                <i class="fa-solid fa-file-invoice-dollar"></i> Facturación
+            </a>
+            <a href="tienda.html" class="nav-item ${page === "tienda.html" ? "active" : ""}">
+                <i class="fa-solid fa-bag-shopping"></i> Tienda
+            </a>
+            <a href="usuarios.html" class="nav-item ${page === "usuarios.html" ? "active" : ""}">
+                <i class="fa-solid fa-user-shield"></i> Usuarios
+            </a>
+            <a href="comunicados.html" class="nav-item ${page === "comunicados.html" ? "active" : ""}">
+                <i class="fa-solid fa-bullhorn"></i> Comunicados
+            </a>
+            <a href="ajustes.html" class="nav-item ${page === "ajustes.html" ? "active" : ""}">
                 <i class="fa-solid fa-gear"></i> Ajustes
             </a>
         </nav>
@@ -63,20 +73,17 @@ function renderMenuGlobal() {
 
   const mobileTabBarHTML = `
         <a href="dashboard.html" class="tab-item ${page === "dashboard.html" ? "active" : ""}">
-            <i class="fa-solid fa-house"></i><span>Inicio</span>
+            <i class="fa-solid fa-house"></i><span>Dashboard</span>
         </a>
         <a href="agenda.html" class="tab-item ${page === "agenda.html" ? "active" : ""}">
             <i class="fa-solid fa-calendar"></i><span>Agenda</span>
         </a>
-        <a href="profesionales.html" class="tab-item ${page === "profesionales.html" ? "active" : ""}">
-            <i class="fa-solid fa-user-tie"></i><span>Staff</span>
-        </a>
         <a href="clientes.html" class="tab-item ${page === "clientes.html" ? "active" : ""}">
-            <i class="fa-solid fa-users"></i><span>VIP</span>
+            <i class="fa-solid fa-users"></i><span>Clientes</span>
         </a>
         <a href="facturacion.html" class="tab-item ${page === "facturacion.html" ? "active" : ""}">
-    <i class="fa-solid fa-file-invoice-dollar"></i><span>Fact.</span>
-</a>
+            <i class="fa-solid fa-file-invoice-dollar"></i><span>Facturación</span>
+        </a>
         <a href="ajustes.html" class="tab-item ${page === "ajustes.html" ? "active" : ""}">
             <i class="fa-solid fa-gear"></i><span>Ajustes</span>
         </a>

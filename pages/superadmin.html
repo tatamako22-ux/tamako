@@ -58,7 +58,7 @@
             <form id="agendaCotizacionForm" class="agenda-form">
               <label>Tipo de registro<select name="tipo_registro"><option value="BARBERIA">Barbería / contacto</option><option value="EMPRESA_SEDE">Empresa o sede</option></select></label>
               <div class="form-grid">
-                <label>Nombre del prospecto<input name="nombre_tienda" type="text" required></label>
+                <label>Nombre del prospecto<input name="nombre_tienda" type="text"></label>
                 <label>Contacto<input name="contacto" type="text"></label>
               </div>
               <div class="form-grid">
@@ -109,14 +109,15 @@
           </div>
         </div>
 
+        <p id="agendaCotizacionFeedback" class="agenda-feedback" role="status" aria-live="polite" hidden></p>
         <div id="tablaAgendaCotizacion" class="tabla-agenda-cotizacion"></div>
         <dialog id="dialogoIntentoAgenda" class="dialogo-agenda" aria-labelledby="nombreRegistroIntento">
           <form id="intentoAgendaForm" class="agenda-form">
             <header><div><span>SEGUIMIENTO COMERCIAL</span><h3 id="nombreRegistroIntento">Registrar intento</h3></div><button type="button" data-cerrar-intento aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></header>
             <input name="registro_id" type="hidden">
-            <label>Medio de contacto<select name="medio" required><option value="WHATSAPP">WhatsApp</option><option value="CORREO">Correo electrónico</option><option value="CORREO_FISICO">Correo físico</option><option value="LLAMADA">Llamada</option><option value="OTRO">Otro</option></select></label>
+            <label>Medio de contacto<select name="medio"><option value="WHATSAPP">WhatsApp</option><option value="CORREO">Correo electrónico</option><option value="CORREO_FISICO">Correo físico</option><option value="LLAMADA">Llamada</option><option value="OTRO">Otro</option></select></label>
             <div class="form-grid">
-              <label>Fecha y hora del intento<input name="intento_en" type="datetime-local" required></label>
+              <label>Fecha y hora del intento<input name="intento_en" type="datetime-local"></label>
               <label>Resultado<select name="resultado"><option value="PENDIENTE">Pendiente de respuesta</option><option value="CONTACTADO">Contactado</option><option value="REUNION_PROGRAMADA">Reunión programada</option><option value="COTIZACION_ENVIADA">Cotización enviada</option><option value="INTERESADO">Interesado</option><option value="NO_INTERESADO">No interesado</option></select></label>
             </div>
             <label>Información enviada<input name="informacion_enviada" type="text" placeholder="Catálogo, propuesta, presentación, cotización..."></label>
@@ -132,7 +133,7 @@
             <header><div><span>REUNIÓN COMERCIAL</span><h3 id="nombreRegistroReunion">Registrar reunión</h3></div><button type="button" data-cerrar-reunion aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></header>
             <input name="registro_id" type="hidden">
             <div class="form-grid">
-              <label>Fecha y hora<input name="fecha_reunion" type="datetime-local" required></label>
+              <label>Fecha y hora<input name="fecha_reunion" type="datetime-local"></label>
               <label>Estado<select name="estado"><option value="PROGRAMADA">Programada</option><option value="REALIZADA">Realizada</option><option value="CANCELADA">Cancelada</option></select></label>
             </div>
             <div class="form-grid">
@@ -166,5 +167,5 @@
   </aside>
 
   <script>fechaPanel.textContent=new Date().toLocaleDateString('es-CO',{dateStyle:'full'})</script>
-  <script type="module" src="../assets/js/superadmin/superadmin.js?v=agenda-tres-cargas3"></script>
+  <script type="module" src="../assets/js/superadmin/superadmin.js?v=agenda-tabla4"></script>
 </body></html>

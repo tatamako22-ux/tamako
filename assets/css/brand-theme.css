@@ -1,3 +1,11 @@
+/* Base del branding configurado para que cada módulo respete el color de la tienda. */
+body{background:var(--bg,#050505)!important;color:var(--text,#f5f5f2)!important}
+body>.sidebar{background:var(--panel,#101010)!important;border-right-color:var(--gold-border,rgba(191,149,63,.2))!important}
+body>.main-content,body>.plan-page,body>.liquidaciones-main,body>.com-main,body>.main-content.dashboard-v3,body>.tienda-main,body>.galeria-page,body>.users-page,body>.main-content.agenda-grid{background:var(--bg,#050505)!important;color:var(--text,#f5f5f2)!important}
+body .mobile-tab-bar{background:var(--surface,#121212)!important;border-color:var(--gold-border,rgba(191,149,63,.2))!important}
+body .nav-item,body .tab-item,body .module-eyebrow,body .agenda-eyebrow,body .page-badge{color:var(--text,#f5f5f2)!important}
+body .nav-item.active,body .tab-item.active{background:var(--accent-soft,rgba(191,149,63,.12))!important;color:var(--gold-light,#f0cf79)!important}
+
 /* Modo claro accesible para el panel privado de cada tienda. */
 body.tamaku-brand-light{color:#171717!important;background:radial-gradient(circle at 90% 0,var(--accent-soft),transparent 27%),#f4f3ef!important}
 body.tamaku-brand-light>.sidebar{background:#fff!important;border-right-color:rgba(0,0,0,.11)!important}

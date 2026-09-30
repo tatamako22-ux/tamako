@@ -19,7 +19,8 @@
 }
 
 body{
-    background: radial-gradient(circle at top,#151515 0%,#050505 100%);
+    background: radial-gradient(circle at top, var(--accent-soft, rgba(191,149,63,.12)), var(--bg, #050505) 48%);
+    color: var(--text, #f5f5f2);
     overflow-x:hidden;
     overflow-y:auto;
     min-height:100vh;

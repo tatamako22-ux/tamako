@@ -13,6 +13,14 @@
       };
     };
 
+    if (!document.getElementById('tamakuBrandThemeCss')) {
+      const link = document.createElement('link');
+      link.id = 'tamakuBrandThemeCss';
+      link.rel = 'stylesheet';
+      link.href = '../assets/css/brand-theme.css?v=4';
+      document.head.appendChild(link);
+    }
+
     const principal = HEX.test(tienda?.color_primario || '') ? tienda.color_primario : '#D1A13A';
     const secundario = HEX.test(tienda?.color_secundario || '') ? tienda.color_secundario : '#F0CF79';
     const { r, g, b } = rgb(principal);

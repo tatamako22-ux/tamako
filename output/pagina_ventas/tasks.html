@@ -1,0 +1,12 @@
+<section id="tasks-panel" class="notice-board task-board" aria-labelledby="tasks-title" hidden>
+  <div class="board-heading"><span class="board-symbol" aria-hidden="true">✓</span><span class="board-kicker">UN PENDIENTE MENOS, UN PASO MÁS</span><h2 class="content-title" id="tasks-title">Repisa de tareas</h2><p class="board-subtitle">Escribe, organiza y marca lo que ya terminaste.</p></div>
+  <div class="task-workspace">
+    <p class="task-scope">Tareas personales · guardadas en este navegador.</p>
+    <form id="task-form" class="task-form"><label for="task-input">¿Qué necesitas hacer?</label><div class="task-compose"><input id="task-input" maxlength="300" required autocomplete="off" placeholder="Ej. Revisar solicitudes de tiquetes"><button type="submit">＋ Agregar tarea</button></div></form>
+    <div class="task-progress"><span id="task-summary" role="status"></span><progress id="task-progress" max="1" value="0" aria-label="Progreso de tareas"></progress></div>
+    <div class="task-filters" role="group" aria-label="Filtrar tareas"><button type="button" data-filter="all" aria-pressed="true">Todas</button><button type="button" data-filter="pending" aria-pressed="false">Pendientes</button><button type="button" data-filter="done" aria-pressed="false">Completadas</button></div>
+    <ul id="task-list" class="task-shelf" aria-label="Lista de tareas"></ul>
+    <p id="task-empty" class="empty-state">Tu repisa está lista. Agrega tu primera tarea.</p>
+    <p id="task-status" role="status" class="task-status"></p>
+  </div>
+</section>

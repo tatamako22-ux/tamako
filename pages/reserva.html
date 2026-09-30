@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>TAMAKÚ | KLEOS Experiencia Élite</title>
+    <script src="../assets/js/core/booking-launch.js?v=1"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/reserva.css?v=9">
+    <link rel="stylesheet" href="../assets/css/reserva.css?v=10">
     <link rel="stylesheet" href="../assets/css/galeria-publica.css?v=1">
     <link rel="stylesheet" href="../assets/css/legal.css?v=1">
     <!-- Conexión PWA -->
@@ -30,7 +31,7 @@
             <div class="top-nav">
                 <a href="https://wa.me/573145038202" target="_blank" class="btn-nm" style="text-decoration: none; color: #25d366;"><i class="fa-brands fa-whatsapp"></i></a>
                 <button class="btn-nm" onclick="toggleTheme()" aria-label="Cambiar tema blanco o negro" title="Cambiar tema"><i class="fa-solid fa-circle-half-stroke"></i></button>
-                <button class="btn-auth" id="btn-auth-status" onclick="toggleAuthModal(true)">Mi Cuenta</button>
+                <button class="btn-auth login-highlight" id="btn-auth-status" onclick="openBookingLogin()">Iniciar sesión</button>
                 <button class="btn-auth" id="btn-mis-citas" style="display:none;" onclick="toggleCitasModal(true)">Mis Citas</button>
                 <button class="btn-nm" id="btn-logout" style="display:none;" onclick="handleLogout()"><i class="fa-solid fa-power-off"></i></button>
             </div>
@@ -55,6 +56,10 @@
             </div>
         </header>
 
+        <aside class="booking-login-notice" data-guest-login>
+            <div><strong>¿Ya tienes cuenta o reservaste antes?</strong><p>Inicia sesión con tu correo y contraseña para reservar sin repetir tus datos. Si es tu primera vez, continúa con tu reserva.</p></div>
+            <button type="button" class="btn-auth login-highlight" onclick="openBookingLogin()">Iniciar sesión</button>
+        </aside>
         <nav class="booking-progress" aria-label="Progreso de la reserva">
             <div class="progress-item active" data-progress="1"><span>1</span><small>Profesional</small></div>
             <div class="progress-line"></div>
@@ -104,6 +109,10 @@
                 <div class="btn-back" onclick="window.changeStep(3)"><i class="fa-solid fa-chevron-left"></i></div>
                 <div class="section-tag">04 / ÚNETE AL CLUB ÉLITE</div>
 
+                <aside class="booking-login-notice" data-guest-login>
+                    <div><strong>¿Ya estás registrado?</strong><p>Inicia sesión para continuar con el profesional, servicio y horario que elegiste.</p></div>
+                    <button type="button" class="btn-auth login-highlight" onclick="openBookingLogin()">Ya tengo cuenta · Iniciar sesión</button>
+                </aside>
                 <div class="vip-info-card">
                     <p style="margin-bottom: 10px; font-size: 0.9rem; font-weight: 800; letter-spacing: 1px;">CREA TU PERFIL VIP</p>
                     <p style="font-weight: 400; opacity: 0.9;">Para asegurar tu reserva, crea una contraseña. Con ella podrás ingresar a tu perfil, consultar tus citas y reservar nuevamente sin repetir tus datos.</p>
@@ -164,7 +173,8 @@
 
     <div class="modal" id="modal-auth">
         <div id="auth-login-view">
-            <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:40px;">ACCESO PRIVADO</h2>
+            <h2 style="font-family:'Cinzel'; color:var(--gold); text-align:center; margin-bottom:20px;">INICIAR SESIÓN</h2>
+            <p id="auth-login-help" class="auth-login-help" role="status">Usa el correo y la contraseña de tu cuenta. Si olvidaste la contraseña, puedes recuperarla aquí.</p>
             <div class="field-3d"><label>EMAIL</label><input type="email" id="auth-email" inputmode="email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false"></div>
             <div class="field-3d">
                 <label>CONTRASEÑA</label>
@@ -722,7 +732,8 @@ if (!p) {
 
         // Cambiar botón Mi Cuenta a MI PERFIL
         const btnAuth = document.getElementById("btn-auth-status");
-        if (btnAuth) btnAuth.innerText = "MI PERFIL";
+        if (btnAuth) { btnAuth.innerText = "MI PERFIL"; btnAuth.classList.remove("login-highlight"); }
+        document.querySelectorAll("[data-guest-login]").forEach(el => el.hidden = true);
 
         // Mostrar botón de cerrar sesión
         const btnLogout = document.getElementById("btn-logout");
@@ -762,6 +773,7 @@ if (!p) {
                 return;
             }
 
+            window.TamakuBookingLaunch?.remember(tiendaRef);
             tiendaData = tienda;
             tiendaId = tienda.id;
             aplicarMarcaReserva(tienda);
@@ -1002,13 +1014,13 @@ if (resDate) {
                 .maybeSingle();
 
             if (emailExiste && (!user || user.email !== email)) {
-                showAlert("⚠️ Este email ya está registrado. Por favor, inicia sesión en 'Mi Cuenta'.");
+                window.openBookingLogin("Este correo ya tiene una cuenta. Inicia sesión para continuar tu reserva. Si olvidaste tu contraseña, pulsa «¿Olvidaste tu contraseña?».");
                 btn.disabled = false;
                 btn.innerText = "Finalizar y Unirme";
                 return;
             }
             if (whatsappExiste && (!user || window.userWhatsApp !== phone)) {
-                showAlert("⚠️ Este número de WhatsApp ya está registrado. Por favor, inicia sesión en 'Mi Cuenta'.");
+                window.openBookingLogin("Este WhatsApp ya está asociado a una cuenta. Inicia sesión con el correo que usaste al registrarte. Puedes corregir el correo de abajo o recuperar tu contraseña.");
                 btn.disabled = false;
                 btn.innerText = "Finalizar y Unirme";
                 return;
@@ -1393,6 +1405,16 @@ if (notificar) {
 
     window.toggleTheme = () => document.body.classList.toggle("dark-mode");
 
+    window.openBookingLogin = (message) => {
+        window.toggleAuthModal(true);
+        if (user && window.userFullName) return;
+        const email = document.getElementById("res-email").value.trim();
+        if (email) document.getElementById("auth-email").value = email;
+        document.getElementById("auth-pass").value = "";
+        document.getElementById("auth-login-help").textContent = message || "Usa el correo y la contraseña de tu cuenta. Tu selección de reserva se conserva. Si olvidaste la contraseña, puedes recuperarla aquí.";
+        document.getElementById(email ? "auth-pass" : "auth-email").focus();
+    };
+
     window.toggleAuthModal = (s) => {
         const modal = document.getElementById("modal-auth");
         if (!s) { modal.style.display = "none"; return; }
@@ -1439,25 +1461,45 @@ if (notificar) {
     });
 
     // 2. Enviar el código de recuperación
+    let recuperacionEnCurso = false;
     window.recuperarClave = async () => {
+        if (recuperacionEnCurso) return;
         const email = document.getElementById("auth-email").value.trim().toLowerCase();
 
-        if (!email) {
+        if (!email || !document.getElementById("auth-email").checkValidity()) {
             showAlert("⚠️ Ingresa tu email en la casilla de arriba para enviarte el código.");
             return;
         }
 
-        const { error } = await supabase.auth.resetPasswordForEmail(email);
-
-        if (error) {
-            showAlert("❌ Error: " + error.message);
-        } else {
+        const button = document.querySelector('button[onclick="recuperarClave()"]');
+        const originalText = button.textContent;
+        recuperacionEnCurso = true;
+        button.disabled = true;
+        button.setAttribute("aria-busy", "true");
+        button.textContent = "ENVIANDO...";
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email);
+            if (error) throw error;
             recoveryEmail = email;
             document.getElementById("auth-recovery-code").value = "";
             document.getElementById("auth-new-pass").value = "";
             document.getElementById("auth-confirm-pass").value = "";
             mostrarVistaRecuperacion("codigo");
-            showAlert("📩 Te enviamos un código. Revisa tu bandeja de entrada y la carpeta de correo no deseado.");
+            showAlert("Si el correo está registrado, recibirás las instrucciones de recuperación. Revisa también la carpeta de correo no deseado.");
+        } catch (error) {
+            console.error("Fallo de recuperación de contraseña", { status: error?.status, code: error?.code });
+            if (error?.status === 429 || error?.code === "over_email_send_rate_limit" || error?.code === "over_request_rate_limit") {
+                showAlert("Se alcanzó el límite de solicitudes. Espera unos minutos antes de volver a intentarlo.");
+            } else if (error?.status >= 500) {
+                showAlert("El servicio de correo no pudo enviar la recuperación. Contacta al administrador de la tienda para que revise el servicio.");
+            } else {
+                showAlert("No pudimos solicitar la recuperación. Revisa tu conexión e inténtalo nuevamente. Si persiste, contacta a la tienda.");
+            }
+        } finally {
+            recuperacionEnCurso = false;
+            button.disabled = false;
+            button.removeAttribute("aria-busy");
+            button.textContent = originalText;
         }
     };
 
@@ -1567,6 +1609,7 @@ if (notificar) {
                     showAlert(`✅ ¡Bienvenido!`);
                 }
                 toggleAuthModal(false);
+                if (currentStep === 4 && cargado) window.changeStep(3);
                 if (currentStep === 3) {
                     document.getElementById("btn-next").innerText = "Confirmar Reserva";
                 }
@@ -1637,7 +1680,10 @@ if (notificar) {
         window.userFullName = null;
         window.userWhatsApp = null;
         document.getElementById("welcome-user").style.display = "none";
-        document.getElementById("btn-auth-status").innerText = "Mi Cuenta";
+        document.getElementById("btn-auth-status").innerText = "Iniciar sesión";
+        document.getElementById("btn-auth-status").classList.add("login-highlight");
+        document.querySelectorAll("[data-guest-login]").forEach(el => el.hidden = false);
+        toggleAuthModal(false);
         document.getElementById("btn-logout").style.display = "none";
         document.getElementById("btn-mis-citas").style.display = "none";
         if (currentStep === 3) {

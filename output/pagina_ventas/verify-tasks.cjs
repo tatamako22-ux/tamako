@@ -1,0 +1,22 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
+function el(){return {children:[],dataset:{},attrs:{},events:{},value:'',style:{},append(...items){this.children.push(...items);},replaceChildren(){this.children=[];},setAttribute(k,v){this.attrs[k]=v;},addEventListener(k,f){this.events[k]=f;},focus(){},setCustomValidity(){},reportValidity(){},querySelectorAll(){return this.children.flatMap(li=>li.children.flatMap(label=>label.children||[])).filter(x=>x.type==='checkbox');}};}
+const ids=['notices-panel','tasks-panel','view-notices','view-tasks','task-status','task-list','task-summary','task-progress','task-empty','task-form','task-input'];
+const elements=Object.fromEntries(ids.map(id=>[id,el()]));
+const filters=['all','pending','done'].map(f=>Object.assign(el(),{dataset:{filter:f}}));
+const store={};let fail=false;
+const context={document:{getElementById:id=>elements[id],createElement:el,querySelectorAll:()=>filters},window:{addEventListener(){}},localStorage:{getItem:k=>store[k]||null,setItem(k,v){if(fail)throw Error();store[k]=v;}},crypto:{randomUUID:()=>String(Math.random())}};
+vm.runInNewContext(fs.readFileSync(__dirname+'/tasks.js','utf8'),context);
+elements['view-tasks'].events.click();assert.equal(elements['notices-panel'].hidden,true);
+elements['task-input'].value='<img src=x onerror=alert(1)> Revisar tiquetes';
+elements['task-form'].events.submit({preventDefault(){}});
+assert.equal(elements['task-list'].children.length,1);
+assert.equal(JSON.parse(Object.values(store)[0])[0].done,false);
+let check=elements['task-list'].querySelectorAll()[0];check.checked=true;check.events.change();
+assert.equal(JSON.parse(Object.values(store)[0])[0].done,true);
+filters[1].events.click();assert.equal(elements['task-list'].children.length,0);
+filters[2].events.click();assert.equal(elements['task-list'].children.length,1);
+check=elements['task-list'].querySelectorAll()[0];check.checked=false;check.events.change();
+assert.equal(JSON.parse(Object.values(store)[0])[0].done,false);
+fail=true;elements['task-input'].value='Otra tarea';elements['task-form'].events.submit({preventDefault(){}});
+assert.match(elements['task-status'].textContent,/No se pudo guardar/);
+console.log('PASS: cambio de vista, creación, persistencia, completar/reabrir, filtros y error de almacenamiento con DOM simulado.');

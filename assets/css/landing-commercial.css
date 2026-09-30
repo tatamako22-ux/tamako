@@ -1,0 +1,56 @@
+/* Commercial landing: scoped to the public page. */
+.landing-v2 { background:#090b0d; --landing-max:1240px; }
+.landing-v2 .stars,.landing-v2 .background { display:none; }
+.landing-v2 nav { background:rgba(9,11,13,.96); }
+.landing-v2 .hero { min-height:740px; padding:150px 28px 85px; background:radial-gradient(ellipse at 78% 48%,rgba(190,142,48,.09),transparent 55%); }
+.landing-v2 .hero-container { grid-template-columns:minmax(0,1fr) minmax(0,1.12fr); gap:36px; }
+.landing-v2 .hero-left h1 { font-size:clamp(42px,4.6vw,66px); line-height:1.09; letter-spacing:-.045em; max-width:620px; text-wrap:balance; }
+.landing-v2 .hero-left h1 span { background:none; -webkit-text-fill-color:#e7c37a; color:#e7c37a; }
+.landing-v2 .hero-eyebrow { font-size:11px; line-height:1.6; letter-spacing:.17em; color:#dfc48e; }
+.landing-v2 .hero-left p { font-size:17px; line-height:1.8; color:#b9bec3; max-width:500px; margin-top:24px; }
+.landing-v2 .hero-buttons { display:flex; flex-wrap:wrap; gap:12px; margin-top:28px; }
+.landing-v2 .btn-primary,.landing-v2 .btn-secondary { font-size:14px; letter-spacing:0; padding:0 22px; min-height:52px; border-radius:9px; }
+.landing-v2 .btn-primary { background:#e7c37a; box-shadow:0 8px 24px #0003; border-color:#e7c37a; }
+.landing-v2 .btn-primary:hover { background:#f4dba4; transform:translateY(-2px); }
+.landing-v2 .btn-secondary { background:transparent; }
+.landing-v2 .hero-trust { font-size:12px; line-height:1.6; color:#a7adb4; gap:10px 18px; }
+.landing-v2 .hero-trust strong { color:#e5e7eb; }
+.landing-v2 .hero-right { padding:0; width:100%; isolation:isolate; }
+.landing-v2 .hero-right::before { inset:20% 10%; background:rgba(202,155,61,.09); }
+.landing-v2 .hero-right img { display:block; width:100%; max-width:none; height:auto; border:0; border-radius:0; box-shadow:none; transform:none; background:transparent; filter:none; mix-blend-mode:screen; }
+.landing-v2 .product-label { position:static; display:table; margin:0 auto 12px; font-size:10px; letter-spacing:.12em; background:#111619; color:#d8dedc; border-color:#29332d; box-shadow:none; }
+.landing-v2 .product-caption { margin:12px auto 0; text-align:center; color:#9ca5ae; font-size:12px; letter-spacing:.025em; }
+.landing-v2 .audience-strip { max-width:1240px; margin:0 auto; padding:26px 24px; display:flex; flex-wrap:wrap; justify-content:center; gap:16px 32px; border-block:1px solid #ffffff12; color:#bdc2c6; font-size:13px; }
+.landing-v2 .audience-strip strong { color:#e7c37a; font-weight:500; }
+.landing-v2 .content-section,.landing-v2 .sales-section,.landing-v2 .landing-plans,.landing-v2 .workflow-section { padding-block:80px; }
+.landing-v2 .cinzel-title,.landing-v2 .section-heading h2,.landing-v2 .plans-heading h2,.landing-v2 .workflow-copy h2,.landing-v2 .final-cta h2 { font-size:clamp(30px,3.3vw,46px); line-height:1.18; text-wrap:balance; }
+.landing-v2 .benefit-card { padding:28px; background:#101417; border-color:#ffffff12; border-radius:14px; }
+.landing-v2 .benefit-card h3 { font-size:18px; }
+.landing-v2 .benefit-card p,.landing-v2 .business-grid p,.landing-v2 .plan-card > p,.landing-v2 .section-heading p,.landing-v2 .plans-heading p { font-size:14px; color:#afb6bd; line-height:1.8; }
+.landing-v2 .benefit-icon { font-family:inherit; font-size:14px; color:#e7c37a; }
+.landing-v2 #quienes { border-top:1px solid #ffffff12; }
+.landing-v2 .section-text { color:#afb6bd; }
+.landing-v2 .business-grid article,.landing-v2 .plan-card { background:#101417; border-color:#ffffff15; }
+.landing-v2 .plan-card.featured { background:linear-gradient(155deg,#282318,#101417 65%); border-color:#b89a5e; }
+.landing-v2 .plan-tag { font-size:10px; letter-spacing:.04em; }
+.landing-v2 .final-cta { background:radial-gradient(ellipse at top,#302819,#101417 75%); }
+.landing-v2 a:focus-visible,.landing-v2 button:focus-visible { outline:3px solid #f0ce8e; outline-offset:5px; }
+@media(max-width:1000px) {
+ .landing-v2 .hero { min-height:0; padding-top:130px; }
+ .landing-v2 .hero-container { grid-template-columns:1fr; gap:42px; }
+ .landing-v2 .hero-left { max-width:650px; }
+ .landing-v2 .hero-right { max-width:650px; margin:auto; }
+ .landing-v2 .hero-left h1 { font-size:clamp(42px,7vw,62px); }
+}
+@media(max-width:600px) {
+ .landing-v2 .hero { padding:110px 20px 40px; }
+ .landing-v2 .hero-left h1 { font-size:40px; }
+ .landing-v2 .hero-left p { font-size:16px; }
+ .landing-v2 .hero-buttons { display:grid; grid-template-columns:1fr; }
+ .landing-v2 .hero-trust { display:flex; }
+ .landing-v2 .hero-right { padding:0; }
+ .landing-v2 .hero-right img { border-radius:0; }
+ .landing-v2 .content-section,.landing-v2 .sales-section,.landing-v2 .landing-plans,.landing-v2 .workflow-section { padding-block:56px; }
+ .landing-v2 .audience-strip { justify-content:flex-start; gap:12px 20px; font-size:12px; }
+}
+@media(prefers-reduced-motion:reduce) { .landing-v2 * { scroll-behavior:auto!important; animation:none!important; transition:none!important; } }

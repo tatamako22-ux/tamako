@@ -456,3 +456,13 @@ body:not(.dark-mode) #user-name-display{color:var(--text)!important}
   .appointment-actions { justify-content:stretch; }
   .btn-cancelar { width:100%; justify-content:center; min-height:37px; }
 }
+
+/* Visible sign-in for returning customers. */
+.booking-login-notice { display:flex; align-items:center; flex-wrap:wrap; gap:16px; padding:20px; margin:20px 0; border:1px solid var(--gold); border-radius:16px; background:var(--surface); color:var(--text); }
+.booking-login-notice[hidden] { display:none; }
+.booking-login-notice > div { flex:1 1 230px; }
+.booking-login-notice strong { font-size:.9rem; }
+.booking-login-notice p, .auth-login-help { font-size:.82rem; line-height:1.65; margin-top:8px; }
+.auth-login-help { margin-bottom:24px; }
+.btn-auth.login-highlight { min-height:44px; font-size:.72rem; border:2px solid #ff4545; box-shadow:0 0 7px #ff454580, 0 0 18px #ff30304d; }
+.btn-auth.login-highlight:focus-visible { outline:3px solid #ff4545; outline-offset:4px; }

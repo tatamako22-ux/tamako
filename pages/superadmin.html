@@ -56,9 +56,14 @@
           <div class="mini-panel">
             <h4>Carga manual</h4>
             <form id="agendaCotizacionForm" class="agenda-form">
+              <label>Tipo de registro<select name="tipo_registro"><option value="BARBERIA">Barbería / contacto</option><option value="EMPRESA_SEDE">Empresa o sede</option></select></label>
               <div class="form-grid">
-                <label>Nombre de la barbería<input name="nombre_tienda" type="text" required></label>
+                <label>Nombre del prospecto<input name="nombre_tienda" type="text" required></label>
                 <label>Contacto<input name="contacto" type="text"></label>
+              </div>
+              <div class="form-grid">
+                <label>Empresa<input name="empresa" type="text"></label>
+                <label>Sede / espacio<input name="sede" type="text"></label>
               </div>
               <div class="form-grid">
                 <label>Email<input name="email" type="email"></label>
@@ -83,12 +88,29 @@
               <input id="csvAgendaCotizacion" type="file" accept=".csv,text/csv">
               <span>Seleccionar archivo CSV</span>
             </label>
-            <p class="muted">Columnas sugeridas: nombre_tienda, contacto, email, telefono, direccion, fecha_agenda, valor_cotizacion, estado, notas.</p>
+            <p class="muted">La plantilla incluye barbería o empresa/sede, contacto, intentos anteriores, último canal, fecha, resultado y producto ofrecido.</p>
             <button id="plantillaAgendaCotizacion" class="btn-outline" type="button">Descargar plantilla</button>
           </div>
         </div>
 
         <div id="tablaAgendaCotizacion" class="tabla-agenda-cotizacion"></div>
+        <dialog id="dialogoIntentoAgenda" class="dialogo-agenda" aria-labelledby="nombreRegistroIntento">
+          <form id="intentoAgendaForm" class="agenda-form">
+            <header><div><span>SEGUIMIENTO COMERCIAL</span><h3 id="nombreRegistroIntento">Registrar intento</h3></div><button type="button" data-cerrar-intento aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></header>
+            <input name="registro_id" type="hidden">
+            <label>Medio de contacto<select name="medio" required><option value="WHATSAPP">WhatsApp</option><option value="CORREO">Correo electrónico</option><option value="CORREO_FISICO">Correo físico</option><option value="LLAMADA">Llamada</option><option value="REUNION">Reunión presencial</option><option value="OTRO">Otro</option></select></label>
+            <div class="form-grid">
+              <label>Fecha y hora del intento<input name="intento_en" type="datetime-local" required></label>
+              <label>Resultado<select name="resultado"><option value="PENDIENTE">Pendiente de respuesta</option><option value="CONTACTADO">Contactado</option><option value="REUNION_PROGRAMADA">Reunión programada</option><option value="COTIZACION_ENVIADA">Cotización enviada</option><option value="INTERESADO">Interesado</option><option value="NO_INTERESADO">No interesado</option></select></label>
+            </div>
+            <label>Producto ofrecido<input name="producto_ofrecido" type="text" placeholder="Producto o servicio presentado"></label>
+            <div class="form-grid">
+              <label>Próxima acción<input name="proxima_accion" type="date"></label>
+              <label>Notas<textarea name="notas" rows="3" placeholder="Acuerdos, asistentes o respuesta recibida"></textarea></label>
+            </div>
+            <footer><button type="button" class="btn-outline" data-cerrar-intento>Cancelar</button><button type="submit" class="btn-secundario">Guardar intento</button></footer>
+          </form>
+        </dialog>
       </section>
     </section>
 
@@ -107,5 +129,5 @@
   </aside>
 
   <script>fechaPanel.textContent=new Date().toLocaleDateString('es-CO',{dateStyle:'full'})</script>
-  <script type="module" src="../assets/js/superadmin/superadmin.js?v=agenda-supabase1"></script>
+  <script type="module" src="../assets/js/superadmin/superadmin.js?v=agenda-seguimiento2"></script>
 </body></html>

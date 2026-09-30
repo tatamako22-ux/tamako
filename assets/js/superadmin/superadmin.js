@@ -6,53 +6,86 @@ const dinero = new Intl.NumberFormat("es-CO", { style: "currency", currency: "CO
 const escapar = (v = "") => String(v).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 const hoyISO = () => new Date().toISOString().slice(0, 10);
 const fecha = (v) => v ? new Date(v).toLocaleDateString("es-CO") : "—";
-let suscripciones = [], pagos = [], notificaciones = [], seleccionada = null, agendaCotizaciones = [];
+let suscripciones = [], pagos = [], notificaciones = [], seleccionada = null, agendaCotizaciones = [], intentosAgenda = [];
 
 async function cargarAgendaCotizaciones() {
-  const { data, error } = await supabase
-    .from("tamaku_agenda_cotizaciones")
-    .select("id,nombre_tienda,contacto,email,telefono,direccion,fecha_agenda,valor_cotizacion,estado,notas,created_at")
-    .order("fecha_agenda", { ascending: true, nullsFirst: false })
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  agendaCotizaciones = data || [];
+  const [registros, intentos] = await Promise.all([
+    supabase.from("tamaku_agenda_cotizaciones")
+      .select("id,tipo_registro,nombre_tienda,empresa,sede,contacto,email,telefono,direccion,fecha_agenda,valor_cotizacion,estado,notas,intentos_previos,ultimo_medio,ultimo_intento_en,ultimo_resultado,ultimo_producto_ofrecido,notas_ultimo_intento,created_at")
+      .order("fecha_agenda", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: false }),
+    supabase.from("tamaku_agenda_intentos")
+      .select("id,registro_id,medio,intento_en,resultado,producto_ofrecido,notas,proxima_accion,created_at")
+      .order("intento_en", { ascending: false }),
+  ]);
+  if (registros.error) throw registros.error;
+  if (intentos.error) throw intentos.error;
+  agendaCotizaciones = registros.data || [];
+  intentosAgenda = intentos.data || [];
   renderAgendaCotizaciones();
 }
 
 function emitAgendaCotizacion(raw) {
+  const valorCotizacion = Number(raw.valor_cotizacion || 0);
+  const intentosPrevios = Number(raw.intentos_previos || 0);
   return {
+    tipo_registro: String(raw.tipo_registro || "BARBERIA").trim().toUpperCase() === "EMPRESA_SEDE" ? "EMPRESA_SEDE" : "BARBERIA",
     nombre_tienda: String(raw.nombre_tienda || "").trim(),
+    empresa: String(raw.empresa || "").trim(),
+    sede: String(raw.sede || "").trim(),
     contacto: String(raw.contacto || "").trim(),
     email: String(raw.email || "").trim(),
     telefono: String(raw.telefono || "").trim(),
     direccion: String(raw.direccion || "").trim(),
     fecha_agenda: raw.fecha_agenda || null,
-    valor_cotizacion: Number(raw.valor_cotizacion || 0),
+    valor_cotizacion: Number.isFinite(valorCotizacion) ? Math.max(0, valorCotizacion) : 0,
     estado: raw.estado || "Pendiente",
     notas: String(raw.notas || "").trim(),
+    intentos_previos: Number.isFinite(intentosPrevios) ? Math.max(0, Math.trunc(intentosPrevios)) : 0,
+    ultimo_medio: String(raw.ultimo_medio || "").trim().toUpperCase() || null,
+    ultimo_intento_en: raw.ultimo_intento_en || null,
+    ultimo_resultado: String(raw.ultimo_resultado || "").trim() || null,
+    ultimo_producto_ofrecido: String(raw.ultimo_producto_ofrecido || "").trim() || null,
+    notas_ultimo_intento: String(raw.notas_ultimo_intento || "").trim() || null,
   };
+}
+
+function etiquetaMedio(medio) {
+  return { WHATSAPP: "WhatsApp", CORREO: "Correo electrónico", CORREO_FISICO: "Correo físico", LLAMADA: "Llamada", REUNION: "Reunión presencial", OTRO: "Otro" }[medio] || medio;
+}
+
+function etiquetaResultado(resultado) {
+  return { PENDIENTE: "Pendiente de respuesta", CONTACTADO: "Contactado", REUNION_PROGRAMADA: "Reunión programada", COTIZACION_ENVIADA: "Cotización enviada", INTERESADO: "Interesado", NO_INTERESADO: "No interesado" }[resultado] || resultado;
 }
 
 function renderAgendaCotizaciones() {
   const q = $("#buscarAgendaCotizacion")?.value?.toLowerCase() || "";
-  const filtradas = agendaCotizaciones.filter((item) => `${item.nombre_tienda} ${item.contacto} ${item.email} ${item.telefono} ${item.direccion} ${item.notas}`.toLowerCase().includes(q));
+  const filtradas = agendaCotizaciones.filter((item) => `${item.nombre_tienda} ${item.empresa} ${item.sede} ${item.contacto} ${item.email} ${item.telefono} ${item.direccion} ${item.notas}`.toLowerCase().includes(q));
   const contenedor = $("#tablaAgendaCotizacion");
   if (!contenedor) return;
   contenedor.innerHTML = filtradas.length
-    ? filtradas.map((item) => `
-        <article>
-          <div><strong>${escapar(item.nombre_tienda)}</strong><small>${escapar(item.contacto || "Sin contacto")}</small></div>
+    ? filtradas.map((item) => {
+      const historial = intentosAgenda.filter((intento) => intento.registro_id === item.id);
+      const totalIntentos = Number(item.intentos_previos || 0) + historial.length;
+      return `
+        <article class="agenda-item">
+          <div><strong>${escapar(item.nombre_tienda)}</strong><small>${item.tipo_registro === "EMPRESA_SEDE" ? "Empresa o sede" : "Barbería / contacto"} · ${escapar(item.contacto || "Sin contacto")}</small></div>
           <div><span>${escapar(item.email || "Sin email")}</span><small>${escapar(item.telefono || "Sin teléfono")}</small></div>
-          <div><span>${escapar(item.direccion || "Sin dirección")}</span><small>${fecha(item.fecha_agenda)}</small></div>
-          <div><span>${dinero.format(Number(item.valor_cotizacion || 0))}</span><small>${escapar(item.estado || "Pendiente")}</small></div>
-          <div><em>${escapar(item.estado || "Pendiente")}</em><small>${escapar(item.notas || "Sin notas")}</small></div>
+          <div><span class="agenda-ubicacion">${escapar([item.empresa, item.sede, item.direccion].filter(Boolean).join(" · ") || "Sin empresa o dirección")}</span><small>${fecha(item.fecha_agenda)} · ${dinero.format(Number(item.valor_cotizacion || 0))} · ${escapar(item.estado || "Pendiente")}</small></div>
+          <button type="button" data-registrar-intento="${escapar(item.id)}">Registrar intento</button>
+          <div class="agenda-item-meta"><span><b>${totalIntentos}</b> ${totalIntentos === 1 ? "intento" : "intentos"}</span><span>${escapar(item.notas || "Sin notas generales")}</span></div>
+          <details class="agenda-historial"><summary>Historial de contacto (${totalIntentos})</summary>
+            ${Number(item.intentos_previos || 0) ? `<p class="intentos-importados">${Number(item.intentos_previos)} intentos anteriores importados${item.ultimo_medio ? ` · último medio: ${escapar(etiquetaMedio(item.ultimo_medio))}` : ""}${item.ultimo_intento_en ? ` · ${new Date(item.ultimo_intento_en).toLocaleString("es-CO")}` : ""}${item.ultimo_resultado ? ` · ${escapar(etiquetaResultado(item.ultimo_resultado))}` : ""}${item.ultimo_producto_ofrecido ? ` · producto: ${escapar(item.ultimo_producto_ofrecido)}` : ""}${item.notas_ultimo_intento ? ` · ${escapar(item.notas_ultimo_intento)}` : ""}</p>` : ""}
+            ${historial.length ? `<ol>${historial.map((intento) => `<li><strong>${escapar(etiquetaMedio(intento.medio))}</strong><time>${new Date(intento.intento_en).toLocaleString("es-CO")}</time><span>${escapar(etiquetaResultado(intento.resultado))}</span>${intento.producto_ofrecido ? `<small>Producto ofrecido: ${escapar(intento.producto_ofrecido)}</small>` : ""}${intento.notas ? `<small>${escapar(intento.notas)}</small>` : ""}${intento.proxima_accion ? `<small>Próxima acción: ${fecha(intento.proxima_accion)}</small>` : ""}</li>`).join("")}</ol>` : Number(item.intentos_previos || 0) ? "" : `<p class="muted">Todavía no hay intentos registrados.</p>`}
+          </details>
         </article>
-      `).join("")
+      `;
+    }).join("")
     : `<div class="vacio">Aún no hay registros en agenda y cotización.</div>`;
 }
 
 function exportarAgendaCotizacionCsv() {
-  const filas = [["nombre_tienda", "contacto", "email", "telefono", "direccion", "fecha_agenda", "valor_cotizacion", "estado", "notas"], ...agendaCotizaciones.map((item) => [item.nombre_tienda, item.contacto, item.email, item.telefono, item.direccion, item.fecha_agenda, Number(item.valor_cotizacion || 0), item.estado, item.notas])];
+  const filas = [["tipo_registro", "nombre_tienda", "empresa", "sede", "contacto", "email", "telefono", "direccion", "fecha_agenda", "valor_cotizacion", "estado", "intentos_previos", "ultimo_medio", "ultimo_intento_en", "ultimo_resultado", "ultimo_producto_ofrecido", "notas_ultimo_intento", "notas"], ...agendaCotizaciones.map((item) => [item.tipo_registro, item.nombre_tienda, item.empresa, item.sede, item.contacto, item.email, item.telefono, item.direccion, item.fecha_agenda, Number(item.valor_cotizacion || 0), item.estado, Number(item.intentos_previos || 0) + intentosAgenda.filter((intento) => intento.registro_id === item.id).length, item.ultimo_medio, item.ultimo_intento_en, item.ultimo_resultado, item.ultimo_producto_ofrecido, item.notas_ultimo_intento, item.notas])];
   const csv = filas.map((fila) => fila.map((valor) => `"${String(valor ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");
   const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
   const link = document.createElement("a");
@@ -64,8 +97,8 @@ function exportarAgendaCotizacionCsv() {
 
 function descargarPlantillaAgendaCotizacion() {
   const csv = [
-    "nombre_tienda,contacto,email,telefono,direccion,fecha_agenda,valor_cotizacion,estado,notas",
-    "Barbería Demo,Juan Pérez,juan@ejemplo.com,3000000000,Calle 20 #15-40,2026-10-05,180000,Cotizado,Cliente solicita agenda para 3 personas",
+    "tipo_registro,nombre_tienda,empresa,sede,contacto,email,telefono,direccion,fecha_agenda,valor_cotizacion,estado,intentos_previos,ultimo_medio,ultimo_intento_en,ultimo_resultado,ultimo_producto_ofrecido,notas_ultimo_intento,notas",
+    "EMPRESA_SEDE,Barbería Demo,Grupo Demo,Sede Centro,Juan Pérez,juan@ejemplo.com,3000000000,Calle 20 #15-40,2026-10-05,180000,Cotizado,2,WHATSAPP,2026-09-28T10:30:00,REUNION_PROGRAMADA,Plan Premium,Pidió reunión presencial,Cliente solicita agenda para 3 personas",
   ].join("\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const link = document.createElement("a");
@@ -116,7 +149,10 @@ function procesarCsvAgendaCotizacion(file) {
       const fila = {};
       encabezados.forEach((campo, i) => { fila[campo] = celdas[i] || ""; });
       const registro = emitAgendaCotizacion({
+        tipo_registro: fila.tipo_registro,
         nombre_tienda: fila.nombre_tienda,
+        empresa: fila.empresa,
+        sede: fila.sede,
         contacto: fila.contacto,
         email: fila.email,
         telefono: fila.telefono,
@@ -124,6 +160,12 @@ function procesarCsvAgendaCotizacion(file) {
         fecha_agenda: fila.fecha_agenda,
         valor_cotizacion: fila.valor_cotizacion,
         estado: fila.estado || "Pendiente",
+        intentos_previos: fila.intentos_previos,
+        ultimo_medio: fila.ultimo_medio,
+        ultimo_intento_en: fila.ultimo_intento_en,
+        ultimo_resultado: fila.ultimo_resultado,
+        ultimo_producto_ofrecido: fila.ultimo_producto_ofrecido,
+        notas_ultimo_intento: fila.notas_ultimo_intento,
         notas: fila.notas,
       });
       return registro.nombre_tienda ? registro : null;
@@ -282,6 +324,44 @@ $("#csvAgendaCotizacion")?.addEventListener("change", (e) => {
   const archivo = e.target.files?.[0];
   if (archivo) procesarCsvAgendaCotizacion(archivo);
   e.target.value = "";
+});
+$("#tablaAgendaCotizacion")?.addEventListener("click", (event) => {
+  const boton = event.target.closest("[data-registrar-intento]");
+  if (!boton) return;
+  const registro = agendaCotizaciones.find((item) => item.id === boton.dataset.registrarIntento);
+  if (!registro) return;
+  const formulario = $("#intentoAgendaForm");
+  formulario.reset();
+  formulario.elements.registro_id.value = registro.id;
+  formulario.elements.intento_en.value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+  $("#nombreRegistroIntento").textContent = registro.empresa || registro.nombre_tienda;
+  $("#dialogoIntentoAgenda").showModal();
+});
+$$("[data-cerrar-intento]").forEach((boton) => boton.addEventListener("click", () => $("#dialogoIntentoAgenda").close()));
+$("#intentoAgendaForm")?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const formulario = event.currentTarget;
+  const boton = formulario.querySelector('button[type="submit"]');
+  const valores = Object.fromEntries(new FormData(formulario).entries());
+  const registro = agendaCotizaciones.find((item) => item.id === valores.registro_id);
+  if (!registro) return mostrarAviso("error", "Prospecto no encontrado", "Recarga la lista e inténtalo nuevamente.");
+  boton.disabled = true;
+  const intento = {
+    registro_id: valores.registro_id,
+    medio: valores.medio,
+    intento_en: new Date(valores.intento_en).toISOString(),
+    resultado: valores.resultado,
+    producto_ofrecido: valores.producto_ofrecido.trim() || null,
+    notas: valores.notas.trim() || null,
+    proxima_accion: valores.proxima_accion || null,
+  };
+  const { error } = await supabase.from("tamaku_agenda_intentos").insert(intento);
+  boton.disabled = false;
+  if (error) return mostrarAviso("error", "No se pudo guardar el intento", error.message);
+  $("#dialogoIntentoAgenda").close();
+  formulario.reset();
+  await cargarAgendaCotizaciones();
+  mostrarAviso("success", "Seguimiento guardado", `Intento registrado para ${registro.empresa || registro.nombre_tienda}.`);
 });
 $("#agendaCotizacionForm")?.addEventListener("submit", async (event) => {
   event.preventDefault();

@@ -17,6 +17,7 @@
       <button class="active" data-vista="resumen"><i class="fa-solid fa-chart-pie"></i> Resumen</button>
       <button data-vista="tiendas"><i class="fa-solid fa-store"></i> Tiendas</button>
       <button data-vista="pagos"><i class="fa-solid fa-wallet"></i> Pagos</button>
+      <button data-vista="agenda-cotizacion"><i class="fa-solid fa-calendar-check"></i> Agenda y cotización</button>
       <button data-vista="alertas"><i class="fa-solid fa-bell"></i> Alertas <b id="notifBadge">0</b></button>
     </nav>
     <footer><small id="adminNombre">Superadmin</small><button id="cerrarSesionAdmin">Cerrar sesión</button></footer>
@@ -41,6 +42,56 @@
       <section class="panel"><div class="panel-head"><div><span>RECAUDO</span><h3>Historial general de pagos</h3></div><div class="herramientas"><input id="filtroMesPago" type="month"><button id="exportarPagos" class="btn-outline"><i class="fa-solid fa-download"></i> Exportar CSV</button></div></div><div class="pagos-head"><span>Tienda</span><span>Plan / referencia</span><span>Periodo</span><span>Fecha</span><span>Monto</span></div><div id="tablaPagos" class="tabla-pagos"></div></section>
     </section>
 
+    <section class="vista" data-seccion="agenda-cotizacion">
+      <section class="panel">
+        <div class="panel-head">
+          <div><span>AGENDA</span><h3>Agenda y cotización</h3></div>
+          <div class="herramientas">
+            <label class="search-inline"><i class="fa-solid fa-search"></i><input id="buscarAgendaCotizacion" placeholder="Buscar barbería..."></label>
+            <button id="exportarAgendaCotizacion" class="btn-outline" type="button">Exportar CSV</button>
+          </div>
+        </div>
+
+        <div class="agenda-cotizacion-layout">
+          <div class="mini-panel">
+            <h4>Carga manual</h4>
+            <form id="agendaCotizacionForm" class="agenda-form">
+              <div class="form-grid">
+                <label>Nombre de la barbería<input name="nombre_tienda" type="text" required></label>
+                <label>Contacto<input name="contacto" type="text"></label>
+              </div>
+              <div class="form-grid">
+                <label>Email<input name="email" type="email"></label>
+                <label>Teléfono<input name="telefono" type="text"></label>
+              </div>
+              <div class="form-grid">
+                <label>Dirección<input name="direccion" type="text"></label>
+                <label>Fecha agenda<input name="fecha_agenda" type="date"></label>
+              </div>
+              <div class="form-grid">
+                <label>Valor cotización<input name="valor_cotizacion" type="number" min="0" step="1000"></label>
+                <label>Estado<select name="estado"><option value="Pendiente">Pendiente</option><option value="En agenda">En agenda</option><option value="Cotizado">Cotizado</option><option value="Confirmado">Confirmado</option><option value="Cerrado">Cerrado</option></select></label>
+              </div>
+              <label>Notas<textarea name="notas" rows="3" placeholder="Reserva, horario, requerimientos del cliente, detalle del proyecto..."></textarea></label>
+              <button type="submit" class="btn-secundario">Guardar registro</button>
+            </form>
+          </div>
+
+          <div class="mini-panel">
+            <h4>Carga masiva</h4>
+            <label class="file-upload">
+              <input id="csvAgendaCotizacion" type="file" accept=".csv,text/csv">
+              <span>Seleccionar archivo CSV</span>
+            </label>
+            <p class="muted">Columnas sugeridas: nombre_tienda, contacto, email, telefono, direccion, fecha_agenda, valor_cotizacion, estado, notas.</p>
+            <button id="plantillaAgendaCotizacion" class="btn-outline" type="button">Descargar plantilla</button>
+          </div>
+        </div>
+
+        <div id="tablaAgendaCotizacion" class="tabla-agenda-cotizacion"></div>
+      </section>
+    </section>
+
     <section class="vista" data-seccion="alertas">
       <section class="panel"><div class="panel-head"><div><span>ACTIVIDAD</span><h3>Centro de alertas</h3></div><button id="marcarTodas" class="btn-outline">Marcar todas como leídas</button></div><div id="listaNotificaciones" class="notificaciones"></div></section>
     </section>
@@ -56,5 +107,5 @@
   </aside>
 
   <script>fechaPanel.textContent=new Date().toLocaleDateString('es-CO',{dateStyle:'full'})</script>
-  <script type="module" src="../assets/js/superadmin/superadmin.js?v=notices2"></script>
+  <script type="module" src="../assets/js/superadmin/superadmin.js?v=agenda-supabase1"></script>
 </body></html>

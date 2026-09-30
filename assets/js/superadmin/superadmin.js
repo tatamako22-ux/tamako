@@ -6,7 +6,144 @@ const dinero = new Intl.NumberFormat("es-CO", { style: "currency", currency: "CO
 const escapar = (v = "") => String(v).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 const hoyISO = () => new Date().toISOString().slice(0, 10);
 const fecha = (v) => v ? new Date(v).toLocaleDateString("es-CO") : "—";
-let suscripciones = [], pagos = [], notificaciones = [], seleccionada = null;
+let suscripciones = [], pagos = [], notificaciones = [], seleccionada = null, agendaCotizaciones = [];
+
+async function cargarAgendaCotizaciones() {
+  const { data, error } = await supabase
+    .from("tamaku_agenda_cotizaciones")
+    .select("id,nombre_tienda,contacto,email,telefono,direccion,fecha_agenda,valor_cotizacion,estado,notas,created_at")
+    .order("fecha_agenda", { ascending: true, nullsFirst: false })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  agendaCotizaciones = data || [];
+  renderAgendaCotizaciones();
+}
+
+function emitAgendaCotizacion(raw) {
+  return {
+    nombre_tienda: String(raw.nombre_tienda || "").trim(),
+    contacto: String(raw.contacto || "").trim(),
+    email: String(raw.email || "").trim(),
+    telefono: String(raw.telefono || "").trim(),
+    direccion: String(raw.direccion || "").trim(),
+    fecha_agenda: raw.fecha_agenda || null,
+    valor_cotizacion: Number(raw.valor_cotizacion || 0),
+    estado: raw.estado || "Pendiente",
+    notas: String(raw.notas || "").trim(),
+  };
+}
+
+function renderAgendaCotizaciones() {
+  const q = $("#buscarAgendaCotizacion")?.value?.toLowerCase() || "";
+  const filtradas = agendaCotizaciones.filter((item) => `${item.nombre_tienda} ${item.contacto} ${item.email} ${item.telefono} ${item.direccion} ${item.notas}`.toLowerCase().includes(q));
+  const contenedor = $("#tablaAgendaCotizacion");
+  if (!contenedor) return;
+  contenedor.innerHTML = filtradas.length
+    ? filtradas.map((item) => `
+        <article>
+          <div><strong>${escapar(item.nombre_tienda)}</strong><small>${escapar(item.contacto || "Sin contacto")}</small></div>
+          <div><span>${escapar(item.email || "Sin email")}</span><small>${escapar(item.telefono || "Sin teléfono")}</small></div>
+          <div><span>${escapar(item.direccion || "Sin dirección")}</span><small>${fecha(item.fecha_agenda)}</small></div>
+          <div><span>${dinero.format(Number(item.valor_cotizacion || 0))}</span><small>${escapar(item.estado || "Pendiente")}</small></div>
+          <div><em>${escapar(item.estado || "Pendiente")}</em><small>${escapar(item.notas || "Sin notas")}</small></div>
+        </article>
+      `).join("")
+    : `<div class="vacio">Aún no hay registros en agenda y cotización.</div>`;
+}
+
+function exportarAgendaCotizacionCsv() {
+  const filas = [["nombre_tienda", "contacto", "email", "telefono", "direccion", "fecha_agenda", "valor_cotizacion", "estado", "notas"], ...agendaCotizaciones.map((item) => [item.nombre_tienda, item.contacto, item.email, item.telefono, item.direccion, item.fecha_agenda, Number(item.valor_cotizacion || 0), item.estado, item.notas])];
+  const csv = filas.map((fila) => fila.map((valor) => `"${String(valor ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");
+  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `agenda-cotizacion-tamaku-${hoyISO()}.csv`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+function descargarPlantillaAgendaCotizacion() {
+  const csv = [
+    "nombre_tienda,contacto,email,telefono,direccion,fecha_agenda,valor_cotizacion,estado,notas",
+    "Barbería Demo,Juan Pérez,juan@ejemplo.com,3000000000,Calle 20 #15-40,2026-10-05,180000,Cotizado,Cliente solicita agenda para 3 personas",
+  ].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "plantilla-agenda-cotizacion.csv";
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+function parsearCsv(contenido) {
+  const filas = [];
+  let fila = [], valor = "", entreComillas = false;
+  for (let i = 0; i < contenido.length; i += 1) {
+    const caracter = contenido[i];
+    if (caracter === '"') {
+      if (entreComillas && contenido[i + 1] === '"') {
+        valor += '"';
+        i += 1;
+      } else entreComillas = !entreComillas;
+    } else if (caracter === "," && !entreComillas) {
+      fila.push(valor.trim());
+      valor = "";
+    } else if ((caracter === "\n" || caracter === "\r") && !entreComillas) {
+      if (caracter === "\r" && contenido[i + 1] === "\n") i += 1;
+      fila.push(valor.trim());
+      if (fila.some((celda) => celda)) filas.push(fila);
+      fila = [];
+      valor = "";
+    } else valor += caracter;
+  }
+  fila.push(valor.trim());
+  if (fila.some((celda) => celda)) filas.push(fila);
+  return filas;
+}
+
+function procesarCsvAgendaCotizacion(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (event) => {
+    const contenido = String(event.target.result || "");
+    const filasCsv = parsearCsv(contenido.replace(/^\uFEFF/, ""));
+    if (filasCsv.length < 2) {
+      mostrarAviso("error", "CSV vacío", "El archivo no tiene registros válidos.");
+      return;
+    }
+    const encabezados = filasCsv[0].map((h) => h.trim().toLowerCase());
+    const registros = filasCsv.slice(1).map((celdas) => {
+      const fila = {};
+      encabezados.forEach((campo, i) => { fila[campo] = celdas[i] || ""; });
+      const registro = emitAgendaCotizacion({
+        nombre_tienda: fila.nombre_tienda,
+        contacto: fila.contacto,
+        email: fila.email,
+        telefono: fila.telefono,
+        direccion: fila.direccion,
+        fecha_agenda: fila.fecha_agenda,
+        valor_cotizacion: fila.valor_cotizacion,
+        estado: fila.estado || "Pendiente",
+        notas: fila.notas,
+      });
+      return registro.nombre_tienda ? registro : null;
+    }).filter(Boolean);
+
+    if (!registros.length) {
+      mostrarAviso("error", "Sin registros", "No se detectaron barberías válidas en el CSV.");
+      return;
+    }
+
+    const { error } = await supabase.from("tamaku_agenda_cotizaciones").insert(registros);
+    if (error) {
+      mostrarAviso("error", "No se pudo importar el CSV", error.message);
+      return;
+    }
+    await cargarAgendaCotizaciones();
+    mostrarAviso("success", "Carga masiva completada", `${registros.length} registros agregados a agenda y cotización.`);
+  };
+  reader.readAsText(file, "utf-8");
+}
 function mostrarAviso(tipo, titulo, mensaje) {
   return window.TamakuUI.notify(mensaje, tipo, { titulo });
 }
@@ -33,7 +170,7 @@ function textoPlan(s) { return s.estado === "PRUEBA" ? `PRUEBA → ${s.plan_soli
 function cambiarVista(nombre) {
   $$(".vista").forEach((v) => v.classList.toggle("active", v.dataset.seccion === nombre));
   $$("#navAdmin [data-vista]").forEach((b) => b.classList.toggle("active", b.dataset.vista === nombre));
-  $("#tituloVista").textContent = { resumen: "Centro de control", tiendas: "Gestión de tiendas", pagos: "Pagos e ingresos", alertas: "Alertas y actividad" }[nombre];
+  $("#tituloVista").textContent = { resumen: "Centro de control", tiendas: "Gestión de tiendas", pagos: "Pagos e ingresos", "agenda-cotizacion": "Agenda y cotización", alertas: "Alertas y actividad" }[nombre];
   history.replaceState(null, "", `#${nombre}`);
 }
 
@@ -95,7 +232,7 @@ async function cargar() {
   if (s.error) throw s.error; if (p.error) throw p.error; if (n.error) throw n.error;
   suscripciones = s.data || []; pagos = p.data || []; notificaciones = n.data || []; renderResumen(); renderTiendas(); renderPagos(); renderNotificaciones();
 }
-async function verificar() { const { data: { user } } = await supabase.auth.getUser(); if (!user) return location.replace("../index.html?login=true"); const { data } = await supabase.from("tamaku_superadmins").select("user_id,nombre").eq("user_id", user.id).eq("activo", true).maybeSingle(); if (!data) { await supabase.auth.signOut(); return location.replace("../index.html?login=true"); } $("#adminNombre").textContent = data.nombre; await cargar(); }
+async function verificar() { const { data: { user } } = await supabase.auth.getUser(); if (!user) return location.replace("../index.html?login=true"); const { data } = await supabase.from("tamaku_superadmins").select("user_id,nombre").eq("user_id", user.id).eq("activo", true).maybeSingle(); if (!data) { await supabase.auth.signOut(); return location.replace("../index.html?login=true"); } $("#adminNombre").textContent = data.nombre; await cargar(); await cargarAgendaCotizaciones(); }
 
 $("#navAdmin").onclick = (e) => { const b = e.target.closest("[data-vista]"); if (b) cambiarVista(b.dataset.vista); };
 document.addEventListener("click", (e) => { const tienda = e.target.closest("[data-abrir-tienda]"); if (tienda) abrirDetalle(tienda.dataset.abrirTienda); const ir = e.target.closest("[data-ir]"); if (ir) cambiarVista(ir.dataset.ir); });
@@ -137,5 +274,40 @@ async function cerrarSesionAdmin() {
 $("#cerrarSesionAdmin").onclick = cerrarSesionAdmin;
 $("#cerrarSesionAdminMovil").onclick = cerrarSesionAdmin;
 
-const inicial = location.hash.slice(1); if (["resumen", "tiendas", "pagos", "alertas"].includes(inicial)) cambiarVista(inicial);
-verificar().catch((e) => { $("#proximosVencimientos").innerHTML = `<div class="vacio">No se pudo cargar el panel: ${escapar(e.message)}</div>`; });
+renderAgendaCotizaciones();
+$("#buscarAgendaCotizacion")?.addEventListener("input", renderAgendaCotizaciones);
+$("#exportarAgendaCotizacion")?.addEventListener("click", exportarAgendaCotizacionCsv);
+$("#plantillaAgendaCotizacion")?.addEventListener("click", descargarPlantillaAgendaCotizacion);
+$("#csvAgendaCotizacion")?.addEventListener("change", (e) => {
+  const archivo = e.target.files?.[0];
+  if (archivo) procesarCsvAgendaCotizacion(archivo);
+  e.target.value = "";
+});
+$("#agendaCotizacionForm")?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const boton = event.currentTarget.querySelector('button[type="submit"]');
+  boton.disabled = true;
+  const formulario = new FormData(event.currentTarget);
+  const dato = emitAgendaCotizacion(Object.fromEntries(formulario.entries()));
+  if (!dato.nombre_tienda) {
+    boton.disabled = false;
+    mostrarAviso("error", "Registro incompleto", "Debes indicar al menos el nombre de la barbería.");
+    return;
+  }
+  const { error } = await supabase.from("tamaku_agenda_cotizaciones").insert(dato);
+  boton.disabled = false;
+  if (error) {
+    mostrarAviso("error", "No se pudo guardar el registro", error.message);
+    return;
+  }
+  await cargarAgendaCotizaciones();
+  event.currentTarget.reset();
+  mostrarAviso("success", "Registro guardado", `${dato.nombre_tienda} quedó agregado a agenda y cotización.`);
+});
+
+const inicial = location.hash.slice(1); if (["resumen", "tiendas", "pagos", "agenda-cotizacion", "alertas"].includes(inicial)) cambiarVista(inicial);
+verificar().catch((e) => {
+  const mensaje = escapar(e.message);
+  $("#proximosVencimientos").innerHTML = `<div class="vacio">No se pudo cargar el panel: ${mensaje}</div>`;
+  $("#tablaAgendaCotizacion").innerHTML = `<div class="vacio">No se pudieron cargar los registros desde Supabase: ${mensaje}</div>`;
+});

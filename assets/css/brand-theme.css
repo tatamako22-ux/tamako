@@ -1,10 +1,63 @@
 /* Base del branding configurado para que cada módulo respete el color de la tienda. */
-body{background:var(--bg,#050505)!important;color:var(--text,#f5f5f2)!important}
-body>.sidebar{background:var(--panel,#101010)!important;border-right-color:var(--gold-border,rgba(191,149,63,.2))!important}
-body>.main-content,body>.plan-page,body>.liquidaciones-main,body>.com-main,body>.main-content.dashboard-v3,body>.tienda-main,body>.galeria-page,body>.users-page,body>.main-content.agenda-grid{background:var(--bg,#050505)!important;color:var(--text,#f5f5f2)!important}
-body .mobile-tab-bar{background:var(--surface,#121212)!important;border-color:var(--gold-border,rgba(191,149,63,.2))!important}
-body .nav-item,body .tab-item,body .module-eyebrow,body .agenda-eyebrow,body .page-badge{color:var(--text,#f5f5f2)!important}
-body .nav-item.active,body .tab-item.active{background:var(--accent-soft,rgba(191,149,63,.12))!important;color:var(--gold-light,#f0cf79)!important}
+body{
+  background: radial-gradient(circle at 92% 0, var(--accent-soft, rgba(191,149,63,.12)), transparent 28%), var(--bg, #050505) !important;
+  color: var(--text, #f5f5f2) !important;
+}
+body>.sidebar{
+  background: linear-gradient(180deg, var(--surface, #121212), var(--bg, #050505)) !important;
+  border-right-color: var(--gold-border, rgba(191,149,63,.2)) !important;
+  box-shadow: inset -1px 0 0 rgba(255,255,255,.04) !important;
+}
+body>.main-content,
+body>.plan-page,
+body>.liquidaciones-main,
+body>.com-main,
+body>.main-content.dashboard-v3,
+body>.tienda-main,
+body>.galeria-page,
+body>.users-page,
+body>.main-content.agenda-grid{
+  background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 22%), var(--bg, #050505) !important;
+  color: var(--text, #f5f5f2) !important;
+}
+body .mobile-tab-bar{
+  background: rgba(18,18,18,.86) !important;
+  border-color: var(--gold-border, rgba(191,149,63,.2)) !important;
+  box-shadow: 0 18px 40px rgba(0,0,0,.18) !important;
+}
+body .nav-item,
+body .tab-item,
+body .module-eyebrow,
+body .agenda-eyebrow,
+body .page-badge{color:var(--text,#f5f5f2)!important}
+body .nav-item.active,
+body .tab-item.active{
+  background: var(--accent-soft, rgba(191,149,63,.12)) !important;
+  color: var(--gold-light, #f0cf79) !important;
+  border-color: var(--gold-border, rgba(191,149,63,.2)) !important;
+}
+body .tamaku-module-header,
+body .stat-card,
+body .panel,
+body .dashboard-panel,
+body .agenda-panel,
+body .users-panel,
+body .modal-card,
+body .dialog-card,
+body .search-box,
+body .user-card,
+body .kpi-card,
+body .payment-method,
+body .quick-action,
+body .invoice-card,
+body .plan-panel,
+body .liq-panel,
+body .com-card,
+body .galeria-admin-panel{
+  background: linear-gradient(180deg, var(--surface, #121212), var(--bg, #050505)) !important;
+  border-color: var(--gold-border, rgba(191,149,63,.2)) !important;
+  box-shadow: 0 18px 50px rgba(0,0,0,.12) !important;
+}
 
 /* Modo claro accesible para el panel privado de cada tienda. */
 body.tamaku-brand-light{color:#171717!important;background:radial-gradient(circle at 90% 0,var(--accent-soft),transparent 27%),#f4f3ef!important}

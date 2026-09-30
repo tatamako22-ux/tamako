@@ -6,22 +6,27 @@ const dinero = new Intl.NumberFormat("es-CO", { style: "currency", currency: "CO
 const escapar = (v = "") => String(v).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 const hoyISO = () => new Date().toISOString().slice(0, 10);
 const fecha = (v) => v ? new Date(v).toLocaleDateString("es-CO") : "—";
-let suscripciones = [], pagos = [], notificaciones = [], seleccionada = null, agendaCotizaciones = [], intentosAgenda = [];
+let suscripciones = [], pagos = [], notificaciones = [], seleccionada = null, agendaCotizaciones = [], intentosAgenda = [], reunionesAgenda = [];
 
 async function cargarAgendaCotizaciones() {
-  const [registros, intentos] = await Promise.all([
+  const [registros, intentos, reuniones] = await Promise.all([
     supabase.from("tamaku_agenda_cotizaciones")
       .select("id,tipo_registro,nombre_tienda,empresa,sede,contacto,email,telefono,direccion,fecha_agenda,valor_cotizacion,estado,notas,intentos_previos,ultimo_medio,ultimo_intento_en,ultimo_resultado,ultimo_producto_ofrecido,notas_ultimo_intento,created_at")
       .order("fecha_agenda", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false }),
     supabase.from("tamaku_agenda_intentos")
-      .select("id,registro_id,medio,intento_en,resultado,producto_ofrecido,notas,proxima_accion,created_at")
+      .select("id,registro_id,medio,intento_en,resultado,informacion_enviada,producto_ofrecido,notas,proxima_accion,created_at")
       .order("intento_en", { ascending: false }),
+    supabase.from("tamaku_agenda_reuniones")
+      .select("id,registro_id,fecha_reunion,lugar,asistentes,producto_ofrecido,estado,resultado,notas,proxima_accion,created_at")
+      .order("fecha_reunion", { ascending: false }),
   ]);
   if (registros.error) throw registros.error;
   if (intentos.error) throw intentos.error;
+  if (reuniones.error) throw reuniones.error;
   agendaCotizaciones = registros.data || [];
   intentosAgenda = intentos.data || [];
+  reunionesAgenda = reuniones.data || [];
   renderAgendaCotizaciones();
 }
 
@@ -66,6 +71,7 @@ function renderAgendaCotizaciones() {
   contenedor.innerHTML = filtradas.length
     ? filtradas.map((item) => {
       const historial = intentosAgenda.filter((intento) => intento.registro_id === item.id);
+      const reuniones = reunionesAgenda.filter((reunion) => reunion.registro_id === item.id);
       const totalIntentos = Number(item.intentos_previos || 0) + historial.length;
       return `
         <article class="agenda-item">
@@ -73,10 +79,14 @@ function renderAgendaCotizaciones() {
           <div><span>${escapar(item.email || "Sin email")}</span><small>${escapar(item.telefono || "Sin teléfono")}</small></div>
           <div><span class="agenda-ubicacion">${escapar([item.empresa, item.sede, item.direccion].filter(Boolean).join(" · ") || "Sin empresa o dirección")}</span><small>${fecha(item.fecha_agenda)} · ${dinero.format(Number(item.valor_cotizacion || 0))} · ${escapar(item.estado || "Pendiente")}</small></div>
           <button type="button" data-registrar-intento="${escapar(item.id)}">Registrar intento</button>
-          <div class="agenda-item-meta"><span><b>${totalIntentos}</b> ${totalIntentos === 1 ? "intento" : "intentos"}</span><span>${escapar(item.notas || "Sin notas generales")}</span></div>
+          <button type="button" data-registrar-reunion="${escapar(item.id)}">Registrar reunión</button>
+          <div class="agenda-item-meta"><span><b>${totalIntentos}</b> ${totalIntentos === 1 ? "intento" : "intentos"}</span><span><b>${reuniones.length}</b> ${reuniones.length === 1 ? "reunión" : "reuniones"}</span><span>${escapar(item.notas || "Sin notas generales")}</span></div>
           <details class="agenda-historial"><summary>Historial de contacto (${totalIntentos})</summary>
             ${Number(item.intentos_previos || 0) ? `<p class="intentos-importados">${Number(item.intentos_previos)} intentos anteriores importados${item.ultimo_medio ? ` · último medio: ${escapar(etiquetaMedio(item.ultimo_medio))}` : ""}${item.ultimo_intento_en ? ` · ${new Date(item.ultimo_intento_en).toLocaleString("es-CO")}` : ""}${item.ultimo_resultado ? ` · ${escapar(etiquetaResultado(item.ultimo_resultado))}` : ""}${item.ultimo_producto_ofrecido ? ` · producto: ${escapar(item.ultimo_producto_ofrecido)}` : ""}${item.notas_ultimo_intento ? ` · ${escapar(item.notas_ultimo_intento)}` : ""}</p>` : ""}
-            ${historial.length ? `<ol>${historial.map((intento) => `<li><strong>${escapar(etiquetaMedio(intento.medio))}</strong><time>${new Date(intento.intento_en).toLocaleString("es-CO")}</time><span>${escapar(etiquetaResultado(intento.resultado))}</span>${intento.producto_ofrecido ? `<small>Producto ofrecido: ${escapar(intento.producto_ofrecido)}</small>` : ""}${intento.notas ? `<small>${escapar(intento.notas)}</small>` : ""}${intento.proxima_accion ? `<small>Próxima acción: ${fecha(intento.proxima_accion)}</small>` : ""}</li>`).join("")}</ol>` : Number(item.intentos_previos || 0) ? "" : `<p class="muted">Todavía no hay intentos registrados.</p>`}
+            ${historial.length ? `<ol>${historial.map((intento) => `<li><strong>${escapar(etiquetaMedio(intento.medio))}</strong><time>${new Date(intento.intento_en).toLocaleString("es-CO")}</time><span>${escapar(etiquetaResultado(intento.resultado))}</span>${intento.informacion_enviada ? `<small>Información enviada: ${escapar(intento.informacion_enviada)}</small>` : ""}${intento.notas ? `<small>${escapar(intento.notas)}</small>` : ""}${intento.proxima_accion ? `<small>Próxima acción: ${fecha(intento.proxima_accion)}</small>` : ""}</li>`).join("")}</ol>` : Number(item.intentos_previos || 0) ? "" : `<p class="muted">Todavía no hay intentos registrados.</p>`}
+          </details>
+          <details class="agenda-historial"><summary>Reuniones (${reuniones.length})</summary>
+            ${reuniones.length ? `<ol>${reuniones.map((reunion) => `<li><strong>${escapar(reunion.estado)}</strong><time>${new Date(reunion.fecha_reunion).toLocaleString("es-CO")}</time>${reunion.lugar ? `<span>Lugar: ${escapar(reunion.lugar)}</span>` : ""}${reunion.asistentes ? `<small>Asistentes: ${escapar(reunion.asistentes)}</small>` : ""}${reunion.producto_ofrecido ? `<small>Producto ofrecido: ${escapar(reunion.producto_ofrecido)}</small>` : ""}${reunion.resultado ? `<small>Resultado: ${escapar(reunion.resultado)}</small>` : ""}${reunion.notas ? `<small>${escapar(reunion.notas)}</small>` : ""}${reunion.proxima_accion ? `<small>Próxima acción: ${fecha(reunion.proxima_accion)}</small>` : ""}</li>`).join("")}</ol>` : `<p class="muted">Todavía no hay reuniones registradas.</p>`}
           </details>
         </article>
       `;
@@ -85,7 +95,7 @@ function renderAgendaCotizaciones() {
 }
 
 function exportarAgendaCotizacionCsv() {
-  const filas = [["tipo_registro", "nombre_tienda", "empresa", "sede", "contacto", "email", "telefono", "direccion", "fecha_agenda", "valor_cotizacion", "estado", "intentos_previos", "ultimo_medio", "ultimo_intento_en", "ultimo_resultado", "ultimo_producto_ofrecido", "notas_ultimo_intento", "notas"], ...agendaCotizaciones.map((item) => [item.tipo_registro, item.nombre_tienda, item.empresa, item.sede, item.contacto, item.email, item.telefono, item.direccion, item.fecha_agenda, Number(item.valor_cotizacion || 0), item.estado, Number(item.intentos_previos || 0) + intentosAgenda.filter((intento) => intento.registro_id === item.id).length, item.ultimo_medio, item.ultimo_intento_en, item.ultimo_resultado, item.ultimo_producto_ofrecido, item.notas_ultimo_intento, item.notas])];
+  const filas = [["id", "tipo_registro", "nombre_tienda", "empresa", "sede", "contacto", "email", "telefono", "direccion", "fecha_agenda", "valor_cotizacion", "estado", "notas"], ...agendaCotizaciones.map((item) => [item.id, item.tipo_registro, item.nombre_tienda, item.empresa, item.sede, item.contacto, item.email, item.telefono, item.direccion, item.fecha_agenda, Number(item.valor_cotizacion || 0), item.estado, item.notas])];
   const csv = filas.map((fila) => fila.map((valor) => `"${String(valor ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");
   const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
   const link = document.createElement("a");
@@ -96,14 +106,25 @@ function exportarAgendaCotizacionCsv() {
 }
 
 function descargarPlantillaAgendaCotizacion() {
-  const csv = [
-    "tipo_registro,nombre_tienda,empresa,sede,contacto,email,telefono,direccion,fecha_agenda,valor_cotizacion,estado,intentos_previos,ultimo_medio,ultimo_intento_en,ultimo_resultado,ultimo_producto_ofrecido,notas_ultimo_intento,notas",
-    "EMPRESA_SEDE,Barbería Demo,Grupo Demo,Sede Centro,Juan Pérez,juan@ejemplo.com,3000000000,Calle 20 #15-40,2026-10-05,180000,Cotizado,2,WHATSAPP,2026-09-28T10:30:00,REUNION_PROGRAMADA,Plan Premium,Pidió reunión presencial,Cliente solicita agenda para 3 personas",
-  ].join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  descargarCsv("plantilla-empresas-agenda.csv", [
+    ["tipo_registro", "nombre_tienda", "empresa", "sede", "contacto", "email", "telefono", "direccion", "fecha_agenda", "valor_cotizacion", "estado", "notas"],
+    ["EMPRESA_SEDE", "Barbería Demo", "Grupo Demo", "Sede Centro", "Juan Pérez", "juan@ejemplo.com", "3000000000", "Calle 20 #15-40", "2026-10-05", "180000", "Pendiente", "Ejemplo de registro"],
+  ]);
+}
+
+function descargarPlantillaIntentosAgenda() {
+  descargarCsv("plantilla-intentos-contacto.csv", [["registro_id", "nombre_tienda", "empresa", "email", "medio", "intento_en", "informacion_enviada", "resultado", "notas", "proxima_accion"], ["", "Barbería Demo", "Grupo Demo", "juan@ejemplo.com", "WHATSAPP", "2026-09-30T10:30:00", "Catálogo TAMAKU", "PENDIENTE", "Enviar seguimiento", "2026-10-02"]]);
+}
+
+function descargarPlantillaReunionesAgenda() {
+  descargarCsv("plantilla-reuniones-empresa.csv", [["registro_id", "nombre_tienda", "empresa", "email", "fecha_reunion", "lugar", "asistentes", "producto_ofrecido", "estado", "resultado", "notas", "proxima_accion"], ["", "Barbería Demo", "Grupo Demo", "juan@ejemplo.com", "2026-10-05T14:00:00", "Sede Centro", "Juan Pérez, gerente", "Plan Premium", "PROGRAMADA", "", "Presentación comercial", "2026-10-06"]]);
+}
+
+function descargarCsv(nombre, filas) {
+  const csv = filas.map((fila) => fila.map((valor) => `"${String(valor ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");
   const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "plantilla-agenda-cotizacion.csv";
+  link.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }));
+  link.download = nombre;
   link.click();
   URL.revokeObjectURL(link.href);
 }
@@ -134,57 +155,109 @@ function parsearCsv(contenido) {
   return filas;
 }
 
-function procesarCsvAgendaCotizacion(file) {
+async function leerCsvObjetos(file) {
+  const contenido = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => resolve(String(event.target.result || ""));
+    reader.onerror = () => reject(new Error("No se pudo leer el archivo CSV."));
+    reader.readAsText(file, "utf-8");
+  });
+  const filas = parsearCsv(contenido.replace(/^\uFEFF/, ""));
+  if (filas.length < 2) throw new Error("El CSV no contiene filas de datos.");
+  const encabezados = filas[0].map((celda) => celda.trim().toLowerCase());
+  return filas.slice(1).map((celdas) => Object.fromEntries(encabezados.map((encabezado, index) => [encabezado, celdas[index] || ""])));
+}
+
+function resolverRegistroImportacion(fila) {
+  const id = String(fila.registro_id || fila.id || "").trim();
+  if (id) return agendaCotizaciones.find((item) => item.id === id) || null;
+  const email = String(fila.email || "").trim().toLowerCase();
+  if (email) {
+    const porEmail = agendaCotizaciones.filter((item) => String(item.email || "").trim().toLowerCase() === email);
+    if (porEmail.length === 1) return porEmail[0];
+    if (porEmail.length > 1) return null;
+  }
+  const nombre = String(fila.nombre_tienda || fila.empresa || "").trim().toLowerCase();
+  const sede = String(fila.sede || "").trim().toLowerCase();
+  if (!nombre) return null;
+  const coincidentes = agendaCotizaciones.filter((item) => {
+    const mismoNombre = [item.nombre_tienda, item.empresa].some((valor) => String(valor || "").trim().toLowerCase() === nombre);
+    return mismoNombre && (!sede || String(item.sede || "").trim().toLowerCase() === sede);
+  });
+  return coincidentes.length === 1 ? coincidentes[0] : null;
+}
+
+async function procesarCsvAgendaCotizacion(file) {
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = async (event) => {
-    const contenido = String(event.target.result || "");
-    const filasCsv = parsearCsv(contenido.replace(/^\uFEFF/, ""));
-    if (filasCsv.length < 2) {
-      mostrarAviso("error", "CSV vacío", "El archivo no tiene registros válidos.");
-      return;
-    }
-    const encabezados = filasCsv[0].map((h) => h.trim().toLowerCase());
-    const registros = filasCsv.slice(1).map((celdas) => {
-      const fila = {};
-      encabezados.forEach((campo, i) => { fila[campo] = celdas[i] || ""; });
-      const registro = emitAgendaCotizacion({
-        tipo_registro: fila.tipo_registro,
-        nombre_tienda: fila.nombre_tienda,
-        empresa: fila.empresa,
-        sede: fila.sede,
-        contacto: fila.contacto,
-        email: fila.email,
-        telefono: fila.telefono,
-        direccion: fila.direccion,
-        fecha_agenda: fila.fecha_agenda,
-        valor_cotizacion: fila.valor_cotizacion,
-        estado: fila.estado || "Pendiente",
-        intentos_previos: fila.intentos_previos,
-        ultimo_medio: fila.ultimo_medio,
-        ultimo_intento_en: fila.ultimo_intento_en,
-        ultimo_resultado: fila.ultimo_resultado,
-        ultimo_producto_ofrecido: fila.ultimo_producto_ofrecido,
-        notas_ultimo_intento: fila.notas_ultimo_intento,
-        notas: fila.notas,
-      });
-      return registro.nombre_tienda ? registro : null;
-    }).filter(Boolean);
-
-    if (!registros.length) {
-      mostrarAviso("error", "Sin registros", "No se detectaron barberías válidas en el CSV.");
-      return;
-    }
-
+  try {
+    const filas = await leerCsvObjetos(file);
+    const registros = filas.map((fila) => emitAgendaCotizacion(fila)).filter((registro) => registro.nombre_tienda);
+    if (!registros.length) throw new Error("No se encontraron empresas con nombre válido.");
     const { error } = await supabase.from("tamaku_agenda_cotizaciones").insert(registros);
-    if (error) {
-      mostrarAviso("error", "No se pudo importar el CSV", error.message);
-      return;
-    }
+    if (error) throw error;
     await cargarAgendaCotizaciones();
-    mostrarAviso("success", "Carga masiva completada", `${registros.length} registros agregados a agenda y cotización.`);
-  };
-  reader.readAsText(file, "utf-8");
+    mostrarAviso("success", "Empresas importadas", `${registros.length} registros agregados.`);
+  } catch (error) {
+    mostrarAviso("error", "No se pudo importar empresas", error.message);
+  }
+}
+
+async function procesarCsvIntentosAgenda(file) {
+  if (!file) return;
+  try {
+    const filas = await leerCsvObjetos(file);
+    const registros = filas.map((fila) => {
+      const empresa = resolverRegistroImportacion(fila);
+      const fechaIntento = new Date(fila.intento_en);
+      if (!empresa || !fila.medio || !fila.intento_en || Number.isNaN(fechaIntento.getTime())) return null;
+      return {
+        registro_id: empresa.id,
+        medio: String(fila.medio).trim().toUpperCase(),
+        intento_en: fechaIntento.toISOString(),
+        informacion_enviada: fila.informacion_enviada || null,
+        resultado: String(fila.resultado || "PENDIENTE").trim().toUpperCase(),
+        notas: fila.notas || null,
+        proxima_accion: fila.proxima_accion || null,
+      };
+    });
+    if (registros.some((registro) => !registro)) throw new Error("Hay filas sin empresa coincidente, medio o fecha válida. No se importó ningún intento; usa registro_id del CSV de empresas o un email/nombre único.");
+    const { error } = await supabase.from("tamaku_agenda_intentos").insert(registros);
+    if (error) throw error;
+    await cargarAgendaCotizaciones();
+    mostrarAviso("success", "Intentos importados", `${registros.length} contactos agregados al historial.`);
+  } catch (error) {
+    mostrarAviso("error", "No se pudieron importar intentos", error.message);
+  }
+}
+
+async function procesarCsvReunionesAgenda(file) {
+  if (!file) return;
+  try {
+    const filas = await leerCsvObjetos(file);
+    const reuniones = filas.map((fila) => {
+      const empresa = resolverRegistroImportacion(fila);
+      const fechaReunion = new Date(fila.fecha_reunion);
+      if (!empresa || !fila.fecha_reunion || Number.isNaN(fechaReunion.getTime())) return null;
+      return {
+        registro_id: empresa.id,
+        fecha_reunion: fechaReunion.toISOString(),
+        lugar: fila.lugar || null,
+        asistentes: fila.asistentes || null,
+        producto_ofrecido: fila.producto_ofrecido || null,
+        estado: String(fila.estado || "PROGRAMADA").trim().toUpperCase(),
+        resultado: fila.resultado || null,
+        notas: fila.notas || null,
+        proxima_accion: fila.proxima_accion || null,
+      };
+    });
+    if (reuniones.some((reunion) => !reunion)) throw new Error("Hay filas sin empresa coincidente o fecha válida. No se importó ninguna reunión; usa registro_id del CSV de empresas o un email/nombre único.");
+    const { error } = await supabase.from("tamaku_agenda_reuniones").insert(reuniones);
+    if (error) throw error;
+    await cargarAgendaCotizaciones();
+    mostrarAviso("success", "Reuniones importadas", `${reuniones.length} reuniones agregadas.`);
+  } catch (error) {
+    mostrarAviso("error", "No se pudieron importar reuniones", error.message);
+  }
 }
 function mostrarAviso(tipo, titulo, mensaje) {
   return window.TamakuUI.notify(mensaje, tipo, { titulo });
@@ -320,16 +393,31 @@ renderAgendaCotizaciones();
 $("#buscarAgendaCotizacion")?.addEventListener("input", renderAgendaCotizaciones);
 $("#exportarAgendaCotizacion")?.addEventListener("click", exportarAgendaCotizacionCsv);
 $("#plantillaAgendaCotizacion")?.addEventListener("click", descargarPlantillaAgendaCotizacion);
-$("#csvAgendaCotizacion")?.addEventListener("change", (e) => {
-  const archivo = e.target.files?.[0];
-  if (archivo) procesarCsvAgendaCotizacion(archivo);
-  e.target.value = "";
+$("#plantillaIntentosAgenda")?.addEventListener("click", descargarPlantillaIntentosAgenda);
+$("#plantillaReunionesAgenda")?.addEventListener("click", descargarPlantillaReunionesAgenda);
+[["#csvAgendaCotizacion", procesarCsvAgendaCotizacion], ["#csvIntentosAgenda", procesarCsvIntentosAgenda], ["#csvReunionesAgenda", procesarCsvReunionesAgenda]].forEach(([selector, procesar]) => {
+  $(selector)?.addEventListener("change", (event) => {
+    const archivo = event.target.files?.[0];
+    if (archivo) procesar(archivo);
+    event.target.value = "";
+  });
 });
 $("#tablaAgendaCotizacion")?.addEventListener("click", (event) => {
   const boton = event.target.closest("[data-registrar-intento]");
-  if (!boton) return;
-  const registro = agendaCotizaciones.find((item) => item.id === boton.dataset.registrarIntento);
+  const botonReunion = event.target.closest("[data-registrar-reunion]");
+  if (!boton && !botonReunion) return;
+  const idRegistro = boton?.dataset.registrarIntento || botonReunion?.dataset.registrarReunion;
+  const registro = agendaCotizaciones.find((item) => item.id === idRegistro);
   if (!registro) return;
+  if (botonReunion) {
+    const formularioReunion = $("#reunionAgendaForm");
+    formularioReunion.reset();
+    formularioReunion.elements.registro_id.value = registro.id;
+    formularioReunion.elements.fecha_reunion.value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    $("#nombreRegistroReunion").textContent = registro.empresa || registro.nombre_tienda;
+    $("#dialogoReunionAgenda").showModal();
+    return;
+  }
   const formulario = $("#intentoAgendaForm");
   formulario.reset();
   formulario.elements.registro_id.value = registro.id;
@@ -338,6 +426,7 @@ $("#tablaAgendaCotizacion")?.addEventListener("click", (event) => {
   $("#dialogoIntentoAgenda").showModal();
 });
 $$("[data-cerrar-intento]").forEach((boton) => boton.addEventListener("click", () => $("#dialogoIntentoAgenda").close()));
+$$("[data-cerrar-reunion]").forEach((boton) => boton.addEventListener("click", () => $("#dialogoReunionAgenda").close()));
 $("#intentoAgendaForm")?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const formulario = event.currentTarget;
@@ -351,7 +440,7 @@ $("#intentoAgendaForm")?.addEventListener("submit", async (event) => {
     medio: valores.medio,
     intento_en: new Date(valores.intento_en).toISOString(),
     resultado: valores.resultado,
-    producto_ofrecido: valores.producto_ofrecido.trim() || null,
+    informacion_enviada: valores.informacion_enviada.trim() || null,
     notas: valores.notas.trim() || null,
     proxima_accion: valores.proxima_accion || null,
   };
@@ -362,6 +451,32 @@ $("#intentoAgendaForm")?.addEventListener("submit", async (event) => {
   formulario.reset();
   await cargarAgendaCotizaciones();
   mostrarAviso("success", "Seguimiento guardado", `Intento registrado para ${registro.empresa || registro.nombre_tienda}.`);
+});
+$("#reunionAgendaForm")?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const formulario = event.currentTarget;
+  const boton = formulario.querySelector('button[type="submit"]');
+  const valores = Object.fromEntries(new FormData(formulario).entries());
+  const registro = agendaCotizaciones.find((item) => item.id === valores.registro_id);
+  if (!registro) return mostrarAviso("error", "Empresa no encontrada", "Recarga la lista e inténtalo nuevamente.");
+  boton.disabled = true;
+  const { error } = await supabase.from("tamaku_agenda_reuniones").insert({
+    registro_id: valores.registro_id,
+    fecha_reunion: new Date(valores.fecha_reunion).toISOString(),
+    lugar: valores.lugar.trim() || null,
+    asistentes: valores.asistentes.trim() || null,
+    producto_ofrecido: valores.producto_ofrecido.trim() || null,
+    estado: valores.estado,
+    resultado: valores.resultado.trim() || null,
+    notas: valores.notas.trim() || null,
+    proxima_accion: valores.proxima_accion || null,
+  });
+  boton.disabled = false;
+  if (error) return mostrarAviso("error", "No se pudo guardar la reunión", error.message);
+  $("#dialogoReunionAgenda").close();
+  formulario.reset();
+  await cargarAgendaCotizaciones();
+  mostrarAviso("success", "Reunión guardada", `Reunión registrada para ${registro.empresa || registro.nombre_tienda}.`);
 });
 $("#agendaCotizacionForm")?.addEventListener("submit", async (event) => {
   event.preventDefault();

@@ -48,13 +48,13 @@
           <div><span>AGENDA</span><h3>Agenda y cotización</h3></div>
           <div class="herramientas">
             <label class="search-inline"><i class="fa-solid fa-search"></i><input id="buscarAgendaCotizacion" placeholder="Buscar barbería..."></label>
-            <button id="exportarAgendaCotizacion" class="btn-outline" type="button">Exportar CSV</button>
+            <button id="exportarAgendaCotizacion" class="btn-outline" type="button">Exportar empresas</button>
           </div>
         </div>
 
         <div class="agenda-cotizacion-layout">
           <div class="mini-panel">
-            <h4>Carga manual</h4>
+            <h4>1. Base de empresas</h4>
             <form id="agendaCotizacionForm" class="agenda-form">
               <label>Tipo de registro<select name="tipo_registro"><option value="BARBERIA">Barbería / contacto</option><option value="EMPRESA_SEDE">Empresa o sede</option></select></label>
               <div class="form-grid">
@@ -80,16 +80,32 @@
               <label>Notas<textarea name="notas" rows="3" placeholder="Reserva, horario, requerimientos del cliente, detalle del proyecto..."></textarea></label>
               <button type="submit" class="btn-secundario">Guardar registro</button>
             </form>
+            <label class="file-upload">
+              <input id="csvAgendaCotizacion" type="file" accept=".csv,text/csv">
+              <span>Importar empresas desde CSV</span>
+            </label>
+            <p class="muted">Datos generales de la barbería, empresa, sede y contacto.</p>
+            <button id="plantillaAgendaCotizacion" class="btn-outline" type="button">Descargar plantilla</button>
           </div>
 
           <div class="mini-panel">
-            <h4>Carga masiva</h4>
+            <h4>2. Intentos de contacto</h4>
             <label class="file-upload">
-              <input id="csvAgendaCotizacion" type="file" accept=".csv,text/csv">
-              <span>Seleccionar archivo CSV</span>
+              <input id="csvIntentosAgenda" type="file" accept=".csv,text/csv">
+              <span>Importar intentos desde CSV</span>
             </label>
-            <p class="muted">La plantilla incluye barbería o empresa/sede, contacto, intentos anteriores, último canal, fecha, resultado y producto ofrecido.</p>
-            <button id="plantillaAgendaCotizacion" class="btn-outline" type="button">Descargar plantilla</button>
+            <p class="muted">Cada fila registra un contacto por WhatsApp, correo, correo físico o llamada. Usa el ID de empresa exportado.</p>
+            <button id="plantillaIntentosAgenda" class="btn-outline" type="button">Descargar plantilla</button>
+          </div>
+
+          <div class="mini-panel">
+            <h4>3. Reuniones</h4>
+            <label class="file-upload">
+              <input id="csvReunionesAgenda" type="file" accept=".csv,text/csv">
+              <span>Importar reuniones desde CSV</span>
+            </label>
+            <p class="muted">Registra fecha, lugar, asistentes, producto presentado, resultado y próxima acción.</p>
+            <button id="plantillaReunionesAgenda" class="btn-outline" type="button">Descargar plantilla</button>
           </div>
         </div>
 
@@ -98,17 +114,38 @@
           <form id="intentoAgendaForm" class="agenda-form">
             <header><div><span>SEGUIMIENTO COMERCIAL</span><h3 id="nombreRegistroIntento">Registrar intento</h3></div><button type="button" data-cerrar-intento aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></header>
             <input name="registro_id" type="hidden">
-            <label>Medio de contacto<select name="medio" required><option value="WHATSAPP">WhatsApp</option><option value="CORREO">Correo electrónico</option><option value="CORREO_FISICO">Correo físico</option><option value="LLAMADA">Llamada</option><option value="REUNION">Reunión presencial</option><option value="OTRO">Otro</option></select></label>
+            <label>Medio de contacto<select name="medio" required><option value="WHATSAPP">WhatsApp</option><option value="CORREO">Correo electrónico</option><option value="CORREO_FISICO">Correo físico</option><option value="LLAMADA">Llamada</option><option value="OTRO">Otro</option></select></label>
             <div class="form-grid">
               <label>Fecha y hora del intento<input name="intento_en" type="datetime-local" required></label>
               <label>Resultado<select name="resultado"><option value="PENDIENTE">Pendiente de respuesta</option><option value="CONTACTADO">Contactado</option><option value="REUNION_PROGRAMADA">Reunión programada</option><option value="COTIZACION_ENVIADA">Cotización enviada</option><option value="INTERESADO">Interesado</option><option value="NO_INTERESADO">No interesado</option></select></label>
             </div>
-            <label>Producto ofrecido<input name="producto_ofrecido" type="text" placeholder="Producto o servicio presentado"></label>
+            <label>Información enviada<input name="informacion_enviada" type="text" placeholder="Catálogo, propuesta, presentación, cotización..."></label>
             <div class="form-grid">
               <label>Próxima acción<input name="proxima_accion" type="date"></label>
               <label>Notas<textarea name="notas" rows="3" placeholder="Acuerdos, asistentes o respuesta recibida"></textarea></label>
             </div>
             <footer><button type="button" class="btn-outline" data-cerrar-intento>Cancelar</button><button type="submit" class="btn-secundario">Guardar intento</button></footer>
+          </form>
+        </dialog>
+        <dialog id="dialogoReunionAgenda" class="dialogo-agenda" aria-labelledby="nombreRegistroReunion">
+          <form id="reunionAgendaForm" class="agenda-form">
+            <header><div><span>REUNIÓN COMERCIAL</span><h3 id="nombreRegistroReunion">Registrar reunión</h3></div><button type="button" data-cerrar-reunion aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></header>
+            <input name="registro_id" type="hidden">
+            <div class="form-grid">
+              <label>Fecha y hora<input name="fecha_reunion" type="datetime-local" required></label>
+              <label>Estado<select name="estado"><option value="PROGRAMADA">Programada</option><option value="REALIZADA">Realizada</option><option value="CANCELADA">Cancelada</option></select></label>
+            </div>
+            <div class="form-grid">
+              <label>Lugar / sede<input name="lugar" type="text"></label>
+              <label>Asistentes<input name="asistentes" type="text" placeholder="Nombres o cargos"></label>
+            </div>
+            <label>Producto ofrecido<input name="producto_ofrecido" type="text" placeholder="Producto o servicio presentado"></label>
+            <label>Resultado<textarea name="resultado" rows="2" placeholder="Acuerdos o respuesta de la empresa"></textarea></label>
+            <div class="form-grid">
+              <label>Próxima acción<input name="proxima_accion" type="date"></label>
+              <label>Notas<textarea name="notas" rows="3"></textarea></label>
+            </div>
+            <footer><button type="button" class="btn-outline" data-cerrar-reunion>Cancelar</button><button type="submit" class="btn-secundario">Guardar reunión</button></footer>
           </form>
         </dialog>
       </section>
@@ -129,5 +166,5 @@
   </aside>
 
   <script>fechaPanel.textContent=new Date().toLocaleDateString('es-CO',{dateStyle:'full'})</script>
-  <script type="module" src="../assets/js/superadmin/superadmin.js?v=agenda-seguimiento2"></script>
+  <script type="module" src="../assets/js/superadmin/superadmin.js?v=agenda-tres-cargas3"></script>
 </body></html>

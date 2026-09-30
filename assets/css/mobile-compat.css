@@ -97,6 +97,15 @@ textarea {
     margin-right: 0 !important;
     overflow-x: hidden !important;
     box-sizing: border-box !important;
+    padding-left: clamp(12px, 3vw, 18px) !important;
+    padding-right: clamp(12px, 3vw, 18px) !important;
+  }
+
+  body > .main-content > *,
+  .main-content > *,
+  main > * {
+    max-width: 100% !important;
+    min-width: 0 !important;
   }
 
   input:not([type="checkbox"]):not([type="radio"]),

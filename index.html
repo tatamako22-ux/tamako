@@ -8,10 +8,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TAMAKU">
-<link rel="apple-touch-icon" href="assets/images/icon-192-optimized.png">
+<link rel="apple-touch-icon" href="assets/images/tamaku-icon-192.png">
 
 <!-- ENLACE ACTIVO AL MANIFEST -->
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json?v=29">
 <link rel="stylesheet" href="assets/css/pwa.css?v=5">
 
 <title>Software para negocios de belleza | Agenda y CRM | Tamaku</title>
@@ -24,13 +24,13 @@
 <meta property="og:url" content="https://www.tamaku.co/">
 <meta property="og:title" content="Tamaku | Agenda y CRM para negocios de belleza">
 <meta property="og:description" content="Conecta agenda, clientes, equipo y ventas en una sola plataforma. Prueba Tamaku gratis durante 7 días, sin tarjeta.">
-<meta property="og:image" content="https://www.tamaku.co/assets/images/dashboard-tamaku-optimized.jpg">
-<meta property="og:image:alt" content="Panel de gestión de Tamaku para negocios de belleza">
+<meta property="og:image" content="https://www.tamaku.co/assets/images/PANEL_TAMAKU.png">
+<meta property="og:image:alt" content="Panel de gestión TAMAKU en laptop y móvil">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Tamaku | Agenda y CRM para negocios de belleza">
 <meta name="twitter:description" content="Conecta agenda, clientes, equipo y ventas. Prueba gratis 7 días sin tarjeta.">
-<meta name="twitter:image" content="https://www.tamaku.co/assets/images/dashboard-tamaku-optimized.jpg">
-<meta name="twitter:image:alt" content="Panel de gestión de Tamaku para negocios de belleza">
+<meta name="twitter:image" content="https://www.tamaku.co/assets/images/PANEL_TAMAKU.png">
+<meta name="twitter:image:alt" content="Panel de gestión TAMAKU en laptop y móvil">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -91,7 +91,7 @@ body{
     radial-gradient(circle at 30% 70%, rgba(191,149,63,0.08), transparent 50%),
     linear-gradient(180deg, #050505 0%, #0a0a0f 100%);
     color:#ffffff;
-    overflow-x:hidden;
+    overflow-x:clip;
 }
 
 /* Glow central profundo */
@@ -285,6 +285,13 @@ nav.scrolled{
         0 0 10px rgba(255,210,120,0.6),
         0 0 25px rgba(191,149,63,0.5),
         0 0 45px rgba(191,149,63,0.3);
+}
+
+.logo img{
+    display:block;
+    width:104px;
+    height:auto;
+    object-fit:contain;
 }
 
 .nav-links{
@@ -967,7 +974,7 @@ footer p {
     background: radial-gradient(circle at 50% 40%, rgba(191,149,63,0.08) 0%, rgba(10,10,15,1) 55%),
             linear-gradient(180deg, #0b0c10 0%, #07080c 100%);
     color: #fff;
-    overflow-x: hidden;
+    overflow-x: clip;
     }
 
     .sidebar {
@@ -1216,6 +1223,31 @@ html{
 .landing-v2 .logo { font-family:'Playfair Display',serif; font-weight:700; }
 .landing-v2 .nav-links { gap:26px; }
 .landing-v2 .nav-links a { font-size:.68rem; font-weight:600; letter-spacing:.12em; }
+@media (min-width:901px) {
+    .landing-v2 nav {
+        position:sticky;
+        top:0;
+        z-index:9999;
+        padding-top:9px;
+        padding-bottom:9px;
+        background:linear-gradient(180deg,rgba(7,8,10,.96),rgba(7,8,10,.8));
+        backdrop-filter:blur(18px) saturate(130%);
+        -webkit-backdrop-filter:blur(18px) saturate(130%);
+        border-top:1px solid rgba(255,210,119,.1);
+        border-bottom-color:rgba(255,210,119,.18);
+        box-shadow:0 12px 34px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.04);
+        transition:padding .35s ease,background .35s ease,box-shadow .35s ease,border-color .35s ease;
+    }
+    .landing-v2 .nav-links a { font-size:.76rem; }
+    .landing-v2 nav.scrolled {
+        padding-top:9px;
+        padding-bottom:9px;
+        background:rgba(5,5,5,.88);
+        border-bottom-color:rgba(255,210,119,.3);
+        box-shadow:0 14px 38px rgba(0,0,0,.5),0 3px 18px rgba(191,149,63,.12);
+        transform:none;
+    }
+}
 .landing-v2 .hero { min-height:calc(100vh - 76px); padding:90px 24px 70px; display:flex; align-items:center; }
 .landing-v2 .hero-container { width:min(100%,var(--landing-max)); margin:auto; display:grid; grid-template-columns:minmax(0,.9fr) minmax(520px,1.1fr); align-items:center; gap:clamp(45px,7vw,95px); }
 .landing-v2 .hero-left,
@@ -1305,6 +1337,8 @@ html{
 .landing-v2 .final-cta > div { display:flex; align-items:center; gap:12px; }
 .landing-v2 .final-cta button { min-height:50px; padding:0 20px; border:0; background:transparent; color:#bbb; cursor:pointer; }
 .landing-v2 .landing-footer { width:min(calc(100% - 48px),var(--landing-max)); margin:auto; padding:35px 0 45px; display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:35px; border-top:1px solid rgba(255,255,255,.075); background:none; text-align:left; }
+.landing-v2 .landing-footer .footer-emblem { width:72px; height:72px; object-fit:contain; animation:tamakuFooterCoin 8s linear infinite; }
+@keyframes tamakuFooterCoin { from { transform:perspective(700px) rotateY(0deg); } to { transform:perspective(700px) rotateY(360deg); } }
 .landing-v2 .landing-footer p { color:#6f6f6f; font-size:.72rem; }
 .landing-v2 .landing-footer > div:last-child { display:flex; gap:20px; }
 .landing-v2 .landing-footer a { color:#878787; font-size:.67rem; text-decoration:none; }
@@ -1424,7 +1458,7 @@ html{
 
 <nav>
     <div class="logo">
-    ✦ TAMAKU
+        <img class="logo-wordmark" src="assets/images/TAMAKU_LARGO.png" alt="TAMAKU. Impulsa. Conecta. Crece." width="2170" height="725">
 </div>
     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
     <div class="nav-links">
@@ -1468,7 +1502,7 @@ html{
         </div>
         <div class="hero-right" id="producto">
             <div class="product-label"><i>●</i> PANEL OPERATIVO EN TIEMPO REAL</div>
-            <img src="assets/images/dashboard-tamaku-optimized.jpg" alt="Panel de gestión TAMAKU para negocios de belleza" width="1536" height="1024" fetchpriority="high" decoding="async">
+            <img src="assets/images/PANEL_TAMAKU.png" alt="Panel de gestión TAMAKU en laptop y móvil" width="1536" height="1024" fetchpriority="high" decoding="async">
         </div>
 
     </div>
@@ -1618,7 +1652,7 @@ html{
 </section>
 
 <footer class="landing-footer">
-    <div class="logo">✦ TAMAKU</div>
+    <div class="logo"><img class="footer-emblem" src="assets/images/NUEVO.png" alt="TAMAKU - Impulsa. Conecta. Crece." width="1254" height="1254"></div>
     <p>Plataforma de gestión para negocios de belleza.</p>
     <div><a href="#inicio">Inicio</a><a href="#beneficios">Beneficios</a><a href="#planes">Planes</a><a href="pages/registro.html">Prueba gratuita</a><a href="pages/politica-datos.html">Política de datos</a><a href="pages/terminos.html">Términos</a></div>
 </footer>
@@ -2247,6 +2281,6 @@ function toggleConfirmPassword(event) {
     }
 }
 </script>
-<script src="assets/js/core/pwa.js?v=6"></script>
+<script src="assets/js/core/pwa.js?v=7"></script>
 </body>
 </html>

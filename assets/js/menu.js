@@ -33,7 +33,7 @@ function renderMenuGlobal() {
   const page = path.split("/").pop() || "dashboard.html";
 
   const sidebarHTML = `
-        <div class="sidebar-logo">✦ TAMAKU</div>
+        <div class="sidebar-logo"><img src="../assets/images/NUEVO.png" alt="TAMAKU - Impulsa. Conecta. Crece." width="1254" height="1254"></div>
         <nav class="nav-menu">
             <a href="dashboard.html" class="nav-item ${page === "dashboard.html" ? "active" : ""}">
                 <i class="fa-solid fa-house"></i> Dashboard

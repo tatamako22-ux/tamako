@@ -47,69 +47,91 @@
         <div class="panel-head">
           <div><span>AGENDA</span><h3>Agenda y cotización</h3></div>
           <div class="herramientas">
-            <label class="search-inline"><i class="fa-solid fa-search"></i><input id="buscarAgendaCotizacion" placeholder="Buscar barbería..."></label>
+            <label class="search-inline"><i class="fa-solid fa-search"></i><input id="buscarAgendaCotizacion" placeholder="Buscar empresa, sede o contacto..."></label>
             <button id="exportarAgendaCotizacion" class="btn-outline" type="button">Exportar empresas</button>
           </div>
         </div>
 
-        <div class="agenda-cotizacion-layout">
-          <div class="mini-panel">
-            <h4>1. Base de empresas</h4>
-            <form id="agendaCotizacionForm" class="agenda-form">
-              <label>Tipo de registro<select name="tipo_registro"><option value="BARBERIA">Barbería / contacto</option><option value="EMPRESA_SEDE">Empresa o sede</option></select></label>
-              <div class="form-grid">
-                <label>Nombre del prospecto<input name="nombre_tienda" type="text"></label>
-                <label>Contacto<input name="contacto" type="text"></label>
-              </div>
-              <div class="form-grid">
-                <label>Empresa<input name="empresa" type="text"></label>
-                <label>Sede / espacio<input name="sede" type="text"></label>
-              </div>
-              <div class="form-grid">
-                <label>Email<input name="email" type="email"></label>
-                <label>Teléfono<input name="telefono" type="text"></label>
-              </div>
-              <div class="form-grid">
-                <label>Dirección<input name="direccion" type="text"></label>
-                <label>Fecha agenda<input name="fecha_agenda" type="date"></label>
-              </div>
-              <div class="form-grid">
-                <label>Valor cotización<input name="valor_cotizacion" type="number" min="0" step="1000"></label>
-                <label>Estado<select name="estado"><option value="Pendiente">Pendiente</option><option value="En agenda">En agenda</option><option value="Cotizado">Cotizado</option><option value="Confirmado">Confirmado</option><option value="Cerrado">Cerrado</option></select></label>
-              </div>
-              <label>Notas<textarea name="notas" rows="3" placeholder="Reserva, horario, requerimientos del cliente, detalle del proyecto..."></textarea></label>
-              <button type="submit" class="btn-secundario">Guardar registro</button>
-            </form>
-            <label class="file-upload">
-              <input id="csvAgendaCotizacion" type="file" accept=".csv,text/csv">
-              <span>Importar empresas desde CSV</span>
-            </label>
-            <p class="muted">Datos generales de la barbería, empresa, sede y contacto.</p>
-            <button id="plantillaAgendaCotizacion" class="btn-outline" type="button">Descargar plantilla</button>
-          </div>
+        <div id="agendaStepNav" class="agenda-steps" role="tablist" aria-label="Cargas de agenda y cotización">
+          <button id="tabAgendaEmpresas" class="agenda-step-button active" type="button" role="tab" aria-selected="true" aria-controls="panelAgendaEmpresas" tabindex="0" data-agenda-step="empresas">
+            <span class="agenda-step-number">01</span><span class="agenda-step-copy"><strong>Empresas</strong><small>Base y sedes</small></span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+          <button id="tabAgendaIntentos" class="agenda-step-button" type="button" role="tab" aria-selected="false" aria-controls="panelAgendaIntentos" tabindex="-1" data-agenda-step="intentos">
+            <span class="agenda-step-number">02</span><span class="agenda-step-copy"><strong>Contactos</strong><small>Canal e información enviada</small></span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+          <button id="tabAgendaReuniones" class="agenda-step-button" type="button" role="tab" aria-selected="false" aria-controls="panelAgendaReuniones" tabindex="-1" data-agenda-step="reuniones">
+            <span class="agenda-step-number">03</span><span class="agenda-step-copy"><strong>Reuniones</strong><small>Producto y resultado</small></span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
 
-          <div class="mini-panel">
-            <h4>2. Intentos de contacto</h4>
-            <label class="file-upload">
-              <input id="csvIntentosAgenda" type="file" accept=".csv,text/csv">
-              <span>Importar intentos desde CSV</span>
-            </label>
-            <p class="muted">Cada fila registra un contacto por WhatsApp, correo, correo físico o llamada. Usa el ID de empresa exportado.</p>
-            <button id="plantillaIntentosAgenda" class="btn-outline" type="button">Descargar plantilla</button>
-          </div>
+        <div class="agenda-step-content">
+          <section id="panelAgendaEmpresas" class="agenda-step-panel active" role="tabpanel" aria-labelledby="tabAgendaEmpresas" data-agenda-panel="empresas">
+            <div class="agenda-step-heading"><div><span>01 / BASE COMERCIAL</span><h3>Empresas y sedes</h3></div><p>Registra una ficha o importa tu base.</p></div>
+            <div class="agenda-step-grid">
+              <form id="agendaCotizacionForm" class="agenda-form agenda-company-form">
+                <label>Tipo de registro<select name="tipo_registro"><option value="BARBERIA">Barbería / contacto</option><option value="EMPRESA_SEDE">Empresa o sede</option></select></label>
+                <div class="form-grid">
+                  <label>Nombre del prospecto<input name="nombre_tienda" type="text"></label>
+                  <label>Contacto<input name="contacto" type="text"></label>
+                </div>
+                <div class="form-grid">
+                  <label>Empresa<input name="empresa" type="text"></label>
+                  <label>Sede / espacio<input name="sede" type="text"></label>
+                </div>
+                <div class="form-grid">
+                  <label>Email<input name="email" type="email"></label>
+                  <label>Teléfono<input name="telefono" type="text"></label>
+                </div>
+                <div class="form-grid">
+                  <label>Dirección<input name="direccion" type="text"></label>
+                  <label>Fecha agenda<input name="fecha_agenda" type="date"></label>
+                </div>
+                <div class="form-grid">
+                  <label>Valor cotización<input name="valor_cotizacion" type="number" min="0" step="1000"></label>
+                  <label>Estado<select name="estado"><option value="Pendiente">Pendiente</option><option value="En agenda">En agenda</option><option value="Cotizado">Cotizado</option><option value="Confirmado">Confirmado</option><option value="Cerrado">Cerrado</option></select></label>
+                </div>
+                <label>Notas<textarea name="notas" rows="3"></textarea></label>
+                <button type="submit" class="btn-secundario">Guardar empresa</button>
+              </form>
+              <aside class="agenda-import-box">
+                <span class="agenda-import-icon"><i class="fa-solid fa-building"></i></span>
+                <h4>Importar base de empresas</h4>
+                <p>Agrega varias empresas y sedes desde un archivo CSV.</p>
+                <label class="file-upload"><input id="csvAgendaCotizacion" type="file" accept=".csv,text/csv"><span><i class="fa-solid fa-file-arrow-up"></i> Seleccionar CSV</span></label>
+                <button id="plantillaAgendaCotizacion" class="btn-outline" type="button"><i class="fa-solid fa-download"></i> Plantilla de empresas</button>
+              </aside>
+            </div>
+          </section>
 
-          <div class="mini-panel">
-            <h4>3. Reuniones</h4>
-            <label class="file-upload">
-              <input id="csvReunionesAgenda" type="file" accept=".csv,text/csv">
-              <span>Importar reuniones desde CSV</span>
-            </label>
-            <p class="muted">Registra fecha, lugar, asistentes, producto presentado, resultado y próxima acción.</p>
-            <button id="plantillaReunionesAgenda" class="btn-outline" type="button">Descargar plantilla</button>
-          </div>
+          <section id="panelAgendaIntentos" class="agenda-step-panel" role="tabpanel" aria-labelledby="tabAgendaIntentos" data-agenda-panel="intentos" hidden>
+            <div class="agenda-step-heading"><div><span>02 / CONTACTABILIDAD</span><h3>Intentos de contacto</h3></div><p>Canal, fecha e información enviada.</p></div>
+            <div class="agenda-step-grid agenda-step-grid-single">
+              <aside class="agenda-import-box">
+                <span class="agenda-import-icon"><i class="fa-solid fa-paper-plane"></i></span>
+                <h4>Importar intentos</h4>
+                <p>Carga contactos realizados por WhatsApp, correo, correo físico o llamada. Vincula cada fila con el ID de empresa exportado.</p>
+                <label class="file-upload"><input id="csvIntentosAgenda" type="file" accept=".csv,text/csv"><span><i class="fa-solid fa-file-arrow-up"></i> Seleccionar CSV</span></label>
+                <button id="plantillaIntentosAgenda" class="btn-outline" type="button"><i class="fa-solid fa-download"></i> Plantilla de intentos</button>
+              </aside>
+            </div>
+          </section>
+
+          <section id="panelAgendaReuniones" class="agenda-step-panel" role="tabpanel" aria-labelledby="tabAgendaReuniones" data-agenda-panel="reuniones" hidden>
+            <div class="agenda-step-heading"><div><span>03 / PRESENTACIÓN COMERCIAL</span><h3>Reuniones</h3></div><p>Espacio, asistentes, producto y resultado.</p></div>
+            <div class="agenda-step-grid agenda-step-grid-single">
+              <aside class="agenda-import-box">
+                <span class="agenda-import-icon"><i class="fa-solid fa-handshake"></i></span>
+                <h4>Importar reuniones</h4>
+                <p>Registra reuniones programadas o realizadas y vincúlalas con el ID de empresa exportado.</p>
+                <label class="file-upload"><input id="csvReunionesAgenda" type="file" accept=".csv,text/csv"><span><i class="fa-solid fa-file-arrow-up"></i> Seleccionar CSV</span></label>
+                <button id="plantillaReunionesAgenda" class="btn-outline" type="button"><i class="fa-solid fa-download"></i> Plantilla de reuniones</button>
+              </aside>
+            </div>
+          </section>
         </div>
 
         <p id="agendaCotizacionFeedback" class="agenda-feedback" role="status" aria-live="polite" hidden></p>
+        <div class="agenda-list-header"><div><span>SEGUIMIENTO COMERCIAL</span><h3>Empresas registradas</h3></div><strong id="totalAgendaCotizaciones" aria-live="polite">0</strong></div>
         <div id="tablaAgendaCotizacion" class="tabla-agenda-cotizacion"></div>
         <dialog id="dialogoIntentoAgenda" class="dialogo-agenda" aria-labelledby="nombreRegistroIntento">
           <form id="intentoAgendaForm" class="agenda-form">
@@ -167,5 +189,5 @@
   </aside>
 
   <script>fechaPanel.textContent=new Date().toLocaleDateString('es-CO',{dateStyle:'full'})</script>
-  <script type="module" src="../assets/js/superadmin/superadmin.js?v=agenda-tabla4"></script>
+  <script type="module" src="../assets/js/superadmin/superadmin.js?v=agenda-estetica5"></script>
 </body></html>

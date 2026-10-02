@@ -41,7 +41,8 @@ export function aplicarMarcaTienda(tienda) {
     const link = document.createElement("link");
     link.id = "tamakuBrandThemeCss";
     link.rel = "stylesheet";
-    link.href = new URL("../../css/brand-theme.css?v=4", import.meta.url).href;
+    link.setAttribute("blocking", "render");
+    link.href = new URL("../../css/brand-theme.css?v=12", import.meta.url).href;
     document.head.appendChild(link);
   }
 }

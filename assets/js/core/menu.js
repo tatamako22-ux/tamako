@@ -146,7 +146,7 @@ function renderMenuGlobal(tienda) {
 
   const sidebar = document.querySelector(".sidebar");
   if (sidebar) {
-    sidebar.innerHTML = `<div class="sidebar-logo">✦ TAMAKU</div>
+    sidebar.innerHTML = `<div class="sidebar-logo"><img src="../assets/images/TAMAKU_LARGO.png" alt="TAMAKU. Impulsa. Conecta. Crece."></div>
       <nav class="nav-menu">
         ${enlace(tienda, "dashboard_ver", "dashboard.html", pagina, "fa-house", "Dashboard")}
         ${enlace(tienda, "agenda_ver", "agenda.html", pagina, "fa-calendar-alt", "Agenda")}

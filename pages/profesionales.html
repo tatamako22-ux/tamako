@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>TAMAKU | Staff de Élite</title>
-    <script src="../assets/js/core/brand-theme-bootstrap.js?v=1"></script>
+    <script src="../assets/js/core/brand-theme-bootstrap.js?v=6"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/menu.css?v=13">
@@ -170,6 +170,41 @@
                 width: 100%;
                 margin-bottom: 5px;
             }
+            .dia-horario-row {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+                min-width: 0;
+                padding: 12px;
+            }
+            .dia-horario-row .dia-label,
+            .dia-horario-row .checkbox-label {
+                grid-column: 1 / -1;
+                width: auto;
+                min-width: 0;
+                margin: 0;
+            }
+            .dia-horario-row .checkbox-label {
+                gap: 8px;
+                font-size: .68rem;
+                line-height: 1.4;
+            }
+            .dia-horario-row .checkbox-label input[type="checkbox"] {
+                width: 16px;
+                height: 16px;
+                flex: 0 0 16px;
+            }
+            .dia-horario-row input[type="time"] {
+                width: 100%;
+                min-width: 0;
+                max-width: 100%;
+                flex: initial;
+                padding: 0 8px;
+                font-size: 16px !important;
+            }
+            .dia-horario-row > span { text-align: center; }
         }
         .serv-item-row:active {
             transform: scale(0.98);
@@ -231,7 +266,7 @@
             to { transform: rotate(360deg); }
         }
     </style>
-<link rel="stylesheet" href="../assets/css/profesionales.css?v=5">
+<link rel="stylesheet" href="../assets/css/profesionales.css?v=6">
 <link rel="stylesheet" href="../assets/css/notifications.css?v=2">
 <link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
 <script src="../assets/js/core/notifications.js?v=2"></script>
@@ -277,7 +312,10 @@
 
     <div id="configModal" class="modal-overlay">
         <div class="modal-card">
-            <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom: 25px;">Configuración de <span id="nombreStaffConfig"></span></h2>
+            <div class="config-modal-header">
+                <h2>Configuración de <span id="nombreStaffConfig"></span></h2>
+                <button class="config-modal-close" type="button" onclick="cerrarModales()" aria-label="Cerrar configuración"><i class="fa-solid fa-xmark"></i></button>
+            </div>
 
             <div class="tabs-horarios">
                 <button class="tab-horario active" onclick="cambiarTabHorario('general')">⚙️ General</button>

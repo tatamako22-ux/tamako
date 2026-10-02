@@ -1,12 +1,12 @@
 // Cambiamos la versión de la caché para forzar la actualización en los celulares
-const CACHE_NAME = "tamaku-v28-commercial";
+const CACHE_NAME = "tamaku-v29-pwa-logo";
 
 const urlsToCache = [
   "/",
   "/index.html",
   "/manifest.json",
-  "/assets/images/icon-192-optimized.png",
-  "/assets/images/icon-512-optimized.png",
+  "/assets/images/tamaku-icon-192.png",
+  "/assets/images/tamaku-icon-512.png",
 ];
 
 // Pantallas estaticas: se guardan al visitarlas, no todas en la primera visita.

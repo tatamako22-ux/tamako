@@ -2,11 +2,11 @@
    CLIENTES V3 — CRM PREMIUM, CENTRADO Y RESPONSIVE
    ========================================================= */
 :root {
-  --clients-gold: #d0a13d;
-  --clients-gold-light: #f2ce73;
-  --clients-panel: #0d0d0d;
-  --clients-border: rgba(255, 255, 255, 0.075);
-  --clients-muted: #7a7a7a;
+  --clients-gold: var(--gold, #d0a13d);
+  --clients-gold-light: var(--gold-light, #f2ce73);
+  --clients-panel: var(--panel, #0d0d0d);
+  --clients-border: var(--line, rgba(255, 255, 255, 0.075));
+  --clients-muted: var(--muted, #7a7a7a);
 }
 
 body > .main-content {

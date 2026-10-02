@@ -17,7 +17,8 @@
       const link = document.createElement('link');
       link.id = 'tamakuBrandThemeCss';
       link.rel = 'stylesheet';
-      link.href = '../assets/css/brand-theme.css?v=4';
+      link.setAttribute('blocking', 'render');
+      link.href = '../assets/css/brand-theme.css?v=12';
       document.head.appendChild(link);
     }
 
@@ -49,9 +50,18 @@
     root.style.setProperty('--dash-gold-light', secundario);
     root.style.colorScheme = claro ? 'light' : 'dark';
 
-    if (document.body) {
+    const aplicarTemaBody = () => {
+      if (!document.body) return false;
       document.body.dataset.brandTheme = claro ? 'claro' : 'oscuro';
       document.body.classList.toggle('tamaku-brand-light', claro);
+      return true;
+    };
+
+    if (!aplicarTemaBody()) {
+      const observador = new MutationObserver(() => {
+        if (aplicarTemaBody()) observador.disconnect();
+      });
+      observador.observe(document.documentElement, { childList: true });
     }
   } catch (error) {
     console.debug('Tema de marca no disponible al cargar:', error);

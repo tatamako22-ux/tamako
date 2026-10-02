@@ -1,9 +1,11 @@
 .facturacion-panel{
 
 margin-top:30px;
+min-width:0;
+max-width:100%;
 background:rgba(255,255,255,0.03);
 border:1px solid rgba(191,149,63,.2);
-border-radius:20px;
+border-radius:22px;
 padding:25px;
 
 }
@@ -852,17 +854,22 @@ transform:translateY(0);
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .factura-row {
   display: grid;
   grid-template-columns: 44px minmax(170px, 1.4fr) minmax(130px, 1fr) auto auto auto 38px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   align-items: center;
   gap: 16px;
   padding: 16px;
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 15px;
+  border-radius: 18px;
   transition: 0.2s ease;
 }
 
@@ -982,6 +989,23 @@ transform:translateY(0);
   opacity: 0.55;
 }
 
+@media (min-width: 901px) and (max-width: 1180px) {
+  .facturacion-panel,
+  .tab-content,
+  #listaFacturas { min-width: 0; max-width: 100%; }
+
+  .factura-row {
+    grid-template-columns: 38px minmax(0,1fr) auto auto 36px;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 16px;
+    border-radius: 14px;
+  }
+
+  .factura-profesional,
+  .factura-metodo { display: none; }
+}
+
 @media (max-width: 900px) {
   .factura-row {
     grid-template-columns: 42px minmax(0, 1fr) auto;
@@ -1033,6 +1057,7 @@ transform:translateY(0);
   .factura-row {
     gap: 10px;
     padding: 13px;
+    border-radius: 15px;
   }
 
   .factura-valor {

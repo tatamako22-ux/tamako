@@ -136,6 +136,7 @@ function renderAgendaCotizaciones() {
   const filtradas = agendaCotizaciones.filter((item) => `${item.nombre_tienda} ${item.empresa} ${item.sede} ${item.contacto} ${item.email} ${item.telefono} ${item.direccion} ${item.notas}`.toLowerCase().includes(q));
   const contenedor = $("#tablaAgendaCotizacion");
   if (!contenedor) return;
+  $("#totalAgendaCotizaciones").textContent = filtradas.length;
   contenedor.innerHTML = filtradas.length
     ? `<table class="agenda-tabla"><thead><tr><th>Empresa / sede</th><th>Contacto</th><th>Agenda y cotización</th><th>Intentos</th><th>Reuniones</th><th>Acciones</th></tr></thead><tbody>${filtradas.map((item) => {
       const historial = intentosAgenda.filter((intento) => intento.registro_id === item.id);
@@ -160,6 +161,20 @@ function renderAgendaCotizaciones() {
       `;
     }).join("")}</tbody></table>`
     : `<div class="vacio">Aún no hay registros en agenda y cotización.</div>`;
+}
+
+function seleccionarPasoAgenda(nombre) {
+  $$('[data-agenda-step]').forEach((boton) => {
+    const activo = boton.dataset.agendaStep === nombre;
+    boton.classList.toggle("active", activo);
+    boton.setAttribute("aria-selected", String(activo));
+    boton.tabIndex = activo ? 0 : -1;
+  });
+  $$('[data-agenda-panel]').forEach((panel) => {
+    const activo = panel.dataset.agendaPanel === nombre;
+    panel.hidden = !activo;
+    panel.classList.toggle("active", activo);
+  });
 }
 
 function exportarAgendaCotizacionCsv() {
@@ -478,6 +493,24 @@ $("#cerrarSesionAdmin").onclick = cerrarSesionAdmin;
 $("#cerrarSesionAdminMovil").onclick = cerrarSesionAdmin;
 
 renderAgendaCotizaciones();
+$("#agendaStepNav")?.addEventListener("click", (event) => {
+  const boton = event.target.closest("[data-agenda-step]");
+  if (boton) seleccionarPasoAgenda(boton.dataset.agendaStep);
+});
+$("#agendaStepNav")?.addEventListener("keydown", (event) => {
+  const botones = $$('[data-agenda-step]');
+  const indice = botones.indexOf(event.target.closest("[data-agenda-step]"));
+  if (indice < 0) return;
+  let siguiente = null;
+  if (event.key === "ArrowRight") siguiente = (indice + 1) % botones.length;
+  if (event.key === "ArrowLeft") siguiente = (indice - 1 + botones.length) % botones.length;
+  if (event.key === "Home") siguiente = 0;
+  if (event.key === "End") siguiente = botones.length - 1;
+  if (siguiente === null) return;
+  event.preventDefault();
+  botones[siguiente].focus();
+  seleccionarPasoAgenda(botones[siguiente].dataset.agendaStep);
+});
 $("#buscarAgendaCotizacion")?.addEventListener("input", renderAgendaCotizaciones);
 $("#exportarAgendaCotizacion")?.addEventListener("click", exportarAgendaCotizacionCsv);
 $("#plantillaAgendaCotizacion")?.addEventListener("click", descargarPlantillaAgendaCotizacion);

@@ -66,6 +66,8 @@ body.tamaku-brand-light>.sidebar .sidebar-logo{color:var(--gold)!important}
 body.tamaku-brand-light>.sidebar .nav-item{color:#626262!important}
 body.tamaku-brand-light>.sidebar .nav-item:hover,body.tamaku-brand-light>.sidebar .nav-item.active{color:#171717!important;background:var(--accent-soft)!important}
 body.tamaku-brand-light>.main-content,body.tamaku-brand-light>.plan-page{color:#171717!important;background:radial-gradient(circle at 94% 0,var(--accent-soft),transparent 28%),#f4f3ef!important}
+body.tamaku-brand-light .tamaku-module-header{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+body.tamaku-brand-light .tienda-hero{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
 body.tamaku-brand-light :is(h1,h2,h3,h4,strong,.welcome-text h1,.settings-header-v3 h1){color:#171717!important;text-shadow:none!important}
 body.tamaku-brand-light :is(p,small,.welcome-text p,.settings-header-v3 p){color:#666}
 body.tamaku-brand-light :is(.settings-card,.stat-card,.panel,.plan-panel,.plan-kpis article,.users-panel,.user-card,.access-summary article,.dashboard-panel,.agenda-panel,.modal-card,.dialog-card,.user-dialog,.search-box,.dinamic-row,.dia-card){color:#171717!important;background:#fff!important;border-color:rgba(0,0,0,.1)!important;box-shadow:0 12px 35px rgba(0,0,0,.055)!important}
@@ -86,3 +88,484 @@ body.tamaku-brand-light .mobile-tab-bar{background:rgba(255,255,255,.88)!importa
 body.tamaku-brand-light .mobile-tab-bar .tab-item{color:#666!important;background:#f5f4f1!important;box-shadow:none!important}
 body.tamaku-brand-light .mobile-tab-bar .tab-item.active{color:var(--gold)!important;background:var(--accent-soft)!important}
 body.tamaku-brand-light .menu-logout-overlay,body.tamaku-brand-light .modal{color:#eee}
+
+/* Agenda clara: superficies suaves y estados de cita conservados. */
+body.tamaku-brand-light .agenda-header-v3 .calendar-strip-shell {
+  background: rgba(255,255,255,.68) !important;
+  border-color: rgba(25,20,20,.07) !important;
+  box-shadow: 0 8px 22px rgba(30,18,18,.045) !important;
+}
+body.tamaku-brand-light .agenda-header-v3 .calendar-day {
+  color: #171717 !important;
+  background: linear-gradient(145deg,#fff,#fff9f9) !important;
+  border-color: rgba(35,20,20,.08) !important;
+  box-shadow: 0 5px 15px rgba(40,20,20,.045) !important;
+}
+body.tamaku-brand-light .agenda-header-v3 .calendar-day.active {
+  background: linear-gradient(145deg,var(--accent-soft),#fff) !important;
+  border-color: var(--gold-border) !important;
+  box-shadow: 0 8px 20px rgba(70,25,25,.08) !important;
+}
+body.tamaku-brand-light .agenda-header-v3 .day-name,
+body.tamaku-brand-light .current-date-block small,
+body.tamaku-brand-light .professional-selector-wrap label { color: #747070 !important; }
+body.tamaku-brand-light .agenda-header-v3 .day-number,
+body.tamaku-brand-light #fechaActual { color: #202020 !important; }
+body.tamaku-brand-light .agenda-header-v3 .day-count,
+body.tamaku-brand-light .professional-selector-wrap label i { color: var(--gold) !important; }
+
+body.tamaku-brand-light .agenda-toolbar .date-selector,
+body.tamaku-brand-light .professional-selector-wrap {
+  color: #202020 !important;
+  background: linear-gradient(145deg,#fff,#fffafa) !important;
+  border-color: rgba(35,20,20,.075) !important;
+  box-shadow: 0 7px 20px rgba(40,20,20,.045) !important;
+}
+body.tamaku-brand-light .agenda-toolbar .date-btn {
+  color: var(--gold) !important;
+  background: var(--accent-soft) !important;
+  border-color: rgba(35,20,20,.075) !important;
+}
+body.tamaku-brand-light .agenda-toolbar #mobileBarberSelector {
+  color: #202020 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+body.tamaku-brand-light #mobileBarberSelector option {
+  color: #202020;
+  background: #fff;
+}
+
+body.tamaku-brand-light .calendar-column {
+  background: #fff !important;
+  border-color: rgba(35,20,20,.075) !important;
+  box-shadow: 0 16px 36px rgba(40,20,20,.065) !important;
+}
+body.tamaku-brand-light .calendar-barber {
+  background: linear-gradient(145deg,#fff,#fff8f8) !important;
+  border-bottom-color: rgba(35,20,20,.07) !important;
+  box-shadow: none !important;
+}
+body.tamaku-brand-light .barber-photo {
+  background: #fff !important;
+  border-color: var(--gold-border) !important;
+  box-shadow: 0 0 0 4px var(--accent-soft),0 8px 18px rgba(40,20,20,.1) !important;
+  transform: none !important;
+}
+body.tamaku-brand-light .barber-name { color: #202020 !important; }
+body.tamaku-brand-light .barber-role { color: var(--gold) !important; }
+body.tamaku-brand-light .calendar-body,
+body.tamaku-brand-light .calendar-body-movil {
+  background: linear-gradient(180deg,#fff,#fcfafa) !important;
+}
+body.tamaku-brand-light .hour-line { border-top-color: rgba(25,20,20,.075) !important; }
+body.tamaku-brand-light .hour-line span { color: #777 !important; }
+body.tamaku-brand-light .hour-line::before { background: linear-gradient(to right,var(--gold-border),transparent) !important; }
+body.tamaku-brand-light .current-time-line { background: linear-gradient(to right,var(--gold-light),var(--gold)) !important; }
+body.tamaku-brand-light .current-time-line::before { background: var(--gold) !important; }
+body.tamaku-brand-light .current-time-label { color: var(--gold) !important; text-shadow: none !important; }
+
+body.tamaku-brand-light .calendar-event:not(.disponible):not(.facturada):not(.no-show) {
+  color: #222 !important;
+  background: linear-gradient(145deg,#fff,#fffdfd) !important;
+  border-color: rgba(35,20,20,.085) !important;
+  box-shadow: 0 8px 20px rgba(40,20,20,.06) !important;
+  transform: none !important;
+  transform-style: flat !important;
+  backdrop-filter: none !important;
+}
+body.tamaku-brand-light .calendar-event.facturada {
+  color: #203528 !important;
+  background: linear-gradient(145deg,#f2fbf5,#fff) !important;
+  border-color: rgba(46,150,90,.22) !important;
+  box-shadow: 0 7px 18px rgba(25,70,40,.06) !important;
+}
+body.tamaku-brand-light .calendar-event.no-show {
+  color: #49351f !important;
+  background: linear-gradient(145deg,#fff8ef,#fff) !important;
+  border-color: rgba(196,125,47,.24) !important;
+  box-shadow: 0 7px 18px rgba(90,55,20,.06) !important;
+}
+body.tamaku-brand-light .calendar-event:not(.disponible) .event-glow { display: none !important; }
+body.tamaku-brand-light .calendar-event:not(.disponible) .event-top-row,
+body.tamaku-brand-light .calendar-event:not(.disponible) .event-main,
+body.tamaku-brand-light .calendar-event:not(.disponible) .event-phone,
+body.tamaku-brand-light .calendar-event:not(.disponible) .event-actions,
+body.tamaku-brand-light .calendar-event:not(.disponible) .event-invoice-status,
+body.tamaku-brand-light .calendar-event:not(.disponible) .event-avatar,
+body.tamaku-brand-light .calendar-event:not(.disponible) .event-btn { transform: none !important; }
+body.tamaku-brand-light .calendar-event:not(.disponible) .event-avatar {
+  color: var(--gold) !important;
+  background: var(--accent-soft) !important;
+  border: 1px solid var(--gold-border) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+body.tamaku-brand-light .calendar-event:not(.disponible) .event-client { color: #222 !important; }
+body.tamaku-brand-light .calendar-event:not(.disponible) .event-service {
+  color: #5b3434 !important;
+  background: var(--accent-soft) !important;
+  border-color: var(--gold-border) !important;
+}
+body.tamaku-brand-light .calendar-event:not(.disponible) .event-hour { color: #493333 !important; text-shadow: none !important; }
+body.tamaku-brand-light .calendar-event:not(.disponible) .event-phone { color: #696565 !important; }
+body.tamaku-brand-light .calendar-event .event-actions { border-top-color: rgba(25,20,20,.08) !important; }
+
+body.tamaku-brand-light .calendar-event.disponible {
+  color: #4a4242 !important;
+  background: linear-gradient(145deg,rgba(237,69,69,.045),#fff) !important;
+  border: 1px dashed rgba(180,55,55,.25) !important;
+  box-shadow: none !important;
+}
+body.tamaku-brand-light .calendar-event.disponible::after {
+  background: linear-gradient(to bottom,var(--gold-light),var(--gold)) !important;
+}
+body.tamaku-brand-light .calendar-event.disponible:hover {
+  background: var(--accent-soft) !important;
+  border-color: var(--gold-border) !important;
+}
+body.tamaku-brand-light .calendar-event.disponible .event-avatar {
+  color: var(--gold) !important;
+  background: #fff !important;
+  border: 1px dashed var(--gold-border) !important;
+}
+body.tamaku-brand-light .calendar-event.disponible .event-client,
+body.tamaku-brand-light .calendar-event.disponible .event-hour { color: #493333 !important; }
+body.tamaku-brand-light .calendar-event.disponible .event-service {
+  color: #5b3434 !important;
+  background: var(--accent-soft) !important;
+  border-color: var(--gold-border) !important;
+}
+body.tamaku-brand-light .calendar-event.disponible .event-chip.chip-libre {
+  color: #853a3a !important;
+  background: rgba(237,69,69,.09) !important;
+  border-color: rgba(180,55,55,.2) !important;
+}
+body.tamaku-brand-light .empty-message { color: #686363 !important; }
+
+body.tamaku-brand-light .agenda-header-v3.tamaku-module-header {
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+@media (min-width: 901px) {
+  body.tamaku-brand-light .agenda-header-v3 .agenda-title-row { padding-right: 28px; }
+}
+body.tamaku-brand-light .agenda-header-v3 .agenda-new-booking {
+  min-height: 50px;
+  padding-inline: 22px;
+  color: #fff !important;
+  background: color-mix(in srgb,var(--gold) 82%,#000) !important;
+  border-color: color-mix(in srgb,var(--gold) 68%,#000) !important;
+  border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(90,15,15,.16) !important;
+}
+body.tamaku-brand-light .agenda-header-v3 .agenda-new-booking:hover {
+  background: color-mix(in srgb,var(--gold) 88%,#000) !important;
+  box-shadow: 0 11px 26px rgba(90,15,15,.2) !important;
+}
+body.tamaku-brand-light .calendar-barber .barber-photo {
+  width: 104px !important;
+  height: 104px !important;
+}
+
+/* Superficies compartidas por los módulos privados. */
+body.tamaku-brand-light .tamaku-module-header { border-radius: 20px !important; }
+body.tamaku-brand-light :is(
+  .table-container,
+  .barber-card,
+  .sede-info,
+  .disponibilidad-box,
+  .facturacion-panel,
+  .cuenta-card,
+  .reportes-panel,
+  .reporte-kpi,
+  .reporte-card,
+  .caja-panel-principal,
+  .caja-resumen-card,
+  .caja-movimientos-panel,
+  .caja-info-turno,
+  .tienda-hero,
+  .producto-card,
+  .galeria-profesional-card,
+  .com-card,
+  .invoice-card,
+  .liq-detail-card
+) {
+  color: #171717 !important;
+  background: linear-gradient(145deg,#fff,#fffafa) !important;
+  border-color: rgba(35,20,20,.075) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 28px rgba(40,20,20,.045) !important;
+}
+body.tamaku-brand-light .table-container tbody tr {
+  color: #252525 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+body.tamaku-brand-light .table-container tbody tr:hover { background: #fff7f7 !important; }
+body.tamaku-brand-light .table-container tbody td { border-color: rgba(25,20,20,.07) !important; }
+body.tamaku-brand-light .barber-card .action-icon {
+  color: #656060 !important;
+  background: #f8f5f5 !important;
+  border-color: rgba(35,20,20,.08) !important;
+}
+body.tamaku-brand-light .caja-resumen-card.ingreso strong { color: #247c4b !important; }
+body.tamaku-brand-light .caja-resumen-card.egreso strong { color: #c13737 !important; }
+body.tamaku-brand-light .reporte-kpi strong { color: var(--gold) !important; }
+body.tamaku-brand-light .tendencia-barra {
+  border-bottom-color: rgba(25,20,20,.12) !important;
+  background: repeating-linear-gradient(to top,transparent 0 34px,rgba(25,20,20,.035) 35px) !important;
+}
+
+@media (max-width: 900px) {
+  body.tamaku-brand-light .tamaku-module-header { border-radius: 18px !important; }
+  body.tamaku-brand-light :is(
+    .table-container,
+    .barber-card,
+    .sede-info,
+    .disponibilidad-box,
+    .facturacion-panel,
+    .cuenta-card,
+    .reportes-panel,
+    .reporte-kpi,
+    .reporte-card,
+    .caja-panel-principal,
+    .caja-resumen-card,
+    .caja-movimientos-panel,
+    .caja-info-turno,
+    .tienda-hero,
+    .producto-card,
+    .galeria-profesional-card,
+    .com-card,
+    .invoice-card,
+    .liq-detail-card
+  ) {
+    border-radius: 16px !important;
+    box-shadow: 0 7px 20px rgba(40,20,20,.04) !important;
+  }
+}
+
+body.tamaku-brand-light .header-section.tamaku-module-header {
+  padding: 0 0 18px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+body.tamaku-brand-light .btn-new-client {
+  color: #fff !important;
+  background: color-mix(in srgb,var(--gold) 82%,#000) !important;
+  border-color: color-mix(in srgb,var(--gold) 68%,#000) !important;
+  box-shadow: 0 8px 22px rgba(90,15,15,.15) !important;
+}
+body.tamaku-brand-light .btn-new-client:hover {
+  color: #fff !important;
+  background: color-mix(in srgb,var(--gold) 88%,#000) !important;
+}
+body.tamaku-brand-light .stats-grid .stat-card {
+  background: linear-gradient(145deg,#fff,#fffafa) !important;
+  border-color: rgba(35,20,20,.075) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 22px rgba(40,20,20,.045) !important;
+}
+body.tamaku-brand-light .stats-grid .stat-card .stat-info span { color: var(--gold) !important; }
+body.tamaku-brand-light .stats-grid .stat-card .stat-info small { color: #706969 !important; }
+body.tamaku-brand-light .stats-grid .stat-card .stat-icon {
+  color: var(--gold) !important;
+  background: var(--accent-soft) !important;
+  border-color: var(--gold-border) !important;
+}
+body.tamaku-brand-light .stats-grid .stat-card::before {
+  background: linear-gradient(90deg,transparent,var(--gold-light),var(--gold),transparent) !important;
+}
+body.tamaku-brand-light .table-container {
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+body.tamaku-brand-light .table-container tbody tr {
+  background: transparent !important;
+  box-shadow: 0 5px 16px rgba(40,20,20,.035) !important;
+}
+body.tamaku-brand-light .table-container tbody td {
+  background: linear-gradient(145deg,#fff,#fffafa) !important;
+  border-color: rgba(35,20,20,.065) !important;
+}
+body.tamaku-brand-light .table-container tbody td:first-child { border-radius: 15px 0 0 15px; }
+body.tamaku-brand-light .table-container tbody td:last-child { border-radius: 0 15px 15px 0; }
+body.tamaku-brand-light .table-container tbody tr:hover { background: transparent !important; }
+body.tamaku-brand-light .table-container .client-info { min-width: 0; }
+body.tamaku-brand-light .table-container .client-name {
+  color: #242020 !important;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+body.tamaku-brand-light .mobile-card-vip {
+  color: #242020 !important;
+  background: linear-gradient(145deg,#fff,#fff8f8) !important;
+  border: 1px solid rgba(35,20,20,.075) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 7px 20px rgba(40,20,20,.045) !important;
+}
+body.tamaku-brand-light .mobile-card-vip .client-name { color: #171717 !important; }
+
+@media (max-width: 900px) {
+  body.tamaku-brand-light .header-section.tamaku-module-header {
+    padding: 12px 14px !important;
+    background: rgba(255,255,255,.96) !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(25,20,20,.07) !important;
+    border-radius: 0 !important;
+    box-shadow: 0 8px 20px rgba(40,20,20,.045) !important;
+  }
+  body.tamaku-brand-light .stats-grid .stat-card { border-radius: 15px !important; }
+}
+
+body.tamaku-brand-light .client-search-wrap kbd {
+  color: #5d5050 !important;
+  background: #fff7f7 !important;
+  border-color: rgba(35,20,20,.09) !important;
+  box-shadow: 0 2px 5px rgba(40,20,20,.045);
+}
+body.tamaku-brand-light :is(#clientesPaginacion,#facturasPaginacion):not([hidden]) {
+  display: grid !important;
+  grid-template-columns: auto minmax(0,1fr) auto !important;
+  align-items: center !important;
+  justify-content: initial !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  padding: 16px 0 !important;
+  color: #554c4c !important;
+  box-sizing: border-box !important;
+}
+body.tamaku-brand-light :is(#clientesPaginacion,#facturasPaginacion) span {
+  min-width: 0;
+  color: #554c4c !important;
+  text-align: center;
+  line-height: 1.45;
+}
+body.tamaku-brand-light :is(#clientesPaginacion,#facturasPaginacion) button {
+  min-width: 92px;
+  min-height: 44px;
+  padding: 10px 15px !important;
+  color: var(--gold) !important;
+  background: var(--accent-soft) !important;
+  border: 1px solid var(--gold-border) !important;
+  border-radius: 12px !important;
+  font: 700 .72rem Montserrat,sans-serif !important;
+  white-space: nowrap;
+}
+body.tamaku-brand-light :is(#clientesPaginacion,#facturasPaginacion) button:disabled {
+  color: #857a7a !important;
+  background: #f6f1f1 !important;
+  border-color: rgba(35,20,20,.07) !important;
+  opacity: .72;
+}
+@media (max-width: 600px) {
+  body.tamaku-brand-light :is(#clientesPaginacion,#facturasPaginacion):not([hidden]) {
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
+    gap: 8px !important;
+  }
+  body.tamaku-brand-light :is(#clientesPaginacion,#facturasPaginacion) span {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  body.tamaku-brand-light :is(#clientesPaginacion,#facturasPaginacion) button {
+    width: 100%;
+    min-width: 0;
+    padding-inline: 8px !important;
+  }
+}
+
+body.tamaku-brand-light .professionals-header-v3.tamaku-module-header {
+  padding: 0 0 16px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+body.tamaku-brand-light .facturacion-header-v3.tamaku-module-header {
+  padding: 0 0 20px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+@media (max-width: 900px) {
+  body.tamaku-brand-light .facturacion-header-v3.tamaku-module-header {
+    padding: 0 0 18px !important;
+  }
+}
+body.tamaku-brand-light .professionals-header-v3 .header-flex {
+  background: transparent !important;
+}
+body.tamaku-brand-light .sede-info {
+  display: table;
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 16px !important;
+  padding: 8px 12px;
+  color: #625b5b !important;
+  background: rgba(255,255,255,.58) !important;
+  border: 1px solid rgba(35,20,20,.065) !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  font-size: .58rem;
+}
+body.tamaku-brand-light .barbers-grid .barber-card {
+  color: #252020 !important;
+  background: linear-gradient(145deg,#fff,#fffafa) !important;
+  border: 1px solid rgba(35,20,20,.075) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 12px 30px rgba(40,20,20,.055) !important;
+}
+body.tamaku-brand-light .barbers-grid .barber-card:hover {
+  box-shadow: 0 16px 36px rgba(40,20,20,.085) !important;
+}
+body.tamaku-brand-light .barbers-grid .barber-name { color: #1d1919 !important; }
+body.tamaku-brand-light .barbers-grid .puesto-tag {
+  color: var(--gold) !important;
+  background: var(--accent-soft) !important;
+  border-color: var(--gold-border) !important;
+}
+body.tamaku-brand-light .barbers-grid .disponibilidad-box {
+  color: #5b5252 !important;
+  background: #fff !important;
+  border-color: rgba(35,20,20,.07) !important;
+  border-radius: 16px !important;
+}
+body.tamaku-brand-light .barbers-grid .action-icon {
+  color: #655d5d !important;
+  background: #fff !important;
+  border-color: rgba(35,20,20,.09) !important;
+  opacity: 1;
+}
+@media (max-width: 900px) {
+  body.tamaku-brand-light .professionals-header-v3.tamaku-module-header { padding-bottom: 12px !important; }
+  body.tamaku-brand-light .barbers-grid { grid-template-columns: minmax(0,1fr) !important; }
+  body.tamaku-brand-light .barbers-grid .barber-card {
+    width: 100%;
+    padding: 22px 16px 16px;
+    border-radius: 16px !important;
+  }
+}
+
+body.tamaku-brand-light :is(.tienda-hero) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}

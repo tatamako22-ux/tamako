@@ -70,4 +70,28 @@
  .landing-v2 .content-section,.landing-v2 .sales-section,.landing-v2 .landing-plans,.landing-v2 .workflow-section { padding-block:48px; }
  .landing-v2 .audience-strip { width:calc(100% - 36px); padding:18px; justify-content:flex-start; gap:12px 16px; font-size:12px; }
 }
+/* Mantener el acceso oscuro, incluso al autocompletar credenciales. */
+.landing-v2 #loginModal .input-field {
+  background:transparent !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  caret-color:#fff;
+  color-scheme:dark;
+}
+.landing-v2 #loginModal .input-field::placeholder {
+  -webkit-text-fill-color:#777;
+}
+.landing-v2 #loginModal .input-field:autofill {
+  background:#101010 !important;
+  box-shadow:0 0 0 1000px #101010 inset !important;
+  color:#fff !important;
+}
+.landing-v2 #loginModal .input-field:-webkit-autofill,
+.landing-v2 #loginModal .input-field:-webkit-autofill:hover,
+.landing-v2 #loginModal .input-field:-webkit-autofill:focus {
+  -webkit-box-shadow:0 0 0 1000px #101010 inset !important;
+  box-shadow:0 0 0 1000px #101010 inset !important;
+  -webkit-text-fill-color:#fff !important;
+  caret-color:#fff;
+}
 @media(prefers-reduced-motion:reduce) { .landing-v2 * { scroll-behavior:auto!important; animation:none!important; transition:none!important; } }

@@ -592,7 +592,7 @@
     margin:0 auto !important;
     padding:7px !important;
     display:grid !important;
-    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    grid-template-columns:repeat(var(--mobile-tab-count,5),minmax(0,1fr)) !important;
     gap:4px !important;
     background:rgba(10,10,10,.9) !important;
     border:1px solid rgba(191,149,63,.28) !important;
@@ -668,11 +668,14 @@
   .mobile-more-overlay.is-visible { opacity:1; visibility:visible; pointer-events:auto; }
   .mobile-more-sheet {
     width:min(100%,520px);
+    max-height:calc(100dvh - 24px);
+    overflow-y:auto;
+    overscroll-behavior:contain;
     padding:10px 16px max(18px,env(safe-area-inset-bottom));
     background:radial-gradient(circle at 100% 0%,rgba(191,149,63,.1),transparent 35%),#101010;
-    border:1px solid rgba(191,149,63,.24);
+    border:1px solid rgba(230,200,122,.55);
     border-radius:25px 25px 18px 18px;
-    box-shadow:0 30px 100px #000;
+    box-shadow:0 30px 100px rgba(0,0,0,.7),0 0 8px rgba(230,200,122,.2),0 0 24px rgba(191,149,63,.13),inset 0 0 8px rgba(230,200,122,.07);
     transform:translateY(22px);
     transition:.25s ease;
   }
@@ -703,8 +706,41 @@
   .mobile-more-links > * > i:first-child { width:38px; height:38px; display:grid; place-items:center; color:#e2bf64; background:rgba(191,149,63,.1); border-radius:11px; }
   .mobile-more-links > * > i:last-child { color:#555; font-size:.65rem; }
   .mobile-more-links strong,.mobile-more-links span { display:block; }
-  .mobile-more-links strong { margin-bottom:4px; font-size:.72rem; }
-  .mobile-more-links span { color:#6f6f6f; font-size:.57rem; }
+  /* El menú compartido mantiene su tipografía incluso con el tema claro de la tienda. */
+  #mobileMoreMenu .mobile-more-sheet { font-family:"Montserrat",sans-serif; color-scheme:dark; }
+  #mobileMoreMenu .mobile-more-heading h2 {
+    color:#fff !important;
+    font-family:"Montserrat",sans-serif !important;
+    font-size:1.1rem !important;
+    font-weight:700 !important;
+    line-height:1.2 !important;
+    letter-spacing:normal !important;
+    text-transform:none !important;
+    text-shadow:none !important;
+  }
+  #mobileMoreMenu .mobile-more-heading small { color:#bf953f !important; }
+  #mobileMoreMenu .mobile-more-links strong {
+    margin-bottom:4px;
+    color:#ddd !important;
+    font-family:"Montserrat",sans-serif !important;
+    font-size:.72rem !important;
+    font-weight:700 !important;
+    line-height:1.2 !important;
+    letter-spacing:normal !important;
+    text-transform:none !important;
+    text-shadow:none !important;
+  }
+  #mobileMoreMenu .mobile-more-logout strong { color:#df8a8a !important; }
+  #mobileMoreMenu .mobile-more-links span {
+    color:#6f6f6f !important;
+    font-family:"Montserrat",sans-serif !important;
+    font-size:.57rem !important;
+    font-weight:400 !important;
+    line-height:1.4 !important;
+    letter-spacing:normal !important;
+    text-transform:none !important;
+    text-shadow:none !important;
+  }
   .mobile-more-logout { color:#df8a8a !important; cursor:pointer; }
   .mobile-more-logout > i:first-child { color:#e77c7c !important; background:rgba(255,77,77,.08) !important; }
   body.mobile-menu-open { overflow:hidden !important; }

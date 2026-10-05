@@ -172,6 +172,7 @@ function renderMenuGlobal(tienda) {
       ["clientes_ver", "clientes.html", "fa-users", "Clientes"],
       ["facturacion_ver", "facturacion.html", "fa-file-invoice-dollar", "Facturas"],
     ].filter(([permiso, href]) => puede(tienda, permiso) && permitePlan(tienda, href));
+    mobile.style.setProperty("--mobile-tab-count", tabs.length + 1);
     mobile.innerHTML = tabs.map(([, href, icono, texto]) =>
       `<a href="${href}" class="tab-item ${pagina === href ? "active" : ""}"><i class="fa-solid ${icono}"></i><span>${texto}</span></a>`,
     ).join("") + `<button type="button" class="tab-item tab-more ${["profesionales.html", "galeria.html", "usuarios.html", "comunicados.html", "ajustes.html", "tienda.html", "mi-plan.html", "liquidaciones.html"].includes(pagina) ? "active" : ""}" onclick="toggleMobileMore(true)"><i class="fa-solid fa-ellipsis"></i><span>Más</span></button>`;

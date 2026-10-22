@@ -1,0 +1,15 @@
+.tamaku-logo-image { display:block; width:200px; max-width:100%; height:auto; object-fit:contain; }
+.logo:has(> .tamaku-logo-image) { display:flex; align-items:center; justify-content:center; line-height:1; letter-spacing:normal; }
+nav .logo > .tamaku-logo-image { width:180px; }
+.sidebar-logo > img { width:min(100%,220px); height:auto; object-fit:contain; }
+.sidebar-admin h1 > .tamaku-logo-image { width:190px; margin:0 auto; }
+.splash-logo > .tamaku-logo-image { width:min(68vw,320px); margin:0 auto; }
+.landing-v2 .landing-footer .footer-emblem { width:220px; height:auto; animation:none; }
+.landing-v2 #loginModal .login-brand > .tamaku-logo-image { width:210px; margin-bottom:24px; }
+@media(max-width:600px) {
+  nav .logo > .tamaku-logo-image { width:min(42vw,170px); }
+  .landing-v2 .landing-footer .footer-emblem { width:190px; }
+}
+.tamaku-logo-image { zoom:.9; }
+.sidebar-logo > img,.settings-brand-logo,.logo-wordmark,.footer-emblem { zoom:.9; }
+

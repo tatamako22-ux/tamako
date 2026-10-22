@@ -81,7 +81,8 @@ test('PWA no precarga pantallas internas y no intercepta escrituras ni respuesta
   });
   vm.runInContext(fs.readFileSync('sw.js','utf8'),context);
   events.install({waitUntil:p=>tasks.push(p)}); await Promise.all(tasks);
-  assert.equal(cached.length,5); assert.ok(!cached.some(url=>url.includes('/pages/')));
+  assert.ok(cached.length <= 10); assert.ok(!cached.some(url=>url.includes('/pages/')));
+  for (const resource of ['/', '/index.html', '/manifest.json', '/assets/images/tamaku-logo.svg', '/assets/images/tamaku-symbol.svg', '/assets/images/tamaku-icon-192.png', '/assets/images/tamaku-icon-512.png']) assert.ok(cached.includes(resource), resource);
   for(const [url,method] of [['https://www.tamaku.co/api/send-email','POST'],['https://example.com/data','GET'],['https://www.tamaku.co/pages/reserva.html?id=cliente','GET']]) {
     events.fetch({request:{url,method},respondWith:()=>assert.fail('should not intercept')});
   }

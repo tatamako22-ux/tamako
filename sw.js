@@ -1,10 +1,13 @@
 // Cambiamos la versión de la caché para forzar la actualización en los celulares
-const CACHE_NAME = "tamaku-v29-pwa-logo";
+const CACHE_NAME = "tamaku-v32-gold-contact";
 
 const urlsToCache = [
   "/",
   "/index.html",
   "/manifest.json",
+  "/assets/images/tamaku-logo.svg",
+  "/assets/images/tamaku-symbol.svg",
+  "/assets/css/brand-logo.css",
   "/assets/images/tamaku-icon-192.png",
   "/assets/images/tamaku-icon-512.png",
 ];

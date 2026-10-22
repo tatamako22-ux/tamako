@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Símbolo TAMAKU</title>
+  <rect width="512" height="512" rx="112" fill="#090b0d"/>
+  <g fill="#cb9c3a" transform="translate(-180 -20)">
+    <path d="M416 166L427 196L378 274L341 286ZM457 166L532 286L495 276L446 197ZM334 298L359 306L321 366L291 366ZM538 298L582 366L551 366L514 307Z"/>
+    <path d="M436 203C426 261 410 279 342 292C409 304 426 325 436 385C446 325 463 304 531 292C463 279 447 261 436 203Z"/>
+  </g>
+</svg>
+

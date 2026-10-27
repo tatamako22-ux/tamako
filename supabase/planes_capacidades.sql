@@ -9,27 +9,27 @@ alter table public.tamaku_planes
   add column if not exists limite_usuarios integer;
 
 update public.tamaku_planes set
-  nombre='Prueba Premium 7 días', precio_mensual=0, dias_vigencia=7,
+  nombre='Prueba Diamante 7 días', precio_mensual=0, dias_vigencia=7,
   funcionalidades='{"dashboard":true,"agenda":true,"clientes":true,"profesionales":true,"facturacion":true,"caja":true,"reportes":true,"usuarios":true,"tienda":true,"ajustes":true}'::jsonb,
   limite_profesionales=20, limite_usuarios=10
 where codigo='PRUEBA';
 
 update public.tamaku_planes set
-  nombre='Plan Básico', precio_mensual=29900, dias_vigencia=30,
-  funcionalidades='{"dashboard":true,"agenda":true,"clientes":true,"profesionales":true,"facturacion":false,"caja":false,"reportes":false,"usuarios":false,"tienda":false,"ajustes":true}'::jsonb,
-  limite_profesionales=2, limite_usuarios=1
+  nombre='Plata', precio_mensual=69900, dias_vigencia=30,
+  funcionalidades='{"dashboard":true,"agenda":true,"clientes":true,"profesionales":true,"facturacion":true,"caja":true,"reportes":false,"usuarios":true,"tienda":false,"ajustes":true,"marketing":false,"crm_avanzado":false,"multisede":false,"servicio_cliente":true}'::jsonb,
+  limite_profesionales=null, limite_usuarios=1
 where codigo='BASICO';
 
 update public.tamaku_planes set
-  nombre='Plan Pro', precio_mensual=59900, dias_vigencia=30,
-  funcionalidades='{"dashboard":true,"agenda":true,"clientes":true,"profesionales":true,"facturacion":true,"caja":true,"reportes":true,"usuarios":true,"tienda":false,"ajustes":true}'::jsonb,
-  limite_profesionales=6, limite_usuarios=3
+  nombre='Zafiro', precio_mensual=119900, dias_vigencia=30,
+  funcionalidades='{"dashboard":true,"agenda":true,"clientes":true,"profesionales":true,"facturacion":true,"caja":true,"reportes":true,"usuarios":true,"tienda":false,"ajustes":true,"marketing":true,"crm_avanzado":false,"multisede":false,"servicio_cliente":true}'::jsonb,
+  limite_profesionales=null, limite_usuarios=3
 where codigo='PRO';
 
 update public.tamaku_planes set
-  nombre='Plan Premium', precio_mensual=99900, dias_vigencia=30,
-  funcionalidades='{"dashboard":true,"agenda":true,"clientes":true,"profesionales":true,"facturacion":true,"caja":true,"reportes":true,"usuarios":true,"tienda":true,"ajustes":true}'::jsonb,
-  limite_profesionales=20, limite_usuarios=10
+  nombre='Diamante', precio_mensual=199000, dias_vigencia=30,
+  funcionalidades='{"dashboard":true,"agenda":true,"clientes":true,"profesionales":true,"facturacion":true,"caja":true,"reportes":true,"usuarios":true,"tienda":true,"ajustes":true,"marketing":true,"crm_avanzado":true,"multisede":true,"servicio_cliente":true}'::jsonb,
+  limite_profesionales=null, limite_usuarios=10
 where codigo='PREMIUM';
 
 create or replace function public.plan_tiene_funcion(p_tienda uuid,p_funcion text)

@@ -79,6 +79,7 @@ window.tamakuContextReady = Promise.all([import("./session.js"), import("./brand
 });
 
 const PERMISOS_RUTA = {
+  "crecimiento.html": "clientes_gestionar",
   "dashboard.html": "dashboard_ver",
   "agenda.html": "agenda_ver",
   "clientes.html": "clientes_ver",
@@ -93,6 +94,7 @@ const PERMISOS_RUTA = {
 };
 
 const FUNCIONES_RUTA = {
+  "crecimiento.html": "marketing",
   "dashboard.html": "dashboard",
   "agenda.html": "agenda",
   "clientes.html": "clientes",
@@ -140,11 +142,14 @@ function enlace(tienda, permiso, href, pagina, icono, texto) {
   </a>`;
 }
 
-function renderMenuGlobal(tienda) {
+async function renderMenuGlobal(tienda) {
   const pagina = window.location.pathname.split("/").pop();
   if (!protegerRuta(tienda, pagina)) return;
 
   const sidebar = document.querySelector(".sidebar");
+  const { nombrePlan } = await import("./planes.js");
+  const planVisible = nombrePlan(tienda?.suscripcion?.plan_efectivo || tienda?.suscripcion?.plan);
+  const textoPlanVisible = `${planVisible}${tienda?.suscripcion?.estado === "PRUEBA" ? " · Prueba" : ""}`;
   if (sidebar) {
     sidebar.innerHTML = `<div class="sidebar-logo"><img src="../assets/images/tamaku-logo.svg" alt="TAMAKU. Impulsa. Conecta. Crece."></div>
       <nav class="nav-menu">
@@ -159,7 +164,8 @@ function renderMenuGlobal(tienda) {
         ${enlace(tienda, "usuarios_gestionar", "usuarios.html", pagina, "fa-user-shield", "Usuarios")}
         ${enlace(tienda, "ajustes_ver", "comunicados.html", pagina, "fa-bullhorn", "Comunicados")}
         ${enlace(tienda, "ajustes_ver", "ajustes.html", pagina, "fa-gear", "Ajustes")}
-        ${tienda?.sesion?.es_propietario ? `<a href="mi-plan.html" class="nav-item ${pagina === "mi-plan.html" ? "active" : ""}"><i class="fa-solid fa-gem"></i>Mi plan</a>` : ""}
+        ${enlace(tienda, "clientes_gestionar", "crecimiento.html", pagina, "fa-chart-line", "Crecimiento y sedes")}
+        ${tienda?.sesion?.es_propietario ? `<a href="mi-plan.html" class="nav-item ${pagina === "mi-plan.html" ? "active" : ""}"><i class="fa-solid fa-gem"></i>Mi plan · ${textoPlanVisible}</a>` : ""}
       </nav>
       <button class="logout-btn" type="button" onclick="toggleLogout(true)">Cerrar sesión</button>`;
   }
@@ -179,7 +185,7 @@ function renderMenuGlobal(tienda) {
   }
 
   crearModalLogoutGlobal();
-  crearMenuMasMobile(pagina, tienda);
+  crearMenuMasMobile(pagina, tienda, textoPlanVisible);
 }
 
 function opcionMas(tienda, permiso, href, pagina, icono, titulo, detalle) {
@@ -187,7 +193,7 @@ function opcionMas(tienda, permiso, href, pagina, icono, titulo, detalle) {
   return `<a href="${href}" class="${pagina === href ? "active" : ""}"><i class="fa-solid ${icono}"></i><div><strong>${titulo}</strong><span>${detalle}</span></div><i class="fa-solid fa-chevron-right"></i></a>`;
 }
 
-function crearMenuMasMobile(pagina, tienda) {
+function crearMenuMasMobile(pagina, tienda, textoPlanVisible) {
   document.getElementById("mobileMoreMenu")?.remove();
   const panel = document.createElement("div");
   panel.id = "mobileMoreMenu";
@@ -203,7 +209,8 @@ function crearMenuMasMobile(pagina, tienda) {
       ${opcionMas(tienda, "usuarios_gestionar", "usuarios.html", pagina, "fa-user-shield", "Usuarios", "Accesos, roles y permisos")}
       ${opcionMas(tienda, "ajustes_ver", "comunicados.html", pagina, "fa-bullhorn", "Comunicados", "Avisos y promociones para clientes")}
       ${opcionMas(tienda, "ajustes_ver", "ajustes.html", pagina, "fa-sliders", "Ajustes", "Configuración general del negocio")}
-      ${tienda?.sesion?.es_propietario ? `<a href="mi-plan.html" class="${pagina === "mi-plan.html" ? "active" : ""}"><i class="fa-solid fa-gem"></i><div><strong>Mi plan</strong><span>Suscripción, vencimiento y pagos</span></div><i class="fa-solid fa-chevron-right"></i></a>` : ""}
+      ${opcionMas(tienda, "clientes_gestionar", "crecimiento.html", pagina, "fa-chart-line", "Crecimiento y sedes", "Marketing, CRM y ubicaciones")}
+      ${tienda?.sesion?.es_propietario ? `<a href="mi-plan.html" class="${pagina === "mi-plan.html" ? "active" : ""}"><i class="fa-solid fa-gem"></i><div><strong>Mi plan · ${textoPlanVisible}</strong><span>Suscripción, vencimiento y pagos</span></div><i class="fa-solid fa-chevron-right"></i></a>` : ""}
       <button type="button" class="mobile-more-logout" onclick="toggleMobileMore(false); toggleLogout(true)"><i class="fa-solid fa-power-off"></i><div><strong>Cerrar sesión</strong><span>Salir de la administración</span></div><i class="fa-solid fa-chevron-right"></i></button>
     </nav>
   </section>`;
@@ -228,7 +235,7 @@ function crearModalLogoutGlobal() {
 document.addEventListener("DOMContentLoaded", async () => {
   const tienda = await window.tamakuContextReady;
   if (!tienda) return;
-  renderMenuGlobal(tienda);
+  await renderMenuGlobal(tienda);
   import("./cancellation-alerts.js?v=3")
     .then(({ initCancellationAlerts }) => initCancellationAlerts(tienda))
     .catch((error) => console.warn("No se pudieron iniciar las alertas de cancelación:", error));

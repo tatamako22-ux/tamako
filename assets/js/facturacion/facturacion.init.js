@@ -4,6 +4,7 @@ import { FacturacionFacturas } from "./facturacion.facturas.js?v=notices2";
 import { FacturacionCaja } from "./facturacion.caja.js";
 import { FacturacionReportes } from "./facturacion.reportes.js?v=notices2";
 import { FacturacionInsumos } from "./facturacion.insumos.js?v=notices2";
+import { permiteFuncion } from "../core/planes.js";
 
 export const initFacturacion = async () => {
   console.log("Inicializando módulo de Facturación...");
@@ -12,12 +13,15 @@ export const initFacturacion = async () => {
     const tiendaInfo = await window.tamakuContextReady;
     if (!tiendaInfo) return;
     FacturacionModal.init();
+    const reportes = permiteFuncion(tiendaInfo, "reportes") && Boolean(tiendaInfo.sesion?.es_propietario || tiendaInfo.sesion?.permisos?.reportes_ver);
+    document.querySelector('[data-tab="reportes"]').hidden = !reportes;
+    document.getElementById("tab-reportes").hidden = !reportes;
     iniciarTabs();
     await Promise.all([
       FacturacionCuentas.init(),
       FacturacionFacturas.init(),
       FacturacionCaja.init(),
-      FacturacionReportes.init(),
+      ...(reportes ? [FacturacionReportes.init()] : []),
       FacturacionInsumos.init(),
     ]);
   } catch (error) {
@@ -32,7 +36,7 @@ function iniciarTabs() {
   const activarTab = (nombre) => {
     const boton = document.querySelector(`.tab-btn[data-tab="${nombre}"]`);
     const panel = document.getElementById(`tab-${nombre}`);
-    if (!boton || !panel) return;
+    if (!boton || !panel || boton.hidden || panel.hidden) return;
 
     botones.forEach((item) => item.classList.remove("active"));
     paneles.forEach((item) => item.classList.remove("active"));

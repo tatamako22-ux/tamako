@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>TAMAKU | Crecimiento y sedes</title>
+  <script src="../assets/js/core/brand-theme-bootstrap.js?v=6"></script>
+  <link rel="icon" href="../assets/images/tamaku-symbol.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="../assets/css/menu.css?v=18" rel="stylesheet"><link href="../assets/css/brand-logo.css?v=1" rel="stylesheet">
+  <link href="../assets/css/notifications.css?v=2" rel="stylesheet"><link href="../assets/css/crecimiento.css?v=1" rel="stylesheet">
+  <script src="../assets/js/core/notifications.js?v=2"></script><script src="../assets/js/core/menu.js?v=19" defer></script>
+</head>
+<body><aside class="sidebar"></aside><nav class="mobile-tab-bar"></nav>
+<main class="growth-page">
+  <header><small>CRECE CON TAMAKU</small><h1>Crecimiento y sedes</h1><p id="growthPlan">Consultando tu plan…</p></header>
+  <nav class="growth-tabs" aria-label="Módulos de crecimiento">
+    <button type="button" data-modulo="CAMPANA">Marketing &amp; Sales</button>
+    <button type="button" data-modulo="OPORTUNIDAD">Oportunidades</button>
+    <button type="button" data-modulo="TAREA">CRM avanzado</button>
+    <button type="button" data-modulo="SEDE">Multi-Sede</button>
+  </nav>
+  <p id="growthNotice" role="status" aria-live="polite"></p>
+  <section id="growthContent" hidden>
+    <h2 id="growthTitle"></h2><p id="growthDescription"></p>
+    <div class="growth-toolbar"><input id="growthSearch" type="search" placeholder="Buscar…" aria-label="Buscar registros"><label><input id="growthArchived" type="checkbox"> Ver archivados</label><button id="growthNew" type="button">Nuevo registro</button></div>
+    <div id="growthKpis" class="growth-kpis"></div>
+    <div id="growthList" class="growth-list"></div>
+  </section>
+  <dialog id="growthDialog"><form id="growthForm">
+    <header><h2 id="growthFormTitle">Nuevo registro</h2><button id="growthClose" type="button" aria-label="Cerrar">×</button></header>
+    <input name="id" type="hidden">
+    <label>Título / nombre<input name="titulo" required minlength="2" maxlength="120"></label>
+    <div data-campos="comercial">
+      <label>Contacto<input name="contacto" maxlength="120"></label>
+      <label>WhatsApp con código de país<input name="telefono" inputmode="tel" placeholder="573001234567" pattern="[0-9]{7,15}" maxlength="15"></label>
+      <label class="growth-check"><input name="consentimiento" type="checkbox"> El contacto autorizó recibir este mensaje comercial</label>
+      <label>Estado<select name="etapa"></select></label>
+      <label>Valor esperado / presupuesto (COP)<input name="valor" type="number" min="0" max="9999999999" step="0.01" value="0"></label>
+      <label>Próxima acción / fecha objetivo<input name="proxima_accion" type="date"></label>
+      <label>Notas / mensaje de campaña<textarea name="notas" maxlength="4000" rows="5"></textarea></label>
+    </div>
+    <div data-campos="sede" hidden>
+      <label>Dirección<input name="direccion" maxlength="250"></label>
+      <label>Teléfono<input name="telefono_sede" maxlength="30"></label>
+      <p>La sede tendrá su propia agenda, clientes, servicios y ventas. Compartirá el plan y el cupo de usuarios con la tienda principal.</p>
+    </div>
+    <p id="growthFormError" role="alert"></p><button id="growthSave" type="submit">Guardar</button>
+  </form></dialog>
+</main><script type="module" src="../assets/js/crecimiento.js?v=1"></script>
+</body></html>

@@ -1,4 +1,5 @@
 import { FacturacionService } from "./facturacion.service.js";
+import { permiteFuncion } from "../core/planes.js";
 
 const moneda = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -56,6 +57,7 @@ export const FacturacionReportes = {
   hasta: "",
 
   async init() {
+    if (!permiteFuncion(getTienda(), "reportes")) return;
     const ahora = new Date();
     this.desde = fechaInput(new Date(ahora.getFullYear(), ahora.getMonth(), 1));
     this.hasta = fechaInput(ahora);
@@ -108,6 +110,7 @@ export const FacturacionReportes = {
 
   async cargar() {
     const tienda = getTienda();
+    if (!permiteFuncion(tienda, "reportes")) return;
     const estado = document.getElementById("reporteEstado");
     const contenido = document.getElementById("reporteContenido");
     if (!tienda.id || !estado || !this.desde || !this.hasta) return;
@@ -253,6 +256,7 @@ export const FacturacionReportes = {
   },
 
   exportarCSV() {
+    if (!permiteFuncion(getTienda(), "reportes")) return;
     if (!this.datos.movimientos.length && !this.datos.facturas.length)
       return window.TamakuUI.notify("No hay datos para exportar en este periodo.");
 

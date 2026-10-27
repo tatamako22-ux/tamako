@@ -410,6 +410,11 @@ export const FacturacionService = {
   async getDatosReporte(idTienda, desde, hasta) {
     exigirTienda(idTienda);
     if (!desde || !hasta) throw new Error("Selecciona un periodo válido.");
+    const { data: permitido, error: errorPlan } = await supabase.rpc("plan_tiene_funcion", {
+      p_tienda: idTienda, p_funcion: "reportes",
+    });
+    if (errorPlan) throw errorPlan;
+    if (permitido !== true) throw new Error("La generación de informes está incluida en Zafiro y Diamante.");
 
     const [facturasResultado, movimientosResultado, cuentasResultado] =
       await Promise.all([

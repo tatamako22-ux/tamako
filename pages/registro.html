@@ -1096,7 +1096,7 @@ if (perfilError) {
 // Si el sistema de suscripciones ya fue activado, conserva el plan elegido.
 const { error: planError } = await supabaseClient.rpc("seleccionar_plan_tamaku", {
     p_tienda: tiendaInsertada.id,
-    p_plan: planSeleccionado
+    p_plan: ({ PLATA: "BASICO", ZAFIRO: "PRO", DIAMANTE: "PREMIUM" }[planSeleccionado] || planSeleccionado)
 });
 if (planError && !/function|schema cache/i.test(planError.message || "")) {
     console.warn("No se pudo guardar el plan seleccionado:", planError);

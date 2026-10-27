@@ -1,3 +1,4 @@
+import { PLANES, nombrePlan } from "../core/planes.js";
 import { supabase } from "../config/supabaseClient.js";
 
 const $ = (s) => document.querySelector(s);
@@ -383,7 +384,7 @@ function textoDias(s) {
 }
 function nombreTienda(id) { return suscripciones.find((s) => s.id_tienda === id)?.tiendas?.nombre || "Tienda"; }
 function codigoPlan(s) { return s.estado === "PRUEBA" ? "PRUEBA" : (s.tamaku_planes?.codigo || s.plan_solicitado || "SIN PLAN"); }
-function textoPlan(s) { return s.estado === "PRUEBA" ? `PRUEBA → ${s.plan_solicitado && s.plan_solicitado !== "PRUEBA" ? s.plan_solicitado : "POR ELEGIR"}` : codigoPlan(s); }
+function textoPlan(s) { return s.estado === "PRUEBA" ? `PRUEBA → ${s.plan_solicitado && s.plan_solicitado !== "PRUEBA" ? nombrePlan(s.plan_solicitado) : "POR ELEGIR"}` : nombrePlan(codigoPlan(s)); }
 
 function cambiarVista(nombre) {
   $$(".vista").forEach((v) => v.classList.toggle("active", v.dataset.seccion === nombre));
@@ -409,7 +410,7 @@ function renderAnalitica() {
   $("#proximosVencimientos").innerHTML = proximas.map((s) => `<button data-abrir-tienda="${s.id_tienda}"><span><strong>${escapar(s.tiendas?.nombre || "Tienda")}</strong><small>${escapar(textoDias(s))}</small></span><time>${fecha(finAcceso(s))}</time></button>`).join("") || `<div class="vacio">No hay vencimientos programados.</div>`;
   const conteos = ["PRUEBA", "BASICO", "PRO", "PREMIUM"].map((plan) => ({ plan, total: suscripciones.filter((s) => codigoPlan(s) === plan).length }));
   const max = Math.max(1, ...conteos.map((x) => x.total));
-  $("#distribucionPlanes").innerHTML = conteos.map((x) => `<div><label><span>${x.plan}</span><b>${x.total}</b></label><i><em style="width:${x.total / max * 100}%"></em></i></div>`).join("");
+  $("#distribucionPlanes").innerHTML = conteos.map((x) => `<div><label><span>${nombrePlan(x.plan)}</span><b>${x.total}</b></label><i><em style="width:${x.total / max * 100}%"></em></i></div>`).join("");
   const meses = Array.from({ length: 6 }, (_, i) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - (5 - i)); return d; });
   const puntos = meses.map((m) => ({ etiqueta: m.toLocaleDateString("es-CO", { month: "short" }), total: pagos.filter((p) => { const f = new Date(p.fecha_pago); return f.getMonth() === m.getMonth() && f.getFullYear() === m.getFullYear(); }).reduce((a, p) => a + Number(p.monto), 0) }));
   const mayor = Math.max(1, ...puntos.map((p) => p.total));
@@ -440,7 +441,8 @@ function abrirDetalle(id) {
   seleccionada = suscripciones.find((s) => s.id_tienda === id); if (!seleccionada) return;
   $("#detalleNombre").textContent = seleccionada.tiendas?.nombre || "Tienda"; $("#detalleContacto").textContent = `${seleccionada.tiendas?.email || ""} · ${seleccionada.tiendas?.telefono || ""}`;
   $("#detalleEstado").textContent = `${estadoEfectivo(seleccionada)} · ${textoPlan(seleccionada)}`; $("#detalleDias").textContent = textoDias(seleccionada); $("#diasGracia").value = seleccionada.dias_gracia || 0; $("#mensajeBloqueo").value = seleccionada.mensaje_bloqueo || "";
-  $("#pagoPlan").value = ["BASICO", "PRO", "PREMIUM"].includes(seleccionada.plan_solicitado) ? seleccionada.plan_solicitado : "BASICO"; $("#pagoMonto").value = { BASICO: 29900, PRO: 59900, PREMIUM: 99900 }[$("#pagoPlan").value];
+  $("#pagoPlan").value = ["BASICO", "PRO", "PREMIUM"].includes(seleccionada.tamaku_planes?.codigo) ? seleccionada.tamaku_planes.codigo : (["BASICO", "PRO", "PREMIUM"].includes(seleccionada.plan_solicitado) ? seleccionada.plan_solicitado : "BASICO"); $("#pagoMonto").value = PLANES[$("#pagoPlan").value].precio;
+  $("#cambioPlan").value = $("#pagoPlan").value;
   $("#pagoFecha").value = hoyISO(); $("#periodoInicio").value = diferenciaDias(seleccionada.fin_periodo) >= 0 ? new Date(seleccionada.fin_periodo).toISOString().slice(0, 10) : hoyISO(); renderHistorial(id);
   $("#reactivarTienda").hidden = !["SUSPENDIDA", "CANCELADA"].includes(seleccionada.estado); $("#detallePanel").classList.add("open");
 }
@@ -448,7 +450,10 @@ function abrirDetalle(id) {
 async function cargar() {
   const [s, p, n] = await Promise.all([supabase.from("tamaku_suscripciones").select("*,tiendas(id,nombre,email,telefono,direccion),tamaku_planes(codigo,nombre,precio_mensual)").order("created_at", { ascending: false }), supabase.from("tamaku_pagos_suscripcion").select("*,tamaku_planes(nombre,codigo)").order("fecha_pago", { ascending: false }), supabase.from("tamaku_notificaciones_admin").select("*").order("created_at", { ascending: false }).limit(100)]);
   if (s.error) throw s.error; if (p.error) throw p.error; if (n.error) throw n.error;
-  suscripciones = s.data || []; pagos = p.data || []; notificaciones = n.data || []; renderResumen(); renderTiendas(); renderPagos(); renderNotificaciones();
+  const sedes = await supabase.from("tamaku_sedes").select("tienda_sede");
+  if (sedes.error && !/schema cache|does not exist|could not find/i.test(sedes.error.message || "")) throw sedes.error;
+  const vinculadas = new Set((sedes.data || []).map((sede) => sede.tienda_sede));
+  suscripciones = (s.data || []).filter((s) => !vinculadas.has(s.id_tienda)); pagos = p.data || []; notificaciones = n.data || []; renderResumen(); renderTiendas(); renderPagos(); renderNotificaciones();
 }
 async function verificar() { const { data: { user } } = await supabase.auth.getUser(); if (!user) return location.replace("../index.html?login=true"); const { data } = await supabase.from("tamaku_superadmins").select("user_id,nombre").eq("user_id", user.id).eq("activo", true).maybeSingle(); if (!data) { await supabase.auth.signOut(); return location.replace("../index.html?login=true"); } $("#adminNombre").textContent = data.nombre; await cargar(); await cargarAgendaCotizaciones(); }
 
@@ -456,7 +461,19 @@ $("#navAdmin").onclick = (e) => { const b = e.target.closest("[data-vista]"); if
 document.addEventListener("click", (e) => { const tienda = e.target.closest("[data-abrir-tienda]"); if (tienda) abrirDetalle(tienda.dataset.abrirTienda); const ir = e.target.closest("[data-ir]"); if (ir) cambiarVista(ir.dataset.ir); });
 $("#buscarTienda").addEventListener("input", renderTiendas); $("#filtroEstado").addEventListener("change", renderTiendas); $("#filtroMesPago").addEventListener("change", renderPagos);
 $$('[data-filtro]').forEach((kpi) => kpi.onclick = () => { cambiarVista("tiendas"); $("#filtroEstado").value = kpi.dataset.filtro; renderTiendas(); });
-$("#cerrarDetalle").onclick = () => $("#detallePanel").classList.remove("open"); $("#pagoPlan").onchange = (e) => $("#pagoMonto").value = { BASICO: 29900, PRO: 59900, PREMIUM: 99900 }[e.target.value];
+$("#cerrarDetalle").onclick = () => $("#detallePanel").classList.remove("open"); $("#pagoPlan").onchange = (e) => $("#pagoMonto").value = PLANES[e.target.value].precio;
+$("#cambioPlanForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const boton = e.currentTarget.querySelector("button"), id = seleccionada.id_tienda;
+  boton.disabled = true;
+  try {
+    const { error } = await supabase.rpc("cambiar_plan_tamaku", { p_tienda: id, p_plan: $("#cambioPlan").value });
+    if (error) throw error;
+    await cargar(); abrirDetalle(id);
+    mostrarAviso("success", "Plan actualizado", "Se guardó el plan sin modificar el vencimiento ni registrar un pago.");
+  } catch (error) { mostrarAviso("error", "No se pudo cambiar el plan", error.message); }
+  finally { boton.disabled = false; }
+};
 $("#pagoForm").onsubmit = async (e) => {
   e.preventDefault();
   const formulario = e.currentTarget, boton = formulario.querySelector('button[type="submit"], button:not([type])');
@@ -470,7 +487,7 @@ $("#pagoForm").onsubmit = async (e) => {
   formulario.elements.referencia.value = ""; formulario.elements.notas.value = "";
   await cargar(); abrirDetalle(idTienda);
   const actualizada = suscripciones.find((s) => s.id_tienda === idTienda);
-  mostrarAviso("success", "Pago registrado correctamente", `${tienda} quedó activa en el plan ${d.plan}. Nuevo vencimiento: ${fecha(finAcceso(actualizada))}.`);
+  mostrarAviso("success", "Pago registrado correctamente", `${tienda} quedó activa en el plan ${nombrePlan(d.plan)}. Nuevo vencimiento: ${fecha(finAcceso(actualizada))}.`);
 };
 $("#guardarControl").onclick = async () => { const { error } = await supabase.rpc("configurar_acceso_tamaku", { p_tienda: seleccionada.id_tienda, p_dias_gracia: Number($("#diasGracia").value), p_mensaje: $("#mensajeBloqueo").value || null }); if (error) return window.TamakuUI.notify(error.message); window.TamakuUI.notify("Configuración guardada."); await cargar(); abrirDetalle(seleccionada.id_tienda); };
 $("#extenderPrueba").onclick = async () => { const dias = Number((await window.TamakuUI.prompt({ titulo: "Extender prueba gratuita", mensaje: "Indica cuántos días deseas agregar al periodo de prueba.", etiqueta: "Días adicionales", valorInicial: "7", tipo: "number", min: 1, paso: 1, requerido: true, textoConfirmar: "Agregar días" }))); if (!dias) return; const { error } = await supabase.rpc("extender_prueba_tamaku", { p_tienda: seleccionada.id_tienda, p_dias: dias }); if (error) return window.TamakuUI.notify(error.message); await cargar(); abrirDetalle(seleccionada.id_tienda); };

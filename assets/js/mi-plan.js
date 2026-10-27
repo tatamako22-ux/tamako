@@ -1,3 +1,4 @@
+import { PLANES, nombrePlan } from "./core/planes.js";
 import { supabase } from "./config/supabaseClient.js";
 
 const dinero = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
@@ -15,27 +16,32 @@ async function cargarPlan() {
   const { data: suscripcionDirecta } = await supabase
     .from("tamaku_suscripciones")
     .select("plan_solicitado,tamaku_planes(codigo,nombre,precio_mensual)")
-    .eq("id_tienda", tienda.id)
+    .eq("id_tienda", tienda.tienda_principal || tienda.id)
     .maybeSingle();
   const codigo = plan.plan_efectivo || (plan.estado === "PRUEBA" ? "PREMIUM" : plan.plan) || "—";
-  const nombres = { BASICO: "Plan Básico", PRO: "Plan Pro", PREMIUM: "Plan Premium" };
+  const nombres = Object.fromEntries(Object.entries(PLANES).map(([codigo, plan]) => [codigo, plan.nombre]));
   document.getElementById("planNombre").textContent = plan.estado === "PRUEBA" ? `${nombres[codigo] || codigo} · Prueba` : nombres[codigo] || codigo;
   document.getElementById("planPrecio").textContent = plan.estado === "PRUEBA" ? "Gratis por 7 días" : `${dinero.format(suscripcionDirecta?.tamaku_planes?.precio_mensual || 0)} / mes`;
-  document.getElementById("planDescripcion").textContent = plan.estado === "PRUEBA" ? `Tienes acceso Premium completo. Plan solicitado al finalizar: ${suscripcionDirecta?.plan_solicitado || "por elegir"}.` : "Tu suscripción está activa con las capacidades correspondientes a este plan.";
+  document.getElementById("planDescripcion").textContent = plan.estado === "PRUEBA" ? `Tienes acceso ${nombrePlan(codigo)} completo. Plan solicitado al finalizar: ${suscripcionDirecta?.plan_solicitado ? nombrePlan(suscripcionDirecta.plan_solicitado) : "por elegir"}.` : "Tu suscripción está activa con las capacidades correspondientes a este plan.";
   const estado = plan.estado_efectivo || plan.estado || "SIN DATOS";
   const estadoEl = document.getElementById("planEstado"); estadoEl.textContent = estado; estadoEl.className = `plan-status ${estado.toLowerCase()}`;
   document.getElementById("planVence").textContent = fecha(plan.vence);
   document.getElementById("planDias").textContent = `${Number(plan.dias_restantes || 0)} días`;
-  document.getElementById("planProfesionales").textContent = plan.limite_profesionales ?? "—";
+  document.getElementById("planProfesionales").textContent = plan.limite_profesionales ?? "Sin límite de plan";
   document.getElementById("planUsuarios").textContent = plan.limite_usuarios ?? "—";
+  const listaFunciones = document.getElementById("planFunciones");
+  if (listaFunciones) {
+    const funciones = [["agenda", "Agenda y clientes"], ["dashboard", "Dashboard personalizado"], ["facturacion", "Historial de ventas"], ["reportes", "Generación de informes"], ["marketing", "Marketing & Sales y oportunidades"], ["crm_avanzado", "CRM avanzado y seguimientos"], ["multisede", "Administración Multi-Sede"], ["servicio_cliente", "Servicio al cliente"]];
+    listaFunciones.innerHTML = funciones.filter(([clave]) => plan.funcionalidades?.[clave] === true).map(([, texto]) => `<li>${texto}</li>`).join("");
+  }
 
-  let { data: pagos, error } = await supabase.rpc("obtener_pagos_tienda_tamaku", { p_tienda: tienda.id });
+  let { data: pagos, error } = await supabase.rpc("obtener_pagos_tienda_tamaku", { p_tienda: tienda.tienda_principal || tienda.id });
   // Conserva compatibilidad mientras la función nueva se instala en Supabase.
   if (error && /function|schema cache|could not find/i.test(error.message || "")) {
     const resultadoAnterior = await supabase
       .from("tamaku_pagos_suscripcion")
       .select("monto,fecha_pago,periodo_desde,periodo_hasta,referencia,estado,tamaku_planes(nombre,codigo)")
-      .eq("id_tienda", tienda.id)
+      .eq("id_tienda", tienda.tienda_principal || tienda.id)
       .eq("estado", "CONFIRMADO")
       .order("fecha_pago", { ascending: false });
     pagos = resultadoAnterior.data;

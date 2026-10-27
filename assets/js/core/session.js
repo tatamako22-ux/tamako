@@ -3,6 +3,13 @@ import { supabase } from "../config/supabaseClient.js";
 const STORAGE_KEY = "tamaku_tienda";
 const LOGIN_URL = new URL("../../../index.html", import.meta.url).href;
 
+const FUNCIONES_PAGINA = {
+  "dashboard.html": "dashboard", "agenda.html": "agenda", "clientes.html": "clientes",
+  "profesionales.html": "profesionales", "galeria.html": "profesionales",
+  "facturacion.html": "facturacion", "usuarios.html": "usuarios", "tienda.html": "tienda",
+  "ajustes.html": "ajustes", "comunicados.html": "ajustes",
+};
+
 export function getTiendaInfo() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null;
@@ -18,6 +25,7 @@ export function setTiendaInfo(tienda) {
 
 export function clearSession() {
   localStorage.removeItem(STORAGE_KEY);
+  sessionStorage.removeItem("tamaku_sede_activa");
 }
 
 const PERMISOS_PROPIETARIO = {
@@ -40,6 +48,11 @@ const PERMISOS_PROPIETARIO = {
 };
 
 async function obtenerContextoUsuario() {
+  const seleccionada = sessionStorage.getItem("tamaku_sede_activa");
+  const sede = await supabase.rpc("contexto_sede_tamaku", { p_tienda: seleccionada || null });
+  if (sede.error && !/function|schema cache|could not find/i.test(sede.error.message || "")) throw sede.error;
+  if (!sede.error && sede.data) return sede.data;
+  if (seleccionada) sessionStorage.removeItem("tamaku_sede_activa");
   const { data, error } = await supabase.rpc("obtener_contexto_usuario");
   if (error) throw error;
   return Array.isArray(data) ? data[0] || null : data;
@@ -86,8 +99,18 @@ async function validarTiendaInfo({ redirect = true } = {}) {
     const tiendaBase = await buscarTiendaDelContexto(contexto);
     const suscripcion = tiendaBase ? await validarSuscripcion(tiendaBase.id) : null;
     if (suscripcion && !suscripcion.acceso) {
+      if (contexto?.es_propietario && contexto.tienda_principal && contexto.tienda_principal !== tiendaBase.id) {
+        sessionStorage.setItem("tamaku_sede_activa", contexto.tienda_principal);
+        window.location.replace(new URL("../../../pages/dashboard.html", import.meta.url).href);
+        return null;
+      }
       sessionStorage.setItem("tamaku_suscripcion", JSON.stringify(suscripcion));
       window.location.replace(new URL("../../../pages/suscripcion.html", import.meta.url).href);
+      return null;
+    }
+    const funcionPagina = FUNCIONES_PAGINA[window.location.pathname.split("/").pop()];
+    if (suscripcion?.funcionalidades && funcionPagina && suscripcion.funcionalidades[funcionPagina] !== true) {
+      if (redirect) window.location.replace(new URL("../../../pages/mi-plan.html", import.meta.url).href);
       return null;
     }
     const permisos = contexto?.es_propietario
@@ -96,6 +119,7 @@ async function validarTiendaInfo({ redirect = true } = {}) {
     const tienda = tiendaBase
       ? {
           ...tiendaBase,
+          tienda_principal: contexto.tienda_principal || tiendaBase.id,
           sesion: {
             user_id: user.id,
             rol: contexto.rol,
@@ -116,6 +140,17 @@ async function validarTiendaInfo({ redirect = true } = {}) {
     if (redirect) window.location.replace(LOGIN_URL);
     return null;
   }
+}
+
+export async function cambiarSede(id) {
+  const { data, error } = await supabase.rpc("contexto_sede_tamaku", { p_tienda: id });
+  if (error) throw error;
+  if (data?.id_tienda !== id || !data.es_propietario) throw new Error("No tienes acceso a esta sede.");
+  const estado = await validarSuscripcion(id);
+  if (!estado?.acceso) throw new Error(estado?.mensaje || "La sede no tiene acceso vigente.");
+  sessionStorage.setItem("tamaku_sede_activa", id);
+  localStorage.removeItem(STORAGE_KEY);
+  window.location.assign(new URL("../../../pages/dashboard.html", import.meta.url).href);
 }
 
 export function getSesionInfo() {

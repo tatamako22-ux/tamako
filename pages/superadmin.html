@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/superadmin.css?v=5">
   <link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
+  <link rel="stylesheet" href="../assets/css/superadmin-agenda.css?v=1">
 <link rel="stylesheet" href="../assets/css/notifications.css?v=2">
 <script src="../assets/js/core/notifications.js?v=2"></script>
 <link rel="icon" type="image/svg+xml" href="../assets/images/tamaku-symbol.svg">
@@ -44,25 +45,25 @@
       <section class="panel"><div class="panel-head"><div><span>RECAUDO</span><h3>Historial general de pagos</h3></div><div class="herramientas"><input id="filtroMesPago" type="month"><button id="exportarPagos" class="btn-outline"><i class="fa-solid fa-download"></i> Exportar CSV</button></div></div><div class="pagos-head"><span>Tienda</span><span>Plan / referencia</span><span>Periodo</span><span>Fecha</span><span>Monto</span></div><div id="tablaPagos" class="tabla-pagos"></div></section>
     </section>
 
-    <section class="vista" data-seccion="agenda-cotizacion">
-      <section class="panel">
-        <div class="panel-head">
-          <div><span>AGENDA</span><h3>Agenda y cotización</h3></div>
+    <section class="vista agenda-workspace" data-seccion="agenda-cotizacion">
+      <section class="panel agenda-commercial-panel">
+        <div class="panel-head agenda-commercial-header">
+          <div class="agenda-commercial-intro"><span class="agenda-eyebrow"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> TU ESPACIO COMERCIAL</span><h3>Conecta. Agenda. Crece.</h3><p>De la primera conversación a una nueva oportunidad.<br>Organiza tus empresas, contactos y reuniones en un solo lugar.</p></div>
           <div class="herramientas">
-            <label class="search-inline"><i class="fa-solid fa-search"></i><input id="buscarAgendaCotizacion" placeholder="Buscar empresa, sede o contacto..."></label>
-            <button id="exportarAgendaCotizacion" class="btn-outline" type="button">Exportar empresas</button>
+            <label class="search-inline"><i class="fa-solid fa-search" aria-hidden="true"></i><input id="buscarAgendaCotizacion" placeholder="Buscar empresa, sede o contacto…" aria-label="Buscar empresa, sede o contacto"></label>
+            <button id="exportarAgendaCotizacion" class="btn-outline" type="button"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Exportar empresas</button>
           </div>
         </div>
 
         <div id="agendaStepNav" class="agenda-steps" role="tablist" aria-label="Cargas de agenda y cotización">
           <button id="tabAgendaEmpresas" class="agenda-step-button active" type="button" role="tab" aria-selected="true" aria-controls="panelAgendaEmpresas" tabindex="0" data-agenda-step="empresas">
-            <span class="agenda-step-number">01</span><span class="agenda-step-copy"><strong>Empresas</strong><small>Base y sedes</small></span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            <span class="agenda-step-number"><i class="fa-regular fa-building" aria-hidden="true"></i></span><span class="agenda-step-copy"><strong>01. Empresas</strong><small>Construye tu base comercial</small></span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
           <button id="tabAgendaIntentos" class="agenda-step-button" type="button" role="tab" aria-selected="false" aria-controls="panelAgendaIntentos" tabindex="-1" data-agenda-step="intentos">
-            <span class="agenda-step-number">02</span><span class="agenda-step-copy"><strong>Contactos</strong><small>Canal e información enviada</small></span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            <span class="agenda-step-number"><i class="fa-regular fa-comments" aria-hidden="true"></i></span><span class="agenda-step-copy"><strong>02. Contactos</strong><small>Cada conversación cuenta</small></span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
           <button id="tabAgendaReuniones" class="agenda-step-button" type="button" role="tab" aria-selected="false" aria-controls="panelAgendaReuniones" tabindex="-1" data-agenda-step="reuniones">
-            <span class="agenda-step-number">03</span><span class="agenda-step-copy"><strong>Reuniones</strong><small>Producto y resultado</small></span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            <span class="agenda-step-number"><i class="fa-regular fa-calendar-check" aria-hidden="true"></i></span><span class="agenda-step-copy"><strong>03. Reuniones</strong><small>Convierte el interés en acuerdos</small></span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
         </div>
 
@@ -71,6 +72,7 @@
             <div class="agenda-step-heading"><div><span>01 / BASE COMERCIAL</span><h3>Empresas y sedes</h3></div><p>Registra una ficha o importa tu base.</p></div>
             <div class="agenda-step-grid">
               <form id="agendaCotizacionForm" class="agenda-form agenda-company-form">
+                <div class="agenda-form-intro"><span class="agenda-section-icon"><i class="fa-solid fa-plus" aria-hidden="true"></i></span><div><h4>Un nuevo comienzo</h4><p>Agrega una empresa y empieza a darle seguimiento.</p></div><span class="agenda-form-tag">NUEVO PROSPECTO</span></div>
                 <label>Tipo de registro<select name="tipo_registro"><option value="BARBERIA">Barbería / contacto</option><option value="EMPRESA_SEDE">Empresa o sede</option></select></label>
                 <div class="form-grid">
                   <label>Nombre del prospecto<input name="nombre_tienda" type="text"></label>
@@ -93,7 +95,7 @@
                   <label>Estado<select name="estado"><option value="Pendiente">Pendiente</option><option value="En agenda">En agenda</option><option value="Cotizado">Cotizado</option><option value="Confirmado">Confirmado</option><option value="Cerrado">Cerrado</option></select></label>
                 </div>
                 <label>Notas<textarea name="notas" rows="3"></textarea></label>
-                <button type="submit" class="btn-secundario">Guardar empresa</button>
+                <button type="submit" class="btn-secundario"><i class="fa-solid fa-plus" aria-hidden="true"></i> Guardar empresa</button>
               </form>
               <aside class="agenda-import-box">
                 <span class="agenda-import-icon"><i class="fa-solid fa-building"></i></span>
@@ -101,6 +103,7 @@
                 <p>Agrega varias empresas y sedes desde un archivo CSV.</p>
                 <label class="file-upload"><input id="csvAgendaCotizacion" type="file" accept=".csv,text/csv"><span><i class="fa-solid fa-file-arrow-up"></i> Seleccionar CSV</span></label>
                 <button id="plantillaAgendaCotizacion" class="btn-outline" type="button"><i class="fa-solid fa-download"></i> Plantilla de empresas</button>
+                <div class="agenda-import-tip"><i class="fa-regular fa-lightbulb" aria-hidden="true"></i><p>Descarga la plantilla, completa los datos y carga el archivo. Después podrás registrar cada conversación y reunión.</p></div>
               </aside>
             </div>
           </section>
@@ -115,6 +118,7 @@
                 <label class="file-upload"><input id="csvIntentosAgenda" type="file" accept=".csv,text/csv"><span><i class="fa-solid fa-file-arrow-up"></i> Seleccionar CSV</span></label>
                 <button id="plantillaIntentosAgenda" class="btn-outline" type="button"><i class="fa-solid fa-download"></i> Plantilla de intentos</button>
               </aside>
+              <div class="agenda-workflow-note"><span>EL SIGUIENTE PASO</span><h4>Dale continuidad a cada conversación.</h4><p>Para registrar un contacto individual, busca la empresa en el listado y pulsa <strong>Intento</strong>. Allí podrás guardar el canal, la respuesta y la próxima acción.</p><div><i class="fa-brands fa-whatsapp" aria-hidden="true"></i><i class="fa-regular fa-envelope" aria-hidden="true"></i><i class="fa-solid fa-phone" aria-hidden="true"></i><small>Todo el historial, en la ficha de la empresa.</small></div></div>
             </div>
           </section>
 
@@ -128,12 +132,13 @@
                 <label class="file-upload"><input id="csvReunionesAgenda" type="file" accept=".csv,text/csv"><span><i class="fa-solid fa-file-arrow-up"></i> Seleccionar CSV</span></label>
                 <button id="plantillaReunionesAgenda" class="btn-outline" type="button"><i class="fa-solid fa-download"></i> Plantilla de reuniones</button>
               </aside>
+              <div class="agenda-workflow-note"><span>DE LA CONVERSACIÓN A LA ACCIÓN</span><h4>Haz espacio para nuevas oportunidades.</h4><p>Para agendar una reunión individual, pulsa <strong>Reunión</strong> junto a la empresa. Registra fecha, asistentes, producto ofrecido y los acuerdos alcanzados.</p><div><i class="fa-regular fa-calendar" aria-hidden="true"></i><small>Consulta las reuniones y sus resultados en cada ficha.</small></div></div>
             </div>
           </section>
         </div>
 
         <p id="agendaCotizacionFeedback" class="agenda-feedback" role="status" aria-live="polite" hidden></p>
-        <div class="agenda-list-header"><div><span>SEGUIMIENTO COMERCIAL</span><h3>Empresas registradas</h3></div><strong id="totalAgendaCotizaciones" aria-live="polite">0</strong></div>
+        <div class="agenda-list-header"><div><span>DIRECTORIO COMERCIAL</span><h3>Tus próximas oportunidades</h3><p>Contactos, cotizaciones y avances de cada empresa.</p></div><div class="agenda-total-label"><strong id="totalAgendaCotizaciones" aria-live="polite">0</strong><span>empresas en la vista</span></div></div>
         <div id="tablaAgendaCotizacion" class="tabla-agenda-cotizacion"></div>
         <dialog id="dialogoIntentoAgenda" class="dialogo-agenda" aria-labelledby="nombreRegistroIntento">
           <form id="intentoAgendaForm" class="agenda-form">

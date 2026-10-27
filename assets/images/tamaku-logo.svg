@@ -1,14 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="120 110 1360 310" role="img" aria-labelledby="title">
   <title id="title">TAMAKU · Impulsa · Conecta · Crece</title>
+  <defs>
+    <g id="tamaku-wordmark">
+    <path pathLength="100" d="M153 132H374L359 157H284V332H228V157H137Z"/>
+    <path pathLength="100" d="M416 132L427 162L378 240L341 252ZM457 132L532 252L495 242L446 163ZM334 264L359 272L321 332H291ZM538 264L582 332H551L514 273Z"/>
+    <path pathLength="100" d="M436 169C426 227 410 245 342 258C409 270 426 291 436 351C446 291 463 270 531 258C463 245 447 227 436 169Z"/>
+    <path pathLength="100" d="M588 132H626L701 229L776 132H815V332H782V198L701 298L621 198V332H588Z"/>
+    <path pathLength="100" d="M947 132L1065 332H1010L930 198L845 332H820Z"/>
+    <path pathLength="100" d="M1071 132H1118V216L1216 132H1270L1164 220L1282 332H1215L1118 239V332H1071Z"/>
+    <path pathLength="100" d="M1276 132H1323V250C1323 295 1340 314 1381 314C1424 314 1445 292 1445 250V132H1463V250C1463 308 1433 335 1375 335C1309 335 1276 308 1276 250Z"/>
+    </g>
+    <filter id="tamaku-edge-glow" x="-15%" y="-25%" width="130%" height="150%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="glow"/><feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <style>
+    .tamaku-edge-runner{stroke-dasharray:14 86;animation:tamakuEdgeTravel 5.5s linear infinite}
+    @keyframes tamakuEdgeTravel{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
+    @media(prefers-reduced-motion:reduce){.tamaku-edge-runner{animation:none;opacity:0}}
+  </style>
+  <use href="#tamaku-wordmark" fill="#cb9c3a"/>
+  <use class="tamaku-edge-runner" href="#tamaku-wordmark" fill="none" stroke="#ffe9ae" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#tamaku-edge-glow)" aria-hidden="true"/>
   <g fill="#cb9c3a">
-    <path d="M153 132H374L359 157H284V332H228V157H137Z"/>
-    <path d="M416 132L427 162L378 240L341 252ZM457 132L532 252L495 242L446 163ZM334 264L359 272L321 332H291ZM538 264L582 332H551L514 273Z"/>
-    <path d="M436 169C426 227 410 245 342 258C409 270 426 291 436 351C446 291 463 270 531 258C463 245 447 227 436 169Z"/>
-    <path d="M588 132H626L701 229L776 132H815V332H782V198L701 298L621 198V332H588Z"/>
-    <path d="M947 132L1065 332H1010L930 198L845 332H820Z"/>
-    <path d="M1071 132H1118V216L1216 132H1270L1164 220L1282 332H1215L1118 239V332H1071Z"/>
-    <path d="M1276 132H1323V250C1323 295 1340 314 1381 314C1424 314 1445 292 1445 250V132H1463V250C1463 308 1433 335 1375 335C1309 335 1276 308 1276 250Z"/>
     <text x="800" y="403" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="40" font-weight="600" letter-spacing="13" textLength="1015" lengthAdjust="spacing">IMPULSA · CONECTA · CRECE</text>
   </g>
 </svg>
-

@@ -2,6 +2,12 @@
 -- Aditiva: no elimina tiendas, clientes, reservas ni pagos.
 begin;
 
+-- La suscripción puede ser visible al superadmin aunque el JOIN de tiendas
+-- quede vacío por RLS. Autorizar su lectura explícitamente recupera nombres.
+drop policy if exists "Superadmin consulta tiendas" on public.tiendas;
+create policy "Superadmin consulta tiendas" on public.tiendas
+for select to authenticated using (public.es_tamaku_superadmin());
+
 create table if not exists public.tamaku_sedes (
   id uuid primary key default gen_random_uuid(),
   tienda_principal uuid not null references public.tiendas(id),

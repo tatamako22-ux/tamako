@@ -89,5 +89,23 @@ try {
   await q("update tamaku_suscripciones set estado='PRUEBA' where id_tienda=$1",[A]);
   check((await q('select * from obtener_estado_suscripcion($1)',[A]))[0].plan_efectivo,'PRO');
   check((await q('select * from obtener_estado_suscripcion($1)',[A]))[0].limite_usuarios,4);
+  // Reproduce la captura: la suscripción es visible, pero su tienda queda oculta.
+  const admin='30000000-0000-0000-0000-000000000001';
+  await db.exec(`reset role;insert into auth.users values('${admin}');insert into tamaku_superadmins(user_id) values('${admin}');
+    grant select on tamaku_suscripciones to authenticated;
+    alter table tiendas enable row level security;
+    drop policy if exists "Superadmin consulta tiendas" on tiendas;
+    create policy propietario_lectura on tiendas for select to authenticated using(user_id=auth.uid());`);
+  await sesion(admin);
+  check((await q('select s.id_tienda,t.nombre from tamaku_suscripciones s left join tiendas t on t.id=s.id_tienda')).every(r=>r.nombre===null),true);
+  await db.exec('reset role');
+  await db.exec(fs.readFileSync('supabase/superadmin_nombres_tiendas.sql','utf8'));
+  await sesion(admin);
+  check((await q('select s.id_tienda,t.nombre from tamaku_suscripciones s left join tiendas t on t.id=s.id_tienda')).every(r=>Boolean(r.nombre)),true);
+  await sesion(V);
+  check((await q('select nombre from tiendas')).map(r=>r.nombre),['Ajena']);
+  await db.exec(`reset role;update tamaku_superadmins set activo=false where user_id='${admin}';`);
+  await sesion(admin);
+  check((await q('select nombre from tiendas')).length,0);
   console.log(`${comprobaciones} comprobaciones SQL satisfactorias; base efímera cerrada.`);
 } finally { await db.close(); }

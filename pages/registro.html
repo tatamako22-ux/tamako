@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<script src="../assets/js/core/registration-route.js?v=1"></script>
 <title>TAMAKU | Crea tu tienda</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
@@ -614,22 +615,23 @@ form {
 <script src="../assets/js/core/legal-consent.js?v=1" defer></script>
 <link rel="icon" type="image/svg+xml" href="../assets/images/tamaku-symbol.svg">
 <link rel="stylesheet" href="../assets/css/brand-logo.css?v=1">
+<link rel="stylesheet" href="../assets/css/public-nav.css?v=1">
+<script src="../assets/js/public-nav.js?v=1" defer></script>
 </head>
 <body class="registration-v2">
 
 <div class="background"></div>
 <div class="frame"></div>
 <!-- NAVBAR TAMAKO -->
-<nav>
-    <div class="logo"><img class="tamaku-logo-image" src="../assets/images/tamaku-logo.svg" alt="TAMAKU. Impulsa. Conecta. Crece." width="1360" height="310"></div>
-
-    <div class="nav-links" id="navLinks">
-        <a href="../index.html">Inicio</a>
-        <a href="servicios.html">Servicios</a>
-        <a href="../index.html?login=true" class="btn-login">Iniciar sesión</a>
+<nav id="tamakuPublicNav" aria-label="Navegación principal">
+    <a class="logo" href="../index.html#inicio" aria-label="TAMAKU, ir al inicio"><img src="../assets/images/tamaku-logo.svg" alt="TAMAKU. Impulsa. Conecta. Crece." width="1360" height="310"></a>
+    <button class="menu-toggle" type="button" aria-controls="tamakuPublicLinks" aria-expanded="false" aria-label="Abrir menú">☰</button>
+    <div class="nav-links" id="tamakuPublicLinks">
+      <a href="../index.html#inicio">Inicio</a><a href="../index.html#beneficios">Beneficios</a><a href="../index.html#quienes">Nosotros</a><a href="../index.html#soluciones">Soluciones</a>
+      <a href="servicios.html#planes">Planes</a>
+      <a href="../index.html?login=true" class="btn-login">Iniciar sesión</a><a href="servicios.html#planes" class="public-create">Crear tienda</a>
     </div>
-
-</nav>
+  </nav>
 <div class="layout">
 
     <div class="branding">
@@ -649,6 +651,7 @@ form {
         <span class="form-eyebrow">COMIENZA AHORA</span>
         <h1 class="form-title">CREA TU TIENDA</h1>
         <p style="grid-column:span 2; margin-bottom:20px;">Prueba TAMAKU gratis durante 7 días. No necesitas tarjeta.</p>
+        <div id="registrationPlanSummary"><small>TU ELECCIÓN</small><strong id="registrationPlanName">Plan seleccionado</strong><span id="registrationPlanNote">Prueba Diamante durante 7 días, sin tarjeta.</span><a href="servicios.html#planes">Cambiar de plan</a></div>
 
         <div class="form-group">
             <label for="nombre_tienda">Nombre del negocio</label>
@@ -1126,7 +1129,7 @@ document.getElementById("resendOtp").addEventListener("click", async function(){
             type: "signup",
             email,
             options: {
-                emailRedirectTo: `${window.location.origin}/pages/registro.html`
+                emailRedirectTo: `${window.location.origin}/pages/registro.html?plan=${planSeleccionado.toLowerCase()}`
             }
         });
 

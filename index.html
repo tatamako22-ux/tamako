@@ -1453,27 +1453,23 @@ html{
 <link rel="icon" type="image/svg+xml" href="assets/images/tamaku-symbol.svg">
 <link rel="stylesheet" href="assets/css/brand-logo.css?v=1">
 <link rel="stylesheet" href="assets/css/whatsapp-contact.css?v=2">
+<link rel="stylesheet" href="assets/css/public-nav.css?v=1">
+<script src="assets/js/public-nav.js?v=1" defer></script>
 </head>
 
 <body id="top" class="landing-v2">
 <div class="stars"></div>
 <div class="background"></div>
 
-<nav>
-    <div class="logo">
-        <img class="logo-wordmark" src="assets/images/tamaku-logo.svg" alt="TAMAKU. Impulsa. Conecta. Crece." width="1360" height="310">
-</div>
-    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-    <div class="nav-links">
-    <div class="gold-line"></div>
-    <a href="#inicio">Inicio</a>
-    <a href="#beneficios">Beneficios</a>
-    <a href="#quienes">Nosotros</a>
-    <a href="#soluciones">Soluciones</a>
-    <a href="#planes">Planes</a>
-    <a href="javascript:void(0)" class="btn-login" onclick="abrirLoginConLimpiador()">Iniciar sesión</a>
-</div>
-</nav>
+<nav id="tamakuPublicNav" aria-label="Navegación principal">
+    <a class="logo" href="#inicio" aria-label="TAMAKU, ir al inicio"><img src="assets/images/tamaku-logo.svg" alt="TAMAKU. Impulsa. Conecta. Crece." width="1360" height="310"></a>
+    <button class="menu-toggle" type="button" aria-controls="tamakuPublicLinks" aria-expanded="false" aria-label="Abrir menú">☰</button>
+    <div class="nav-links" id="tamakuPublicLinks">
+      <a href="#inicio">Inicio</a><a href="#beneficios">Beneficios</a><a href="#quienes">Nosotros</a><a href="#soluciones">Soluciones</a>
+      <a href="pages/servicios.html#planes">Planes</a>
+      <a href="?login=true" class="btn-login">Iniciar sesión</a><a href="pages/servicios.html#planes" class="public-create">Crear tienda</a>
+    </div>
+  </nav>
 <section id="inicio" class="hero">
 <div class="hero-container">
 
@@ -1490,7 +1486,7 @@ html{
             </p>
 
             <div class="hero-buttons">
-                <a href="pages/registro.html" class="btn-primary">Probar 7 días gratis</a>
+                <a href="pages/servicios.html#planes" class="btn-primary">Probar 7 días gratis</a>
                 <a href="#producto" class="btn-secondary">Conocer la plataforma</a>
                 <a href="output/pdf/portafolio-comercial-tamaku.pdf" class="btn-portfolio" download="Portafolio-Comercial-TAMAKU.pdf" aria-label="Descargar portafolio comercial de TAMAKU en PDF">
                     <span class="download-mark" aria-hidden="true">&#8595;</span>
@@ -1631,7 +1627,7 @@ html{
         <span>DE LA CITA AL CIERRE</span>
         <h2>Tu operación conectada de principio a fin</h2>
         <p>Menos tareas repetidas, menos información dispersa y más claridad para tomar decisiones todos los días.</p>
-        <a href="pages/registro.html" class="text-link">Comenzar prueba gratuita <b>→</b></a>
+        <a href="pages/servicios.html#planes" class="text-link">Comenzar prueba gratuita <b>→</b></a>
     </div>
     <div class="workflow-list">
         <div><i>1</i><span><strong>Recibe reservas</strong><small>Comparte tu enlace y permite que tus clientes agenden.</small></span></div>
@@ -1645,13 +1641,13 @@ html{
     <span>EMPIEZA HOY</span>
     <h2>Tu negocio merece una gestión a su nivel.</h2>
     <p>Crea tu tienda, configura tu equipo y comienza a organizar tu operación con TAMAKU.</p>
-    <div><a href="pages/registro.html" class="btn-primary">Probar TAMAKU gratis</a><button type="button" onclick="abrirLoginConLimpiador()">Ya tengo una cuenta</button></div>
+    <div><a href="pages/servicios.html#planes" class="btn-primary">Probar TAMAKU gratis</a><button type="button" onclick="abrirLoginConLimpiador()">Ya tengo una cuenta</button></div>
 </section>
 
 <footer class="landing-footer">
     <div class="logo"><img class="footer-emblem" src="assets/images/tamaku-logo.svg" alt="TAMAKU - Impulsa. Conecta. Crece." width="1360" height="310"></div>
     <p>Plataforma de gestión para negocios de belleza.</p>
-    <div><a href="#inicio">Inicio</a><a href="#beneficios">Beneficios</a><a href="#planes">Planes</a><a href="pages/registro.html">Prueba gratuita</a><a href="pages/politica-datos.html">Política de datos</a><a href="pages/terminos.html">Términos</a></div>
+    <div><a href="#inicio">Inicio</a><a href="#beneficios">Beneficios</a><a href="#planes">Planes</a><a href="pages/servicios.html#planes">Prueba gratuita</a><a href="pages/politica-datos.html">Política de datos</a><a href="pages/terminos.html">Términos</a></div>
 </footer>
 <div id="loginModal" class="modal-overlay">
     <div class="modal-content">
@@ -1691,7 +1687,7 @@ html{
                     </a>
                 </p>
         <button id="btnAcceder" class="btn-acceder-premium" onclick="intentarLogin()">ACCEDER</button>
-        <p class="login-register">¿Aún no tienes tienda? <a href="pages/registro.html">Comienza gratis</a></p>
+        <p class="login-register">¿Aún no tienes tienda? <a href="pages/servicios.html#planes">Comienza gratis</a></p>
     </div>
 </div>
 <script>
@@ -2245,7 +2241,7 @@ function cerrarResetModal() {
     if(modal) modal.remove();
 }
     function abrirRegistro() {
-        window.location.href = "pages/registro.html";
+        window.location.href = "pages/servicios.html#planes";
     }
 
     function verDemo() {

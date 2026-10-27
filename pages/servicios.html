@@ -1156,27 +1156,26 @@ html{
 <script src="../assets/js/core/notifications.js?v=2"></script>
 <link rel="icon" type="image/svg+xml" href="../assets/images/tamaku-symbol.svg">
 <link rel="stylesheet" href="../assets/css/brand-logo.css?v=1">
+<link rel="stylesheet" href="../assets/css/public-nav.css?v=1">
+<script src="../assets/js/public-nav.js?v=1" defer></script>
+<link rel="stylesheet" href="../assets/css/marketing-qr.css?v=1">
+<script src="../assets/js/vendor/qrcode.min.js" defer></script>
+<script src="../assets/js/marketing-qr.js?v=1" defer></script>
 </head>
 
 <body class="services-v2">
-<nav>
-    <div class="logo"><img class="tamaku-logo-image" src="../assets/images/tamaku-logo.svg" alt="TAMAKU. Impulsa. Conecta. Crece." width="1360" height="310"></div>
-    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-
-    <div class="nav-links">
-        <div class="gold-line"></div>
-
-        <a href="../index.html#top">Inicio</a>
-        <a href="../index.html#beneficios">Beneficios</a>
-        <a href="../index.html#soluciones">Soluciones</a>
-        <a href="servicios.html">Servicios</a>
-
-        <a href="../index.html?login=true" class="btn-login">Iniciar sesión</a>
+<nav id="tamakuPublicNav" aria-label="Navegación principal">
+    <a class="logo" href="../index.html#inicio" aria-label="TAMAKU, ir al inicio"><img src="../assets/images/tamaku-logo.svg" alt="TAMAKU. Impulsa. Conecta. Crece." width="1360" height="310"></a>
+    <button class="menu-toggle" type="button" aria-controls="tamakuPublicLinks" aria-expanded="false" aria-label="Abrir menú">☰</button>
+    <div class="nav-links" id="tamakuPublicLinks">
+      <a href="../index.html#inicio">Inicio</a><a href="../index.html#beneficios">Beneficios</a><a href="../index.html#quienes">Nosotros</a><a href="../index.html#soluciones">Soluciones</a>
+      <a href="servicios.html#planes" aria-current="page">Planes</a>
+      <a href="../index.html?login=true" class="btn-login">Iniciar sesión</a><a href="servicios.html#planes" class="public-create">Crear tienda</a>
     </div>
-</nav> 
+  </nav>
 <div class="stars"></div>    
 <div class="background"></div>
-<section id="beneficios" class="content-section">
+<section id="planes" class="content-section"><span id="beneficios" aria-hidden="true"></span>
     <span class="services-eyebrow">PLANES TAMAKU</span>
     <h2 class="cinzel-title">Planes diseñados para crecer contigo</h2>
     <div class="gold-line-small"></div>
@@ -1237,8 +1236,13 @@ html{
     <span>PRUEBA SIN COMPROMISO</span>
     <h2>Empieza a organizar tu negocio hoy.</h2>
     <p>Configura tu tienda, agrega tus profesionales y centraliza la operación durante 7 días sin tarjeta.</p>
-    <a href="registro.html?plan=prueba">Crear mi tienda gratis</a>
+    <a href="#planes">Elegir mi plan y comenzar</a>
 </section>
+<details id="qr-comercial" class="commercial-qr">
+  <summary><span><small>COMPARTE TAMAKU</small><strong>Tu próximo cliente puede estar a un escaneo.</strong></span><span class="commercial-qr-open">Crear QR y volante <b aria-hidden="true">＋</b></span></summary>
+  <div class="commercial-qr-body"><div><span class="commercial-qr-kicker">DEL PAPEL A TU NEGOCIO DIGITAL</span><h2>Un QR.<br>El recorrido completo.</h2><p>Escanea, conoce los planes y elige cómo comenzar. Descarga el QR para incluirlo en tus tarjetas o usa el volante con la identidad de TAMAKU.</p><ol><li>Escanear el QR</li><li>Conocer y elegir un plan</li><li>Crear la tienda y comenzar la prueba</li></ol><p class="commercial-qr-link">Destino: tamaku.co/pages/servicios.html → Planes</p></div>
+  <div class="commercial-qr-download"><div id="commercialQrPreview" class="commercial-qr-preview"></div><div id="commercialQrSource" hidden></div><strong>Escanea y conoce nuestros planes</strong><div class="commercial-qr-actions"><button type="button" data-qr-download="png">QR en PNG</button><button type="button" data-qr-download="svg">QR vectorial SVG</button><button type="button" data-qr-download="flyer">Descargar volante PNG</button></div><p>QR negro sobre blanco, con margen para impresión. Mantén el contraste y prueba un ejemplar impreso antes de producir tus tarjetas.</p><p id="commercialQrStatus" role="status" aria-live="polite"></p></div></div>
+</details>
 <div id="loginModal" class="modal-overlay">
     <div class="modal-content">
     <span class="close-btn" onclick="cerrarLogin()">&times;</span>

@@ -1,5 +1,5 @@
 // Cambiamos la versión de la caché para forzar la actualización en los celulares
-const CACHE_NAME = "tamaku-v37-cierre-sesion";
+const CACHE_NAME = "tamaku-v38-recorrido-comercial";
 
 const urlsToCache = [
   "/",

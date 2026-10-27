@@ -6,9 +6,24 @@ window.toggleQR = (show) => {
   const modal = document.getElementById("modalQR");
   if (modal) modal.style.display = show ? "flex" : "none";
 };
+let focoAntesDeSalir;
+let scrollAntesDeSalir;
 window.toggleLogout = (show) => {
   const modal = document.getElementById("modalLogout");
-  if (modal) modal.style.display = show ? "flex" : "none";
+  if (!modal) return;
+  if (show && modal.style.display !== "flex") {
+    focoAntesDeSalir = document.activeElement;
+    scrollAntesDeSalir = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    modal.style.display = "flex";
+    modal.setAttribute("aria-hidden", "false");
+    modal.querySelector(".menu-logout-cancel")?.focus();
+  } else if (!show && modal.style.display === "flex") {
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = scrollAntesDeSalir || "";
+    if (focoAntesDeSalir?.isConnected) focoAntesDeSalir.focus();
+  }
 };
 window.toggleMobileMore = (show) => {
   document.getElementById("mobileMoreMenu")?.classList.toggle("is-visible", show);
@@ -225,9 +240,26 @@ function crearModalLogoutGlobal() {
   const modal = document.createElement("div");
   modal.id = "modalLogout";
   modal.className = "menu-logout-overlay";
-  modal.innerHTML = `<div class="menu-logout-card" role="dialog" aria-modal="true" aria-labelledby="menuLogoutTitulo"><div class="menu-logout-icon"><i class="fa-solid fa-power-off"></i></div><h2 id="menuLogoutTitulo">¿Cerrar sesión?</h2><p>Deberás ingresar nuevamente para administrar tu negocio.</p><div class="menu-logout-actions"><button type="button" class="menu-logout-confirm" onclick="cerrarSesion()">Sí, salir</button><button type="button" class="menu-logout-cancel" onclick="toggleLogout(false)">Cancelar</button></div></div>`;
+  modal.setAttribute("aria-hidden", "true");
+  modal.innerHTML = `<div class="menu-logout-card" role="dialog" aria-modal="true" aria-labelledby="menuLogoutTitulo" aria-describedby="menuLogoutDescripcion">
+    <button class="menu-logout-close" type="button" onclick="toggleLogout(false)" aria-label="Cancelar y cerrar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    <div class="menu-logout-visual" aria-hidden="true"><span class="menu-logout-orbit"></span><div class="menu-logout-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v9M6.3 5.8a8 8 0 1 0 11.4 0"/></svg></div><span class="menu-logout-spark"></span></div>
+    <span class="menu-logout-eyebrow">UNA PAUSA, NOS VEMOS PRONTO</span>
+    <h2 id="menuLogoutTitulo">¿Cerrar sesión?</h2>
+    <p id="menuLogoutDescripcion">Para volver a tu negocio, solo tendrás que ingresar nuevamente con tu cuenta.</p>
+    <div class="menu-logout-actions"><button type="button" class="menu-logout-confirm" onclick="cerrarSesion()"><span>Sí, cerrar sesión</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h-8v16h8M12 12h9m-4-4 4 4-4 4"/></svg></button><button type="button" class="menu-logout-cancel" onclick="toggleLogout(false)">Seguir trabajando</button></div>
+    <div class="menu-logout-signature"><span></span>TAMAKU<span></span></div>
+  </div>`;
   modal.addEventListener("click", (event) => {
     if (event.target === modal) window.toggleLogout(false);
+  });
+  modal.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") { event.preventDefault(); window.toggleLogout(false); return; }
+    if (event.key !== "Tab") return;
+    const botones = [...modal.querySelectorAll("button:not(:disabled)")];
+    const primero = botones[0], ultimo = botones[botones.length - 1];
+    if (event.shiftKey && document.activeElement === primero) { event.preventDefault(); ultimo.focus(); }
+    else if (!event.shiftKey && document.activeElement === ultimo) { event.preventDefault(); primero.focus(); }
   });
   document.body.appendChild(modal);
 }

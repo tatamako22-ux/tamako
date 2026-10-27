@@ -817,6 +817,33 @@
   background: transparent;
   border: 1px solid #444;
 }
+/* Confirmación de salida: identidad propia y contraste en ambos temas. */
+#modalLogout.menu-logout-overlay{padding:22px;background:rgba(5,7,9,.76);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font-family:Montserrat,sans-serif}
+#modalLogout .menu-logout-card{position:relative;isolation:isolate;width:min(440px,100%);max-height:calc(100dvh - 44px);overflow:auto;padding:38px 32px 24px;border:1px solid rgba(224,191,118,.23);border-radius:28px;background:radial-gradient(ellipse at 50% 0,rgba(215,173,85,.1),transparent 55%),linear-gradient(155deg,#171817,#0e1011 70%);color:#f7f5ef;box-shadow:0 35px 100px #0009,0 0 0 1px #ffffff03;animation:tamakuLogoutEnter .28s cubic-bezier(.2,.8,.2,1) both}
+#modalLogout .menu-logout-close{position:absolute;top:15px;right:15px;display:grid;place-items:center;width:32px;height:32px;padding:0;color:#92938e;background:#ffffff04;border:1px solid #ffffff0b;border-radius:10px;cursor:pointer;transition:background .18s,color .18s}
+#modalLogout .menu-logout-close:hover{color:#fff;background:#ffffff0d}
+#modalLogout .menu-logout-visual{position:relative;display:grid;place-items:center;width:112px;height:112px;margin:0 auto 24px}
+#modalLogout .menu-logout-orbit{position:absolute;inset:0;border:1px solid #dfbc6f1f;border-radius:50%;background:radial-gradient(circle,#d5ae4b07,transparent 70%)}
+#modalLogout .menu-logout-orbit::after{content:"";position:absolute;inset:11px;border:1px dashed #dfbc6f20;border-radius:50%}
+#modalLogout .menu-logout-icon{position:relative;width:72px;height:72px;margin:0;display:grid;place-items:center;border:1px solid #dfbc6f44;border-radius:23px;color:#ebc77b;background:linear-gradient(145deg,#d4aa4c20,#d4aa4c07);box-shadow:inset 0 1px #ffffff0a,0 12px 25px #0003;font-size:24px}
+#modalLogout .menu-logout-spark{position:absolute;right:7px;top:20px;width:8px;height:8px;border:2px solid #151614;border-radius:50%;background:#ddbd79;box-shadow:0 0 14px #ddbd7933}
+#modalLogout .menu-logout-eyebrow{display:block;margin-bottom:12px;color:#bca26c;font:700 9px/1.6 Montserrat,sans-serif;letter-spacing:1.8px}
+#modalLogout .menu-logout-card h2{margin:0 0 14px;color:#faf7f0!important;font:700 clamp(24px,5vw,30px)/1.2 Montserrat,sans-serif;letter-spacing:-.8px;text-shadow:none!important;text-transform:none}
+#modalLogout .menu-logout-card p{max-width:320px;margin:0 auto 28px;color:#b1b1ac!important;font:400 13px/1.8 Montserrat,sans-serif}
+#modalLogout .menu-logout-actions{display:grid;gap:10px}
+#modalLogout .menu-logout-actions button{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:49px;padding:13px 18px;border-radius:13px;font:600 12px/1.4 Montserrat,sans-serif;letter-spacing:0;text-transform:none;transition:transform .18s,background .18s,box-shadow .18s;cursor:pointer}
+#modalLogout .menu-logout-actions .menu-logout-confirm{color:#fff!important;background:linear-gradient(110deg,#ed6c60,#d84a44);border:1px solid #f58b7c44;box-shadow:0 7px 22px #d44e4120}
+#modalLogout .menu-logout-confirm:hover{transform:translateY(-1px);box-shadow:0 10px 28px #d44e4135;filter:brightness(1.05)}
+#modalLogout .menu-logout-actions .menu-logout-cancel{color:#dedbd2!important;background:#ffffff04;border:1px solid #ffffff1a}
+#modalLogout .menu-logout-cancel:hover{background:#ffffff09;border-color:#d4aa4c55}
+#modalLogout button:focus-visible{outline:2px solid #efd395;outline-offset:4px}
+#modalLogout .menu-logout-signature{display:flex;align-items:center;justify-content:center;gap:12px;margin:24px auto 0;color:#82775e;font:600 9px/1.5 Montserrat,sans-serif;letter-spacing:3px}
+#modalLogout .menu-logout-signature span{width:25px;height:1px;background:linear-gradient(90deg,transparent,#aa8a464d)}
+#modalLogout .menu-logout-signature span:last-child{transform:rotate(180deg)}
+@keyframes tamakuLogoutEnter{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:480px){#modalLogout.menu-logout-overlay{padding:16px}#modalLogout .menu-logout-card{padding:34px 24px 22px;border-radius:24px;max-height:calc(100dvh - 32px)}#modalLogout .menu-logout-visual{width:98px;height:98px;margin-bottom:20px}#modalLogout .menu-logout-eyebrow{font-size:8px;letter-spacing:1.5px}#modalLogout .menu-logout-card p{font-size:12px}}
+@media(prefers-reduced-motion:reduce){#modalLogout .menu-logout-card{animation:none}#modalLogout button{transition:none!important}}
+
 /* Alertas globales de cancelaciones */
 .tamaku-cancellation-bell {
   position: fixed; right: 22px; bottom: 24px; z-index: 1450;

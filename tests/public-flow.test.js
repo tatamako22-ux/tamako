@@ -35,8 +35,9 @@ test('QR comercial real se decodifica a planes en producción con margen de impr
   const contexto=vm.createContext({document,navigator:{userAgent:'Node'},location:{hash:''},URL,Blob,setTimeout,console});
   vm.runInContext(fs.readFileSync('assets/js/vendor/qrcode.min.js','utf8'),contexto);
   vm.runInContext(fs.readFileSync('assets/js/marketing-qr.js','utf8'),contexto);
-  const seccion=document.getElementById('qr-comercial');seccion.open=true;
-  const {window}=parseHTML('<html></html>');seccion.dispatchEvent(new window.Event('toggle'));
+  const seccion=document.getElementById('qr-comercial');assert.equal(seccion.tagName,'SECTION');
+  const html=fs.readFileSync('pages/servicios.html','utf8');assert.ok(html.indexOf('id="qr-comercial"')<html.indexOf('id="planes"'));
+  const boton=document.getElementById('commercialQrMotion');boton.click();assert.equal(boton.getAttribute('aria-pressed'),'true');assert.ok(seccion.classList.contains('is-motion-paused'));
   const svg=document.querySelector('#commercialQrPreview svg');assert.ok(svg);
   const lado=Number(svg.getAttribute('viewBox').split(' ')[2]),escala=10,ancho=lado*escala;
   const pixels=new Uint8ClampedArray(ancho*ancho*4).fill(255);

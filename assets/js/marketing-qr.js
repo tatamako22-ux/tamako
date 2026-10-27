@@ -44,7 +44,11 @@
       estado.textContent='Archivo listo. El QR abre los planes de TAMAKU antes del registro.';
     }catch(error){estado.textContent=error.message;}finally{botones.forEach(b=>b.disabled=false);}
   }
-  seccion.addEventListener('toggle',()=>{if(seccion.open)try{generar();}catch(error){estado.textContent=error.message;}});
+  document.getElementById('commercialQrMotion')?.addEventListener('click', event => {
+    const pausado=seccion.classList.toggle('is-motion-paused');
+    event.currentTarget.setAttribute('aria-pressed',String(pausado));
+    event.currentTarget.textContent=pausado?'Activar animación':'Pausar animación';
+  });
   seccion.querySelectorAll('[data-qr-download]').forEach(b=>b.addEventListener('click',()=>descargar(b.dataset.qrDownload)));
-  if(location.hash==='#qr-comercial'){seccion.open=true;try{generar();}catch(error){estado.textContent=error.message;}}
+  try{generar();}catch(error){estado.textContent=error.message;}
 })();

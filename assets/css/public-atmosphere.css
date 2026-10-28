@@ -1,0 +1,14 @@
+/* Atmósfera compartida de Inicio, Planes y Registro. Solo presentación. */
+body:is(.landing-v2,.services-v2,.registration-v2){isolation:isolate;background:#07090a;color:#f2f1eb}
+body:is(.landing-v2,.services-v2,.registration-v2)::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background-image:radial-gradient(ellipse at 12% 20%,rgba(191,149,63,.15),transparent 44%),radial-gradient(ellipse at 88% 76%,rgba(191,149,63,.09),transparent 43%),radial-gradient(rgba(221,184,101,.12) .8px,transparent 1px);background-size:auto,auto,60px 60px;background-position:center,center,15px 15px;opacity:1}
+body:is(.landing-v2,.services-v2,.registration-v2)::after{content:"";position:fixed;inset:-15% -35%;width:auto;height:auto;z-index:-1;pointer-events:none;background:linear-gradient(115deg,transparent 25%,rgba(214,171,74,.025) 40%,rgba(222,185,104,.075) 48%,rgba(214,171,74,.02) 55%,transparent 69%);opacity:.65;transform:translateX(-25%);animation:tamakuPublicLight 16s ease-in-out infinite;will-change:transform}
+body:is(.landing-v2,.services-v2,.registration-v2)>.background,body:is(.landing-v2,.services-v2,.registration-v2)>.stars,body.registration-v2>.frame{display:none}
+body.landing-v2 .hero{background:radial-gradient(ellipse at 75% 40%,rgba(191,149,63,.035),transparent 60%),transparent}
+body.landing-v2 :is(.content-section,.sales-section,.workflow-section,.landing-plans,.landing-about,.landing-businesses){background-color:transparent}
+body.services-v2 #planes{background:transparent}
+body:is(.landing-v2,.services-v2,.registration-v2) #tamakuPublicNav{background:rgba(7,9,10,.94)}
+body.landing-v2 :is(.plan-card,.benefit-card,.business-grid article),body.registration-v2 .register-card{border-color:rgba(218,184,112,.15);box-shadow:0 16px 50px rgba(0,0,0,.13)}
+body.landing-v2 :is(.plan-card,.benefit-card,.business-grid article):hover,body.services-v2 #planes .benefit-card:hover{border-color:rgba(224,192,128,.48);box-shadow:0 10px 35px rgba(191,149,63,.07)}
+@keyframes tamakuPublicLight{0%,100%{transform:translateX(-25%);opacity:.3}50%{transform:translateX(25%);opacity:.72}}
+@media(max-width:760px){body:is(.landing-v2,.services-v2,.registration-v2)::before{background-size:auto,auto,48px 48px;opacity:.85}body:is(.landing-v2,.services-v2,.registration-v2)::after{animation-duration:22s;opacity:.45}}
+@media(prefers-reduced-motion:reduce){body:is(.landing-v2,.services-v2,.registration-v2)::after{animation:none;transform:none;opacity:.35;will-change:auto}}

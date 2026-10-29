@@ -50,4 +50,3 @@ foreach ($size in @(192, 512)) {
     $graphics.Dispose()
     $bitmap.Dispose()
 }
-

@@ -1,39 +1,5 @@
 import { horaToMin, minToHora, normalizarHora } from "../utils/agenda.utils.js";
-// 📅 Obtener horario según el día seleccionado
-function obtenerHorarioDelDia(barbero, fecha = new Date()) {
-  if (!barbero.horario_semanal) {
-    return {
-      inicio: barbero.horario_inicio || "08:00",
-      fin: barbero.horario_fin || "20:00",
-    };
-  }
-
-  const dias = [
-    "domingo",
-    "lunes",
-    "martes",
-    "miércoles",
-    "jueves",
-    "viernes",
-    "sábado",
-  ];
-
-  const diaActual = dias[fecha.getDay()];
-
-  const horario = barbero.horario_semanal[diaActual];
-
-  if (horario && horario.activo) {
-    return {
-      inicio: horario.inicio,
-      fin: horario.fin,
-    };
-  }
-
-  return {
-    inicio: barbero.horario_inicio || "08:00",
-    fin: barbero.horario_fin || "20:00",
-  };
-}
+import { obtenerHorarioDelDia } from "../utils/agenda.horario.js";
 
 function normalizarTexto(valor = "") {
   return String(valor).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();

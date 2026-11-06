@@ -1,3 +1,4 @@
+import { obtenerHorarioDelDia } from "../utils/agenda.horario.js";
 import { createLatestLoader } from "../../core/latest-load.js";
 import {
   agendaState,
@@ -356,27 +357,7 @@ export function iniciarAgenda({
     const duracionServicio =
       parseInt(opcionSel?.getAttribute("data-duracion"), 10) || duracionBloque;
 
-    const horarioDia = profesional
-      ? (() => {
-          const dias = [
-            "domingo",
-            "lunes",
-            "martes",
-            "miÃ©rcoles",
-            "jueves",
-            "viernes",
-            "sÃ¡bado",
-          ];
-          const indiceDia = getState("fechaSeleccionada").getDay();
-          const horario = profesional.horario_semanal?.[dias[indiceDia]];
-          return horario?.activo
-            ? horario
-            : {
-                inicio: profesional.horario_inicio || "08:00",
-                fin: profesional.horario_fin || "20:00",
-              };
-        })()
-      : { inicio: "00:00", fin: "24:00" };
+    const horarioDia = obtenerHorarioDelDia(profesional, getState("fechaSeleccionada"));
     console.group("=== RESERVA ===");
 
     console.log("Hora inicio:", reserva.horaInicio);

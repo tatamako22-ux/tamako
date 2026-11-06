@@ -4,9 +4,9 @@ import { requireTiendaInfo } from "../../core/session.js";
 
 import { calcularCita } from "./agenda.engine.js";
 
-import { renderSkeleton, renderizarAgenda } from "../ui/agenda.renderer.js?v=7";
+import { renderSkeleton, renderizarAgenda } from "../ui/agenda.renderer.js?v=horario1";
 
-import { iniciarAgenda } from "./agenda.controller.js?v=notices2";
+import { iniciarAgenda } from "./agenda.controller.js?v=horario1";
 
 // 🚀 BOOTSTRAP APP
 export async function iniciarAppAgenda() {

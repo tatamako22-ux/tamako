@@ -62,7 +62,14 @@ function opcionesProfesionales(seleccionado = "") {
   ).join("");
 }
 
+function puedeCrearUsuario() {
+  const limite = Number(tienda.suscripcion?.limite_usuarios);
+  const activos = new Set([tienda.user_id, ...perfiles.filter(p => p.activo === true).map(p => p.user_id)].filter(Boolean)).size;
+  return Number.isFinite(limite) && limite > activos;
+}
+
 function abrirModal(perfil = null) {
+  if (!perfil && !puedeCrearUsuario()) return avisar("Tu plan no tiene cupos disponibles para otro usuario.", "warning");
   $("#userForm").reset();
   $("#profileId").value = perfil?.id || "";
   $("#userModalTitle").textContent = perfil ? "Editar acceso" : "Nuevo usuario";
@@ -87,10 +94,25 @@ function cerrarModal() {
 }
 
 function renderUsuarios() {
+  if ($("#btnNuevoUsuario")) $("#btnNuevoUsuario").hidden = !puedeCrearUsuario();
   const filtro = $("#usersSearch").value.trim().toLowerCase();
-  const lista = perfiles.filter((perfil) => [perfil.nombre, perfil.email, perfil.rol, perfil.profesionales?.nombre_empleado].filter(Boolean).join(" ").toLowerCase().includes(filtro));
-  $("#usersCount").textContent = perfiles.length;
-  $("#usersDetail").textContent = perfiles.length ? `${perfiles.filter((p) => p.activo).length} accesos activos` : "Sin accesos creados";
+  const perfilPropietario = perfiles.find((perfil) => perfil.user_id === tienda.user_id);
+  const propietario = {
+    ...perfilPropietario,
+    id: "propietario",
+    nombre: tienda.propietario || perfilPropietario?.nombre || "Propietario",
+    email: tienda.email || perfilPropietario?.email || "",
+    rol: "PROPIETARIO",
+    activo: true,
+    es_propietario: true,
+    profesionales: null,
+  };
+  const usuarios = [propietario, ...perfiles.filter((perfil) => perfil.user_id !== tienda.user_id)];
+  const activos = new Set([tienda.user_id, ...perfiles.filter((perfil) => perfil.activo === true).map((perfil) => perfil.user_id)].filter(Boolean)).size;
+  const total = new Set([tienda.user_id, ...perfiles.map((perfil) => perfil.user_id)].filter(Boolean)).size;
+  const lista = usuarios.filter((perfil) => [perfil.nombre, perfil.email, perfil.rol, perfil.profesionales?.nombre_empleado].filter(Boolean).join(" ").toLowerCase().includes(filtro));
+  $("#usersCount").textContent = total;
+  $("#usersDetail").textContent = `${activos} accesos activos, incluido el propietario`;
   if (!lista.length) {
     $("#usersList").innerHTML = `<div class="users-empty"><i class="fa-solid fa-user-shield"></i><p>${filtro ? "No encontramos coincidencias." : "Aún no has creado accesos para tu equipo."}</p></div>`;
     return;
@@ -98,9 +120,9 @@ function renderUsuarios() {
   $("#usersList").innerHTML = lista.map((perfil) => `
     <article class="user-card" data-id="${perfil.id}">
       <div class="user-identity"><span class="user-avatar">${perfil.profesionales?.foto_url ? `<img src="${escapar(perfil.profesionales.foto_url)}" alt="${escapar(perfil.profesionales.nombre_empleado || perfil.nombre)}" loading="lazy" decoding="async">` : escapar((perfil.nombre || "U").slice(0, 1).toUpperCase())}</span><div><strong>${escapar(perfil.nombre || "Usuario")}</strong><span>${escapar(perfil.email || "Sin correo")}</span><small>Creado ${perfil.created_at ? new Date(perfil.created_at).toLocaleDateString("es-CO") : "sin fecha"}</small></div></div>
-      <div class="user-meta"><strong>${escapar(perfil.rol)}</strong><span>${escapar(perfil.profesionales?.nombre_empleado || "Sin profesional vinculado")}</span></div>
+      <div class="user-meta"><strong>${escapar(perfil.rol)}</strong><span>${escapar(perfil.es_propietario ? "Acceso total protegido" : (perfil.profesionales?.nombre_empleado || "Sin profesional vinculado"))}</span></div>
       <div class="user-state ${perfil.activo ? "active" : ""}"><span class="state-dot"></span>${perfil.activo ? "Activo" : "Inactivo"}</div>
-      <div class="user-actions"><button class="icon-button edit-user" type="button" title="Editar permisos"><i class="fa-solid fa-sliders"></i></button><button class="icon-button toggle-user" type="button" title="${perfil.activo ? "Desactivar" : "Activar"}"><i class="fa-solid ${perfil.activo ? "fa-user-lock" : "fa-user-check"}"></i></button></div>
+      <div class="user-actions">${perfil.es_propietario ? `<span class="status-pill active">Principal</span>` : `<button class="icon-button edit-user" type="button" title="Editar permisos"><i class="fa-solid fa-sliders"></i></button><button class="icon-button toggle-user" type="button" title="${perfil.activo ? "Desactivar" : "Activar"}"><i class="fa-solid ${perfil.activo ? "fa-user-lock" : "fa-user-check"}"></i></button><button class="icon-button delete-user" type="button" title="Eliminar usuario" aria-label="Eliminar usuario"><i class="fa-solid fa-trash"></i></button>`}</div>
     </article>`).join("");
 }
 
@@ -113,10 +135,15 @@ async function cargarDatos() {
   if (resultadoProfesionales.error) throw resultadoProfesionales.error;
   perfiles = resultadoPerfiles.data || [];
   profesionales = resultadoProfesionales.data || [];
+  if ($("#ownerAgendaVisible")) {
+    const { data, error } = await supabase.from("tamaku_agenda_propietario").select("id_profesional,visible").eq("id_tienda", tienda.id).maybeSingle();
+    if (error) avisar("Para configurar la agenda del propietario falta aplicar la migraci?n de usuarios en Supabase.", "warning");
+    if (data) { $("#ownerAgendaVisible").value = data.visible ? "si" : "no"; }
+  }
   renderUsuarios();
 }
 
-async function guardarUsuarioAuth(payload, editar = false) {
+async function guardarUsuarioAuth(payload, editar = false, eliminar = false) {
   const { data: sesion } = await supabase.auth.getSession();
   const token = sesion.session?.access_token;
   if (!token) throw new Error("La sesión expiró.");
@@ -127,7 +154,7 @@ async function guardarUsuarioAuth(payload, editar = false) {
   let response;
   try {
     response = await fetch(endpoint, {
-      method: editar ? "PATCH" : "POST",
+      method: eliminar ? "DELETE" : editar ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify(payload),
     });
@@ -145,6 +172,7 @@ async function guardarUsuarioAuth(payload, editar = false) {
 async function guardar(event) {
   event.preventDefault();
   const id = $("#profileId").value;
+  if (!id && !puedeCrearUsuario()) return avisar("Tu plan no tiene cupos disponibles.", "warning");
   const datos = { nombre: $("#userName").value.trim(), email: $("#userEmail").value.trim().toLowerCase(), rol: $("#userRole").value, id_profesional: $("#userProfessional").value || null, permisos: obtenerPermisos() };
   if (datos.rol === "EMPLEADO" && !datos.id_profesional) {
     avisar("Debes vincular el empleado con su perfil profesional.", "error");
@@ -169,6 +197,22 @@ async function guardar(event) {
   } finally { boton.disabled = false; }
 }
 
+async function eliminarUsuario(perfil) {
+  if (perfil.user_id === tienda.user_id) return;
+  const confirmado = await window.TamakuUI?.confirm?.({
+    titulo: "?Eliminar usuario de esta tienda?",
+    mensaje: `Se eliminar? el acceso de ${perfil.nombre || perfil.email}. Su profesional, citas e historial se conservan. Para recuperar el acceso tendr?s que volver a vincularlo.`,
+    textoConfirmar: "Eliminar usuario",
+  });
+  if (!confirmado) return;
+  try {
+    const { error } = await supabase.rpc("eliminar_usuario_tienda_tamaku", { p_tienda: tienda.id, p_perfil: perfil.id });
+    if (error) throw error;
+    await cargarDatos();
+    avisar("Usuario eliminado de esta tienda. Su profesional e historial se conservan.");
+  } catch (error) { avisar(error.message || "No se pudo eliminar el usuario.", "error"); }
+}
+
 async function alternar(perfil) {
   const accion = perfil.activo ? "desactivar" : "activar";
   const confirmado = await window.TamakuUI?.confirm?.({ titulo: `¿${accion[0].toUpperCase() + accion.slice(1)} usuario?`, mensaje: `${perfil.nombre} ${perfil.activo ? "dejará de poder iniciar sesión" : "recuperará el acceso"}.`, textoConfirmar: accion[0].toUpperCase() + accion.slice(1) });
@@ -183,6 +227,21 @@ async function iniciar() {
   if (!tienda || !tienePermiso("usuarios_gestionar")) return;
   $("#ownerName").textContent = tienda.propietario || tienda.nombre || "Propietario";
   renderPermisos();
+  if (tienda.sesion?.es_propietario) {
+    $("#ownerAgenda").hidden = false;
+    $("#ownerAgendaSave").onclick = async () => {
+      const boton = $("#ownerAgendaSave"); boton.disabled = true;
+      try {
+        const { error } = await supabase.rpc("configurar_mi_agenda_tamaku", {
+          p_tienda: tienda.id,
+          p_visible: $("#ownerAgendaVisible").value === "si",
+        });
+        if (error) throw error;
+        avisar("Preferencia de agenda guardada. Tu acceso de propietario se conserva.");
+      } catch (error) { avisar(error.message, "error"); }
+      finally { boton.disabled = false; }
+    };
+  }
   $("#btnNuevoUsuario").onclick = () => abrirModal();
   $("#closeUserModal").onclick = cerrarModal;
   $("#cancelUser").onclick = cerrarModal;
@@ -198,6 +257,7 @@ async function iniciar() {
     const card = event.target.closest(".user-card");
     const perfil = perfiles.find((item) => item.id === card?.dataset.id);
     if (!perfil) return;
+    if (event.target.closest(".delete-user")) eliminarUsuario(perfil);
     if (event.target.closest(".edit-user")) abrirModal(perfil);
     if (event.target.closest(".toggle-user")) alternar(perfil);
   };

@@ -264,6 +264,7 @@
     </div>
 
 <script type="module">
+import { filtrarAgendaPropietario } from "../assets/js/core/agenda-propietario.js";
         import { supabase } from "../assets/js/config/supabaseClient.js";
 
     // --- VARIABLES GLOBALES ---
@@ -592,7 +593,7 @@
                 return;
             }
 
-            profesionalesReserva = Array.isArray(pros) ? pros : [];
+            profesionalesReserva = await filtrarAgendaPropietario(Array.isArray(pros) ? pros : [], tiendaId);
             const container = document.getElementById("pro-list");
             container.innerHTML = "";
             if (profesionalesReserva.length > 0) {

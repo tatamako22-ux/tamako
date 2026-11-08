@@ -23,7 +23,7 @@ async function supabaseRequest(url, serviceKey, ruta, opciones = {}) {
 }
 
 export default async function handler(req, res) {
-  if (!["POST", "PATCH"].includes(req.method)) return responder(res, 405, { error: "Método no permitido." });
+  if (!["POST", "PATCH", "DELETE"].includes(req.method)) return responder(res, 405, { error: "Método no permitido." });
 
   const supabaseUrl = process.env.SUPABASE_URL;
   const anonKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY;
@@ -42,15 +42,32 @@ export default async function handler(req, res) {
   const propietario = await usuarioResponse.json();
 
   const { tienda_id, perfil_id, nombre, email, password, rol, id_profesional, permisos = {} } = req.body || {};
-  if (!tienda_id || !nombre?.trim() || !email?.trim()) return responder(res, 400, { error: "Nombre, correo y tienda son obligatorios." });
+  if (req.method !== "DELETE" && (!tienda_id || !nombre?.trim() || !email?.trim())) return responder(res, 400, { error: "Nombre, correo y tienda son obligatorios." });
   if (req.method === "POST" && (!password || password.length < 8)) return responder(res, 400, { error: "La contraseña debe tener mínimo 8 caracteres." });
   if (req.method === "PATCH" && password && password.length < 8) return responder(res, 400, { error: "La nueva contraseña debe tener mínimo 8 caracteres." });
-  if (!["ADMINISTRADOR", "EMPLEADO"].includes(rol)) return responder(res, 400, { error: "El rol seleccionado no es válido." });
+  if (req.method !== "DELETE" && !["ADMINISTRADOR", "EMPLEADO"].includes(rol)) return responder(res, 400, { error: "El rol seleccionado no es válido." });
 
   const tiendaQuery = `/rest/v1/tiendas?select=id&id=eq.${encodeURIComponent(tienda_id)}&user_id=eq.${encodeURIComponent(propietario.id)}`;
   const tiendaResponse = await supabaseRequest(supabaseUrl, serviceKey, tiendaQuery);
   const tiendas = await tiendaResponse.json();
   if (!tiendaResponse.ok || !tiendas.length) return responder(res, 403, { error: "Solo el propietario puede crear usuarios de esta tienda." });
+
+  if (req.method === "DELETE") {
+    if (!tienda_id || !perfil_id) return responder(res, 400, { error: "Indica la tienda y el usuario que deseas eliminar." });
+    const ruta = `/rest/v1/perfiles?id=eq.${encodeURIComponent(perfil_id)}&tienda_id=eq.${encodeURIComponent(tienda_id)}`;
+    const consulta = await supabaseRequest(supabaseUrl, serviceKey, ruta + "&select=id,user_id");
+    const perfiles = await consulta.json();
+    if (!consulta.ok || !perfiles.length) return responder(res, 404, { error: "El acceso no pertenece a esta tienda." });
+    if (perfiles[0].user_id === propietario.id) return responder(res, 403, { error: "No puedes eliminar el acceso del propietario." });
+    // Elimina solo el acceso de esta tienda: conserva Auth y los profesionales.
+    const eliminacion = await supabaseRequest(supabaseUrl, serviceKey, ruta + `&user_id=eq.${encodeURIComponent(perfiles[0].user_id)}`, {
+      method: "DELETE", headers: { Prefer: "return=representation" },
+    });
+    const eliminados = await eliminacion.json();
+    if (!eliminacion.ok) return responder(res, 400, { error: eliminados.message || "No se pudo eliminar el acceso." });
+    if (!eliminados.length) return responder(res, 404, { error: "El acceso ya no existe." });
+    return responder(res, 200, { eliminado: true });
+  }
 
   if (id_profesional) {
     const profesionalQuery = `/rest/v1/profesionales?select=id_barbero&id_barbero=eq.${encodeURIComponent(id_profesional)}&id_tienda=eq.${encodeURIComponent(tienda_id)}`;

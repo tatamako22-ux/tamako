@@ -1,3 +1,4 @@
+import { filtrarAgendaPropietario } from "../core/agenda-propietario.js";
 import { readAllPages } from "../core/read-pages.js";
 import { optionalSummary } from "./performance.service.js";
 import { normalizarTelefono, indexarCitas, citasDelCliente } from "./client-identity.js";
@@ -74,7 +75,7 @@ export async function obtenerBarberos(idTienda, idProfesional = null) {
     return [];
   }
 
-  return data || [];
+  return filtrarAgendaPropietario(data || [], idTienda);
 }
 
 // 📅 OBTENER CITAS

@@ -110,19 +110,11 @@ export default async function handler(req, res) {
   const authUser = await authResponse.json();
   if (!authResponse.ok) return responder(res, authResponse.status, { error: authUser.msg || authUser.message || "No se pudo crear la cuenta." });
 
-  const perfilResponse = await supabaseRequest(supabaseUrl, serviceKey, "/rest/v1/perfiles", {
+  const perfilResponse = await supabaseRequest(supabaseUrl, serviceKey, "/rest/v1/rpc/crear_integrante_tamaku", {
     method: "POST",
-    headers: { Prefer: "return=representation" },
-    body: JSON.stringify({
-      user_id: authUser.id,
-      tienda_id,
-      id_profesional: id_profesional || null,
-      nombre: nombre.trim(),
-      email: email.trim().toLowerCase(),
-      rol,
-      activo: true,
-      permisos: permisosLimpios,
-    }),
+    body: JSON.stringify({ p_actor: propietario.id, p_tienda: tienda_id, p_usuario: authUser.id,
+      p_datos: { nombre: nombre.trim(), email: email.trim().toLowerCase(), rol,
+        id_profesional: id_profesional || null, permisos: permisosLimpios } }),
   });
   const perfil = await perfilResponse.json();
   if (!perfilResponse.ok) {
@@ -130,5 +122,5 @@ export default async function handler(req, res) {
     return responder(res, 400, { error: perfil.message || "No se pudo vincular el usuario con la tienda." });
   }
 
-  return responder(res, 201, { usuario: { id: authUser.id, email: authUser.email }, perfil: perfil[0] });
+  return responder(res, 201, { usuario: { id: authUser.id, email: authUser.email }, perfil });
 }

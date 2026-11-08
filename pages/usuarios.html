@@ -24,7 +24,7 @@
   <main class="main-content users-page">
     <header class="users-header tamaku-module-header">
       <div><span class="eyebrow">CONTROL DE ACCESO</span><h1>USUARIOS Y PERMISOS</h1><p>Decide quién puede entrar y qué puede consultar o administrar.</p></div>
-      <button id="btnNuevoUsuario" class="primary-action" type="button"><i class="fa-solid fa-user-plus"></i> Nuevo usuario</button>
+      <button id="btnNuevoUsuario" class="primary-action" type="button"><i class="fa-solid fa-user-plus"></i> Agregar integrante</button>
     </header>
 
     <section class="access-summary">
@@ -32,11 +32,12 @@
       <article><span class="summary-icon"><i class="fa-solid fa-users-gear"></i></span><div><small>USUARIOS DE LA TIENDA</small><strong id="usersCount">0</strong><p id="usersDetail">Sin accesos creados</p></div></article>
     </section>
 
+    <section class="users-panel"><h2>Organiza tu equipo</h2><p>1. Define si tú atiendes citas. 2. Agrega al integrante con su correo y su perfil profesional en un solo paso. 3. Configura sus horarios y servicios en <a href="profesionales.html">Profesionales</a>.</p><p><strong>Quitar acceso</strong> conserva al profesional atendiendo. <strong>Retirar del equipo</strong> quita el acceso y lo oculta de nuevas citas, conservando su historial.</p></section>
     <section id="ownerAgenda" class="users-panel" hidden>
       <h2>Mi agenda como propietario</h2>
-      <p>Tu correo registrado es el acceso del propietario y cuenta como un usuario. Si atiendes citas, activa tu agenda; tendr?s tu propio perfil profesional.</p>
+      <p>Tu correo registrado es el acceso del propietario y cuenta como un usuario. Si atiendes citas, activa tu agenda; tendrás tu propio perfil profesional.</p>
       <div class="form-grid">
-        <label>?Aparecer en la agenda?<select id="ownerAgendaVisible"><option value="no">No, solo administro</option><option value="si">S?, atiendo citas</option></select></label>
+        <label>¿Aparecer en la agenda?<select id="ownerAgendaVisible"><option value="no">No, solo administro</option><option value="si">Sí, atiendo citas</option></select></label>
       </div>
       <button id="ownerAgendaSave" class="primary-action" type="button">Guardar preferencia</button>
     </section>
@@ -48,13 +49,13 @@
 
   <div id="userModal" class="user-modal" aria-hidden="true">
     <form id="userForm" class="user-dialog">
-      <div class="dialog-heading"><div><span>ACCESO DEL EQUIPO</span><h2 id="userModalTitle">Nuevo usuario</h2></div><button id="closeUserModal" type="button" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="dialog-heading"><div><span>ACCESO DEL EQUIPO</span><h2 id="userModalTitle">Agregar integrante</h2></div><button id="closeUserModal" type="button" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></div>
       <input id="profileId" type="hidden">
       <div class="form-grid">
         <label><span>Nombre</span><input id="userName" required maxlength="80" autocomplete="off"></label>
         <label><span>Correo de acceso</span><input id="userEmail" type="email" required autocomplete="off"></label>
         <label><span>Rol</span><select id="userRole"><option value="EMPLEADO">Empleado</option><option value="ADMINISTRADOR">Administrador</option></select></label>
-        <label><span>Profesional vinculado</span><select id="userProfessional"><option value="">Sin vincular</option></select></label>
+        <label><span>Perfil profesional</span><select id="userProfessional"><option value="">Sin vincular</option></select></label>
         <label id="passwordGroup" class="full"><span id="passwordLabel">Contraseña temporal</span><input id="userPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres"></label>
       </div>
       <div class="permissions-heading"><div><span>PERMISOS</span><h3>¿Qué podrá hacer?</h3></div><button id="toggleAllPermissions" type="button">Marcar todos</button></div>
@@ -63,6 +64,6 @@
     </form>
   </div>
 
-  <script type="module" src="../assets/js/usuarios/usuarios.js?v=7"></script>
+  <script type="module" src="../assets/js/usuarios/usuarios.js?v=8"></script>
 </body>
 </html>

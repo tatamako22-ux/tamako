@@ -1,3 +1,4 @@
+import { profesionalesVigentes } from "../core/equipo.js";
 import { supabase } from "../config/supabaseClient.js";
 import { requireTiendaInfo, tienePermiso } from "../core/session.js";
 
@@ -48,7 +49,7 @@ function aplicarReglaRol() {
   const esEmpleado = $("#userRole").value === "EMPLEADO";
   const profesional = $("#userProfessional");
   const soloPropias = $('input[name="permiso"][value="agenda_solo_propias"]');
-  profesional.required = esEmpleado;
+  profesional.required = esEmpleado && Boolean($("#profileId").value);
   if (soloPropias) {
     soloPropias.checked = esEmpleado;
     soloPropias.disabled = esEmpleado;
@@ -57,7 +58,7 @@ function aplicarReglaRol() {
 }
 
 function opcionesProfesionales(seleccionado = "") {
-  $("#userProfessional").innerHTML = `<option value="">Sin vincular</option>` + profesionales.map((profesional) =>
+  $("#userProfessional").innerHTML = `<option value="">${$("#profileId").value ? "Sin vincular" : "Crear su perfil profesional al guardar"}</option>` + profesionales.filter(p => !p.propietario_user_id && (!perfiles.some(u => String(u.id_profesional) === String(p.id_barbero)) || String(seleccionado) === String(p.id_barbero))).map((profesional) =>
     `<option value="${profesional.id_barbero}" ${String(seleccionado) === String(profesional.id_barbero) ? "selected" : ""}>${escapar(profesional.nombre_empleado)}</option>`,
   ).join("");
 }
@@ -72,7 +73,7 @@ function abrirModal(perfil = null) {
   if (!perfil && !puedeCrearUsuario()) return avisar("Tu plan no tiene cupos disponibles para otro usuario.", "warning");
   $("#userForm").reset();
   $("#profileId").value = perfil?.id || "";
-  $("#userModalTitle").textContent = perfil ? "Editar acceso" : "Nuevo usuario";
+  $("#userModalTitle").textContent = perfil ? "Editar acceso" : "Agregar integrante";
   $("#userName").value = perfil?.nombre || perfil?.profesionales?.nombre_empleado || "";
   $("#userEmail").value = perfil?.email || "";
   $("#userEmail").disabled = false;
@@ -122,22 +123,22 @@ function renderUsuarios() {
       <div class="user-identity"><span class="user-avatar">${perfil.profesionales?.foto_url ? `<img src="${escapar(perfil.profesionales.foto_url)}" alt="${escapar(perfil.profesionales.nombre_empleado || perfil.nombre)}" loading="lazy" decoding="async">` : escapar((perfil.nombre || "U").slice(0, 1).toUpperCase())}</span><div><strong>${escapar(perfil.nombre || "Usuario")}</strong><span>${escapar(perfil.email || "Sin correo")}</span><small>Creado ${perfil.created_at ? new Date(perfil.created_at).toLocaleDateString("es-CO") : "sin fecha"}</small></div></div>
       <div class="user-meta"><strong>${escapar(perfil.rol)}</strong><span>${escapar(perfil.es_propietario ? "Acceso total protegido" : (perfil.profesionales?.nombre_empleado || "Sin profesional vinculado"))}</span></div>
       <div class="user-state ${perfil.activo ? "active" : ""}"><span class="state-dot"></span>${perfil.activo ? "Activo" : "Inactivo"}</div>
-      <div class="user-actions">${perfil.es_propietario ? `<span class="status-pill active">Principal</span>` : `<button class="icon-button edit-user" type="button" title="Editar permisos"><i class="fa-solid fa-sliders"></i></button><button class="icon-button toggle-user" type="button" title="${perfil.activo ? "Desactivar" : "Activar"}"><i class="fa-solid ${perfil.activo ? "fa-user-lock" : "fa-user-check"}"></i></button><button class="icon-button delete-user" type="button" title="Eliminar usuario" aria-label="Eliminar usuario"><i class="fa-solid fa-trash"></i></button>`}</div>
+      <div class="user-actions">${perfil.es_propietario ? `<span class="status-pill active">Principal</span>` : `<button class="icon-button edit-user" type="button" title="Editar permisos"><i class="fa-solid fa-sliders"></i></button><button class="icon-button toggle-user" type="button" title="${perfil.activo ? "Desactivar" : "Activar"}"><i class="fa-solid ${perfil.activo ? "fa-user-lock" : "fa-user-check"}"></i></button><button class="icon-button delete-user" type="button" title="Quitar solo el acceso" aria-label="Quitar solo el acceso"><i class="fa-solid fa-trash"></i></button>${perfil.id_profesional ? `<button class="icon-button retire-user" type="button" title="Retirar del equipo" aria-label="Retirar del equipo"><i class="fa-solid fa-user-minus"></i></button>` : ""}`}</div>
     </article>`).join("");
 }
 
 async function cargarDatos() {
   const [resultadoPerfiles, resultadoProfesionales] = await Promise.all([
     supabase.from("perfiles").select("id, user_id, tienda_id, rol, id_profesional, nombre, email, activo, permisos, created_at, profesionales:id_profesional(id_barbero,nombre_empleado,foto_url)").eq("tienda_id", tienda.id).order("created_at"),
-    supabase.from("profesionales").select("id_barbero,nombre_empleado,foto_url").eq("id_tienda", tienda.id).order("nombre_empleado"),
+    supabase.from("profesionales").select("id_barbero,nombre_empleado,foto_url,propietario_user_id").eq("id_tienda", tienda.id).order("nombre_empleado"),
   ]);
   if (resultadoPerfiles.error) throw resultadoPerfiles.error;
   if (resultadoProfesionales.error) throw resultadoProfesionales.error;
   perfiles = resultadoPerfiles.data || [];
-  profesionales = resultadoProfesionales.data || [];
+  profesionales = await profesionalesVigentes(resultadoProfesionales.data || [], tienda.id);
   if ($("#ownerAgendaVisible")) {
     const { data, error } = await supabase.from("tamaku_agenda_propietario").select("id_profesional,visible").eq("id_tienda", tienda.id).maybeSingle();
-    if (error) avisar("Para configurar la agenda del propietario falta aplicar la migraci?n de usuarios en Supabase.", "warning");
+    if (error) avisar("Para configurar la agenda del propietario falta aplicar la migración de usuarios en Supabase.", "warning");
     if (data) { $("#ownerAgendaVisible").value = data.visible ? "si" : "no"; }
   }
   renderUsuarios();
@@ -174,7 +175,7 @@ async function guardar(event) {
   const id = $("#profileId").value;
   if (!id && !puedeCrearUsuario()) return avisar("Tu plan no tiene cupos disponibles.", "warning");
   const datos = { nombre: $("#userName").value.trim(), email: $("#userEmail").value.trim().toLowerCase(), rol: $("#userRole").value, id_profesional: $("#userProfessional").value || null, permisos: obtenerPermisos() };
-  if (datos.rol === "EMPLEADO" && !datos.id_profesional) {
+  if (id && datos.rol === "EMPLEADO" && !datos.id_profesional) {
     avisar("Debes vincular el empleado con su perfil profesional.", "error");
     $("#userProfessional").focus();
     return;
@@ -187,7 +188,7 @@ async function guardar(event) {
       avisar("Perfil, correo y acceso actualizados correctamente.");
     } else {
       await guardarUsuarioAuth({ ...datos, password: $("#userPassword").value, tienda_id: tienda.id });
-      avisar("Usuario creado correctamente.");
+      avisar("Integrante creado. Configura sus servicios y horarios en Profesionales.");
     }
     cerrarModal();
     await cargarDatos();
@@ -197,12 +198,23 @@ async function guardar(event) {
   } finally { boton.disabled = false; }
 }
 
+async function retirarIntegrante(perfil) {
+  if (!perfil.id_profesional || perfil.user_id === tienda.user_id) return;
+  const ok = await window.TamakuUI?.confirm?.({ titulo: "Retirar del equipo", mensaje: (perfil.nombre || perfil.email) + " perderá el acceso y dejará de aparecer para nuevas citas. Las citas existentes, ventas y liquidaciones se conservan.", textoConfirmar: "Retirar del equipo" });
+  if (!ok) return;
+  try {
+    const { error } = await supabase.rpc("retirar_integrante_tamaku", { p_tienda: tienda.id, p_profesional: String(perfil.id_profesional) });
+    if (error) throw error;
+    await cargarDatos(); avisar("Integrante retirado. Su historial se conserva.");
+  } catch (error) { avisar(error.message, "error"); }
+}
+
 async function eliminarUsuario(perfil) {
   if (perfil.user_id === tienda.user_id) return;
   const confirmado = await window.TamakuUI?.confirm?.({
-    titulo: "?Eliminar usuario de esta tienda?",
-    mensaje: `Se eliminar? el acceso de ${perfil.nombre || perfil.email}. Su profesional, citas e historial se conservan. Para recuperar el acceso tendr?s que volver a vincularlo.`,
-    textoConfirmar: "Eliminar usuario",
+    titulo: "Quitar solo el acceso",
+    mensaje: `Se quitará el acceso de ${perfil.nombre || perfil.email}. Su profesional, citas e historial se conservan. Para recuperar el acceso tendrás que volver a vincularlo.`,
+    textoConfirmar: "Quitar acceso",
   });
   if (!confirmado) return;
   try {
@@ -257,12 +269,14 @@ async function iniciar() {
     const card = event.target.closest(".user-card");
     const perfil = perfiles.find((item) => item.id === card?.dataset.id);
     if (!perfil) return;
+    if (event.target.closest(".retire-user")) retirarIntegrante(perfil);
     if (event.target.closest(".delete-user")) eliminarUsuario(perfil);
     if (event.target.closest(".edit-user")) abrirModal(perfil);
     if (event.target.closest(".toggle-user")) alternar(perfil);
   };
   $("#userModal").onclick = (event) => { if (event.target.id === "userModal") cerrarModal(); };
   await cargarDatos();
+  if (location.hash === "#nuevo-integrante") abrirModal();
 }
 
 iniciar().catch((error) => {

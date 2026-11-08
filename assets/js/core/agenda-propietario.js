@@ -1,6 +1,8 @@
-﻿import { supabase } from '../config/supabaseClient.js';
+import { profesionalesVigentes } from "./equipo.js";
+import { supabase } from '../config/supabaseClient.js';
 
 export async function filtrarAgendaPropietario(profesionales, tiendaId) {
+  profesionales = await profesionalesVigentes(profesionales, tiendaId);
   const { data, error } = await supabase.from('tamaku_agenda_propietario')
     .select('id_profesional,visible').eq('id_tienda', tiendaId).maybeSingle();
   if (error) {

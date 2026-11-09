@@ -109,6 +109,7 @@ const PERMISOS_RUTA = {
 };
 
 const FUNCIONES_RUTA = {
+  "liquidaciones.html": "facturacion",
   "crecimiento.html": "marketing",
   "dashboard.html": "dashboard",
   "agenda.html": "agenda",
@@ -134,7 +135,7 @@ function puede(tienda, permiso) {
 }
 
 function protegerRuta(tienda, pagina) {
-  if (pagina === "liquidaciones.html" && (tienda?.sesion?.es_propietario || tienda?.sesion?.id_profesional)) return true;
+  if (pagina === "liquidaciones.html" && permitePlan(tienda, pagina) && (tienda?.sesion?.es_propietario || tienda?.sesion?.id_profesional)) return true;
   const permiso = PERMISOS_RUTA[pagina];
   if ((!permiso || puede(tienda, permiso)) && permitePlan(tienda, pagina)) return true;
   const destinoPermitido = Object.entries(PERMISOS_RUTA).find(([ruta, clave]) =>
@@ -145,7 +146,7 @@ function protegerRuta(tienda, pagina) {
 }
 
 function enlaceLiquidaciones(tienda, pagina) {
-  if (!tienda?.sesion?.es_propietario && !tienda?.sesion?.id_profesional) return "";
+  if (!permitePlan(tienda, "liquidaciones.html") || (!tienda?.sesion?.es_propietario && !tienda?.sesion?.id_profesional)) return "";
   const texto = tienda.sesion.es_propietario ? "Liquidaciones" : "Mis ganancias";
   return `<a href="liquidaciones.html" class="nav-item ${pagina === "liquidaciones.html" ? "active" : ""}"><i class="fa-solid fa-hand-holding-dollar"></i>${texto}</a>`;
 }
@@ -220,7 +221,7 @@ function crearMenuMasMobile(pagina, tienda, textoPlanVisible) {
       ${opcionMas(tienda, "tienda_ver", "tienda.html", pagina, "fa-bag-shopping", "Tienda", "Productos e insumos a domicilio")}
       ${opcionMas(tienda, "profesionales_ver", "profesionales.html", pagina, "fa-user-tie", "Profesionales", "Equipo, servicios y horarios")}
       ${opcionMas(tienda, "profesionales_ver", "galeria.html", pagina, "fa-images", "Galería", "Portafolio público de trabajos")}
-      ${(tienda?.sesion?.es_propietario || tienda?.sesion?.id_profesional) ? `<a href="liquidaciones.html" class="${pagina === "liquidaciones.html" ? "active" : ""}"><i class="fa-solid fa-hand-holding-dollar"></i><div><strong>${tienda.sesion.es_propietario ? "Liquidaciones" : "Mis ganancias"}</strong><span>Producción, citas y pagos</span></div><i class="fa-solid fa-chevron-right"></i></a>` : ""}
+      ${(permitePlan(tienda, "liquidaciones.html") && (tienda?.sesion?.es_propietario || tienda?.sesion?.id_profesional)) ? `<a href="liquidaciones.html" class="${pagina === "liquidaciones.html" ? "active" : ""}"><i class="fa-solid fa-hand-holding-dollar"></i><div><strong>${tienda.sesion.es_propietario ? "Liquidaciones" : "Mis ganancias"}</strong><span>Producción, citas y pagos</span></div><i class="fa-solid fa-chevron-right"></i></a>` : ""}
       ${opcionMas(tienda, "usuarios_gestionar", "usuarios.html", pagina, "fa-user-shield", "Usuarios", "Accesos, roles y permisos")}
       ${opcionMas(tienda, "ajustes_ver", "comunicados.html", pagina, "fa-bullhorn", "Comunicados", "Avisos y promociones para clientes")}
       ${opcionMas(tienda, "ajustes_ver", "ajustes.html", pagina, "fa-sliders", "Ajustes", "Configuración general del negocio")}

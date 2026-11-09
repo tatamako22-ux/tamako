@@ -31,7 +31,7 @@ async function cargarPlan() {
   document.getElementById("planUsuarios").textContent = plan.limite_usuarios ?? "—";
   const listaFunciones = document.getElementById("planFunciones");
   if (listaFunciones) {
-    const funciones = [["agenda", "Agenda y clientes"], ["dashboard", "Dashboard personalizado"], ["facturacion", "Historial de ventas"], ["reportes", "Generación de informes"], ["marketing", "Marketing & Sales y oportunidades"], ["crm_avanzado", "CRM avanzado y seguimientos"], ["multisede", "Administración Multi-Sede"], ["servicio_cliente", "Servicio al cliente"]];
+    const funciones = [["agenda", "Agenda"], ["clientes", "Clientes"], ["profesionales", "Profesionales y galer?a"], ["usuarios", "Usuarios (incluye propietario)"], ["ajustes", "Ajustes y comunicados"], ["dashboard", "Dashboard personalizado"], ["facturacion", "Historial de ventas"], ["reportes", "Generación de informes"], ["marketing", "Marketing & Sales y oportunidades"], ["crm_avanzado", "CRM avanzado y seguimientos"], ["multisede", "Administración Multi-Sede"], ["servicio_cliente", "Servicio al cliente"]];
     listaFunciones.innerHTML = funciones.filter(([clave]) => plan.funcionalidades?.[clave] === true).map(([, texto]) => `<li>${texto}</li>`).join("");
   }
 

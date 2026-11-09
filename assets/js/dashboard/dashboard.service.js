@@ -44,7 +44,9 @@ export async function obtenerDatosDashboard(tiendaInfo) {
   const esPropietario = Boolean(sesion.es_propietario);
   const idProfesional = sesion.id_profesional || null;
   const permisos = sesion.permisos || {};
-  const puedeVerCaja = esPropietario || permisos.caja_gestionar || permisos.reportes_ver;
+  const funciones = tiendaInfo.suscripcion?.funcionalidades;
+  const tieneFacturacion = !funciones || funciones.facturacion === true;
+  const puedeVerCaja = tieneFacturacion && (esPropietario || permisos.caja_gestionar || permisos.reportes_ver);
 
   const hoy = new Date();
   const desde = inicioDia(hoy);
@@ -137,7 +139,7 @@ export async function obtenerDatosDashboard(tiendaInfo) {
   const [citasResult, facturasResult, cancelacionesResult, cajaResult, cierresResult, reglasResult, profesionalResult] =
     await Promise.all([
       citasQuery,
-      readAllPages(facturasQuery).then(data => ({ data })),
+      tieneFacturacion ? readAllPages(facturasQuery).then(data => ({ data })) : Promise.resolve({ data: [] }),
       cancelacionesQuery,
       cajaQuery,
       cierresQuery,

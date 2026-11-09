@@ -39,3 +39,10 @@ test('al perder Multi-Sede se vuelve a la principal sin cerrar sesión ni perder
   assert.equal(s.temporal.get('tamaku_sede_activa'),'principal');
   assert.match(s.redirects[0],/pages\/dashboard.html$/);
 });
+
+test('Plata rechaza las rutas de facturacion, tienda y liquidaciones',async()=>{
+ for(const pagina of ['facturacion.html','tienda.html','liquidaciones.html']){
+ const s=sesion({pagina,estado:{acceso:true,estado:'ACTIVA',funcionalidades:{dashboard:true,facturacion:false,tienda:false}}});
+ assert.equal(await s.entorno.requireTiendaInfo(),null);assert.ok(s.redirects.length>0);
+ }
+});

@@ -4,6 +4,7 @@ const STORAGE_KEY = "tamaku_tienda";
 const LOGIN_URL = new URL("../../../index.html", import.meta.url).href;
 
 const FUNCIONES_PAGINA = {
+  "liquidaciones.html": "facturacion",
   "dashboard.html": "dashboard", "agenda.html": "agenda", "clientes.html": "clientes",
   "profesionales.html": "profesionales", "galeria.html": "profesionales",
   "facturacion.html": "facturacion", "usuarios.html": "usuarios", "tienda.html": "tienda",

@@ -31,6 +31,7 @@ try {
   await db.exec(`insert into tiendas(id,user_id,nombre,slug) values('${A}','${U}','Principal','principal'),('${B}','${V}','Ajena','ajena');
     grant select on tiendas,perfiles to authenticated;
     grant insert,update on perfiles,tiendas to authenticated;
+    grant insert on profesionales to authenticated;
     grant select on tamaku_planes to authenticated;`);
   await sesion(U);
   const prueba=await q('select * from obtener_estado_suscripcion($1)',[A]);
@@ -59,11 +60,20 @@ try {
   await sesion(U);
   check((await q("select plan_tiene_funcion($1,'marketing') permitido",[A]))[0].permitido,true);
   await falla("insert into tamaku_comercial(id_tienda,tipo,titulo,etapa) values($1,'TAREA','Seguimiento avanzado','PENDIENTE')",[A],/row-level security/);
+  // El propietario duplicado en perfiles y sedes consume un solo cupo.
+  await q('insert into perfiles(user_id,tienda_id) values($1,$2),($1,$2),($1,$3)',[U,A,sede]);
+  await q('insert into profesionales(id_tienda) values($1)',[A]);
+  await db.exec('reset role');
+  check((await q('select total_usuarios_plan_tamaku($1) n',[A]))[0].n,1);
+  await sesion(U);
+  await q('select cambiar_plan_tamaku($1,$2)',[A,'PLATA']);
+  check((await q('select * from obtener_estado_suscripcion($1)',[A]))[0].plan,'BASICO');
+  await q('select cambiar_plan_tamaku($1,$2)',[A,'ZAFIRO']);
   // Dos empleados adicionales + propietario = 3.
   const empleado1='20000000-0000-0000-0000-000000000001',empleado2='20000000-0000-0000-0000-000000000002';
   await q('insert into perfiles(user_id,tienda_id) values($1,$2),($3,$2)',[empleado1,A,empleado2]);
   await falla('insert into perfiles(user_id,tienda_id) values(gen_random_uuid(),$1)',[A],/permite 3/);
-  await falla('select cambiar_plan_tamaku($1,$2)',[A,'PLATA'],/admite 1/);
+  await falla('select cambiar_plan_tamaku($1,$2)',[A,'PLATA'],/admite 1.*hay 3 accesos/);
   await db.exec('reset role');
   await q('update perfiles set activo=false where tienda_id=$1',[A]);
   const antes=(await q('select fin_periodo from tamaku_suscripciones where id_tienda=$1',[A]))[0].fin_periodo;
@@ -107,5 +117,14 @@ try {
   await db.exec(`reset role;update tamaku_superadmins set activo=false where user_id='${admin}';`);
   await sesion(admin);
   check((await q('select nombre from tiendas')).length,0);
+  await db.exec('reset role');
+  const otrosAntes=await q("select codigo,precio_mensual,funcionalidades from tamaku_planes where codigo<>'BASICO' order by codigo");
+  const plataSQL=fs.readFileSync('supabase/plata_esencial_20261108.sql','utf8');
+  await db.exec(plataSQL); await db.exec(plataSQL);
+  const plata=(await q("select * from tamaku_planes where codigo='BASICO'"))[0];
+  check(Number(plata.precio_mensual),35000); check(plata.limite_usuarios,1);
+  for(const clave of ['dashboard','agenda','clientes','profesionales','galeria','comunicados','usuarios','ajustes']) check(plata.funcionalidades[clave],true);
+  for(const clave of ['facturacion','caja','reportes','tienda','marketing','crm_avanzado','multisede']) check(plata.funcionalidades[clave],false);
+  check(await q("select codigo,precio_mensual,funcionalidades from tamaku_planes where codigo<>'BASICO' order by codigo"),otrosAntes);
   console.log(`${comprobaciones} comprobaciones SQL satisfactorias; base efímera cerrada.`);
 } finally { await db.close(); }

@@ -6,6 +6,14 @@ export function initDashboard(tiendaInfo) {
   const bienvenida = document.getElementById("nombreBienvenida");
   if (bienvenida) bienvenida.textContent = nombre.toUpperCase();
 
+  if (tiendaInfo.suscripcion?.funcionalidades?.facturacion === false) {
+    document.querySelectorAll('a[href^="facturacion.html"], a[href^="liquidaciones.html"], #kpiVentas, #estadoCajaKpi, #resumenComisionEmpleado').forEach(el => el.style.setProperty('display','none','important'));
+    ['valPorCobrar','valTicket','metodosPagoHoy','topProfesional','chartVentas','graficaVentas','ultimosCierres','movimientosCaja'].forEach(id => {
+      const el = document.getElementById(id);
+      const panel = el?.closest('.kpi-card, .dashboard-panel');
+      if (panel) panel.style.setProperty('display','none','important');
+    });
+  }
   initQR(tiendaInfo);
   initOverview(tiendaInfo);
 

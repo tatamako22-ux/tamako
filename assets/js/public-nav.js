@@ -19,7 +19,7 @@
   if (resumen) import('./core/planes.js').then(({PLANES,codigoPlan,nombrePlan}) => {
     const codigo = codigoPlan(new URLSearchParams(location.search).get('plan') || 'PRUEBA');
     const precio = PLANES[codigo]?.precio;
-    document.getElementById('registrationPlanName').textContent = codigo === 'PRUEBA' ? 'Prueba Diamante · 7 días gratis' : `${nombrePlan(codigo)} · $${new Intl.NumberFormat('es-CO').format(precio)} COP / mes`;
-    document.getElementById('registrationPlanNote').textContent = codigo === 'PRUEBA' ? 'Conoce todas las funciones antes de decidir. Sin tarjeta.' : 'Empiezas con 7 días de prueba Diamante. Este es tu plan solicitado para después de la prueba.';
+    document.getElementById('registrationPlanName').textContent = codigo === 'PRUEBA' ? 'Prueba tu plan · 7 días gratis' : `${nombrePlan(codigo)} · $${new Intl.NumberFormat('es-CO').format(precio)} COP / mes`;
+    document.getElementById('registrationPlanNote').textContent = codigo === 'PRUEBA' ? 'Elige Plata, Zafiro o Diamante y prueba exactamente sus funciones. Sin tarjeta.' : 'Empiezas con 7 días gratuitos de este mismo plan, con sus funciones y su cupo de usuarios.';
   }).catch(() => {});
 })();

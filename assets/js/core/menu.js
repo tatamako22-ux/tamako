@@ -90,6 +90,7 @@ window.tamakuContextReady = Promise.all([import("./session.js"), import("./brand
   window.cerrarSesion = session.cerrarSesion;
   const tienda = await session.requireTiendaInfo();
   marca.aplicarMarcaTienda(tienda);
+  if (tienda) import("./prueba-contador.js").then(m => m.mostrarContadorPrueba(tienda)).catch(console.error);
   return tienda;
 });
 

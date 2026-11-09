@@ -652,7 +652,7 @@ form {
         <span class="form-eyebrow">COMIENZA AHORA</span>
         <h1 class="form-title">CREA TU TIENDA</h1>
         <p style="grid-column:span 2; margin-bottom:20px;">Prueba TAMAKU gratis durante 7 días. No necesitas tarjeta.</p>
-        <div id="registrationPlanSummary"><small>TU ELECCIÓN</small><strong id="registrationPlanName">Plan seleccionado</strong><span id="registrationPlanNote">Prueba Diamante durante 7 días, sin tarjeta.</span><a href="servicios.html#planes">Cambiar de plan</a></div>
+        <label style="display:block;margin:16px 0">Plan que quieres probar durante 7 días<select id="trialPlanChoice" style="width:100%;padding:14px;border-radius:14px;margin-top:8px" required><option value="PLATA">Plata · 1 usuario · $35.000/mes</option><option value="ZAFIRO">Zafiro · 3 usuarios · $119.900/mes</option><option value="DIAMANTE">Diamante · 10 usuarios · $199.000/mes</option></select></label><div id="registrationPlanSummary"><small>TU ELECCIÓN</small><strong id="registrationPlanName">Plan seleccionado</strong><span id="registrationPlanNote">Prueba las funciones y el cupo del plan elegido durante 7 días, sin tarjeta.</span><a href="servicios.html#planes">Cambiar de plan</a></div>
 
         <div class="form-group">
             <label for="nombre_tienda">Nombre del negocio</label>
@@ -764,7 +764,15 @@ const supabaseUrl = "https://smibbddmwgdmqpwsuaqr.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtaWJiZGRtd2dkbXFwd3N1YXFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzODc1NzYsImV4cCI6MjA4NTk2MzU3Nn0.S3Z4m8s_nHa_reulKMFH1RtqoUgh9Cqzj69H0WTbghk";
 
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
-const planSeleccionado = (new URLSearchParams(window.location.search).get("plan") || "prueba").toUpperCase();
+const planEntrada = (new URLSearchParams(window.location.search).get("plan") || "prueba").toUpperCase();
+let planSeleccionado = planEntrada === "PRUEBA" ? "PLATA" : planEntrada;
+const selectorPrueba = document.getElementById("trialPlanChoice");
+selectorPrueba.value = ({BASICO:"PLATA",PRO:"ZAFIRO",PREMIUM:"DIAMANTE"}[planSeleccionado] || planSeleccionado);
+selectorPrueba.addEventListener("change", () => {
+  planSeleccionado = selectorPrueba.value;
+  document.getElementById("registrationPlanName").textContent = selectorPrueba.options[selectorPrueba.selectedIndex].text;
+  document.getElementById("registrationPlanNote").textContent = "7 días con las funciones y el cupo del plan elegido. Sin cobro automático.";
+});
 let registroReanudado = false;
 // ==========================
 // GENERAR SLUG AUTOMÁTICO
@@ -1102,9 +1110,7 @@ const { error: planError } = await supabaseClient.rpc("seleccionar_plan_tamaku",
     p_tienda: tiendaInsertada.id,
     p_plan: ({ PLATA: "BASICO", ZAFIRO: "PRO", DIAMANTE: "PREMIUM" }[planSeleccionado] || planSeleccionado)
 });
-if (planError && !/function|schema cache/i.test(planError.message || "")) {
-    console.warn("No se pudo guardar el plan seleccionado:", planError);
-}
+if (planError) { window.TamakuUI.notify("Tu tienda fue creada, pero no pudimos aplicar el plan elegido. Revisa Mi plan antes de continuar.", "warning"); window.location.replace("mi-plan.html"); return; }
 verifyBtn.innerText = "ENTRANDO A TU TIENDA...";
 localStorage.setItem("tamakoSession", "active");
 window.location.replace("dashboard.html");

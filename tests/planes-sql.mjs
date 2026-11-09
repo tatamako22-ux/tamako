@@ -126,5 +126,21 @@ try {
   for(const clave of ['dashboard','agenda','clientes','profesionales','galeria','comunicados','usuarios','ajustes']) check(plata.funcionalidades[clave],true);
   for(const clave of ['facturacion','caja','reportes','tienda','marketing','crm_avanzado','multisede']) check(plata.funcionalidades[clave],false);
   check(await q("select codigo,precio_mensual,funcionalidades from tamaku_planes where codigo<>'BASICO' order by codigo"),otrosAntes);
+  await db.exec(fs.readFileSync('supabase/prueba_plan_elegido_20261108.sql','utf8'));
+  await db.exec(fs.readFileSync('supabase/prueba_plan_elegido_20261108.sql','utf8'));
+  const C='10000000-0000-0000-0000-000000000003';
+  await q("insert into tiendas(id,user_id,nombre,slug) values($1,$2,'Prueba elegida','prueba-elegida')",[C,U]);
+  await sesion(U);
+  check((await q('select * from obtener_estado_suscripcion($1)',[C]))[0].plan_efectivo,'BASICO');
+  check((await q('select * from obtener_estado_suscripcion($1)',[C]))[0].limite_usuarios,1);
+  const finTrial=(await q('select * from obtener_estado_suscripcion($1)',[C]))[0].vence;
+  await falla('insert into perfiles(user_id,tienda_id) values($1,$2)',[V,C],/permite 1/);
+  await q("select seleccionar_plan_tamaku($1,'ZAFIRO')",[C]);
+  check((await q('select * from obtener_estado_suscripcion($1)',[C]))[0].plan_efectivo,'PRO');
+  await q('insert into perfiles(user_id,tienda_id) values($1,$2)',[V,C]);
+  await falla("select seleccionar_plan_tamaku($1,'PLATA')",[C],/admite 1/);
+  check((await q('select * from obtener_estado_suscripcion($1)',[C]))[0].vence,finTrial);
+  await q("select seleccionar_plan_tamaku($1,'DIAMANTE')",[C]);
+  check((await q('select * from obtener_estado_suscripcion($1)',[C]))[0].plan_efectivo,'PREMIUM');
   console.log(`${comprobaciones} comprobaciones SQL satisfactorias; base efímera cerrada.`);
 } finally { await db.close(); }

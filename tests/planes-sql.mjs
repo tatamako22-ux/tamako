@@ -22,7 +22,7 @@ try {
     insert into auth.users values('${U}'),('${V}');
     grant usage on schema public,auth to authenticated,anon;
   `);
-  for(const file of ['superadmin_suscripciones.sql','superadmin_suscripciones_v2.sql','planes_capacidades.sql','planes_comerciales_20261027.sql','planes_operacion_20261027.sql']) {
+  for(const file of ['superadmin_suscripciones.sql','superadmin_suscripciones_v2.sql','planes_capacidades.sql','planes_comerciales_20261027.sql','planes_operacion_20261027.sql','precios_planes_20261110.sql']) {
     let sql=fs.readFileSync(`supabase/${file}`,'utf8').replace('create extension if not exists pgcrypto;','');
     await db.exec(sql);
   }
@@ -69,11 +69,13 @@ try {
   await q('select cambiar_plan_tamaku($1,$2)',[A,'PLATA']);
   check((await q('select * from obtener_estado_suscripcion($1)',[A]))[0].plan,'BASICO');
   await q('select cambiar_plan_tamaku($1,$2)',[A,'ZAFIRO']);
-  // Dos empleados adicionales + propietario = 3.
+  // Tres empleados adicionales + propietario = 4.
   const empleado1='20000000-0000-0000-0000-000000000001',empleado2='20000000-0000-0000-0000-000000000002';
   await q('insert into perfiles(user_id,tienda_id) values($1,$2),($3,$2)',[empleado1,A,empleado2]);
-  await falla('insert into perfiles(user_id,tienda_id) values(gen_random_uuid(),$1)',[A],/permite 3/);
-  await falla('select cambiar_plan_tamaku($1,$2)',[A,'PLATA'],/admite 1.*hay 3 accesos/);
+  await q('insert into perfiles(user_id,tienda_id) values(gen_random_uuid(),$1)',[A]);
+  check((await q('select * from obtener_estado_suscripcion($1)',[A]))[0].limite_usuarios,4);
+  await falla('insert into perfiles(user_id,tienda_id) values(gen_random_uuid(),$1)',[A],/permite 4/);
+  await falla('select cambiar_plan_tamaku($1,$2)',[A,'PLATA'],/admite 1.*hay 4 accesos/);
   await db.exec('reset role');
   await q('update perfiles set activo=false where tienda_id=$1',[A]);
   const antes=(await q('select fin_periodo from tamaku_suscripciones where id_tienda=$1',[A]))[0].fin_periodo;
@@ -122,7 +124,7 @@ try {
   const plataSQL=fs.readFileSync('supabase/plata_esencial_20261108.sql','utf8');
   await db.exec(plataSQL); await db.exec(plataSQL);
   const plata=(await q("select * from tamaku_planes where codigo='BASICO'"))[0];
-  check(Number(plata.precio_mensual),35000); check(plata.limite_usuarios,1);
+  check(Number(plata.precio_mensual),34999); check(plata.limite_usuarios,1);
   for(const clave of ['dashboard','agenda','clientes','profesionales','galeria','comunicados','usuarios','ajustes']) check(plata.funcionalidades[clave],true);
   for(const clave of ['facturacion','caja','reportes','tienda','marketing','crm_avanzado','multisede']) check(plata.funcionalidades[clave],false);
   check(await q("select codigo,precio_mensual,funcionalidades from tamaku_planes where codigo<>'BASICO' order by codigo"),otrosAntes);
@@ -142,5 +144,17 @@ try {
   check((await q('select * from obtener_estado_suscripcion($1)',[C]))[0].vence,finTrial);
   await q("select seleccionar_plan_tamaku($1,'DIAMANTE')",[C]);
   check((await q('select * from obtener_estado_suscripcion($1)',[C]))[0].plan_efectivo,'PREMIUM');
+  await db.exec('reset role');
+  const preciosSQL=fs.readFileSync('supabase/precios_planes_20261110.sql','utf8');
+  const pagosAntes=await q('select * from tamaku_pagos_suscripcion order by id');
+  const suscripcionesAntes=await q('select * from tamaku_suscripciones order by id');
+  await db.exec(preciosSQL); await db.exec(preciosSQL);
+  check(await q("select codigo,precio_mensual::integer precio,limite_usuarios from tamaku_planes where codigo<>'PRUEBA' order by codigo"),[
+    {codigo:'BASICO',precio:34999,limite_usuarios:1},
+    {codigo:'PREMIUM',precio:159999,limite_usuarios:10},
+    {codigo:'PRO',precio:69999,limite_usuarios:4},
+  ]);
+  check(await q('select * from tamaku_pagos_suscripcion order by id'),pagosAntes);
+  check(await q('select * from tamaku_suscripciones order by id'),suscripcionesAntes);
   console.log(`${comprobaciones} comprobaciones SQL satisfactorias; base efímera cerrada.`);
 } finally { await db.close(); }

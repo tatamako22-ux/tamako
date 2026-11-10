@@ -1,8 +1,8 @@
 // Los códigos se conservan para mantener suscripciones e historial de pagos.
 export const PLANES = Object.freeze({
-  BASICO: { nombre: "Plata", precio: 35000, usuarios: 1, slug: "plata" },
-  PRO: { nombre: "Zafiro", precio: 119900, usuarios: 3, slug: "zafiro" },
-  PREMIUM: { nombre: "Diamante", precio: 199000, usuarios: 10, slug: "diamante" },
+  BASICO: { nombre: "Plata", precio: 34999, usuarios: 1, slug: "plata" },
+  PRO: { nombre: "Zafiro", precio: 69999, usuarios: 4, slug: "zafiro" },
+  PREMIUM: { nombre: "Diamante", precio: 159999, usuarios: 10, slug: "diamante" },
 });
 
 export function codigoPlan(valor = "") {

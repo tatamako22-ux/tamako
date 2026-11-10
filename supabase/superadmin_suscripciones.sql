@@ -19,8 +19,8 @@ create table if not exists public.tamaku_planes (
 );
 
 insert into public.tamaku_planes(codigo,nombre,precio_mensual,dias_vigencia) values
- ('PRUEBA','Prueba Diamante 7 días',0,7),('BASICO','Plata',69900,30),
- ('PRO','Zafiro',119900,30),('PREMIUM','Diamante',199000,30)
+ ('PRUEBA','Prueba Diamante 7 días',0,7),('BASICO','Plata',34999,30),
+ ('PRO','Zafiro',69999,30),('PREMIUM','Diamante',159999,30)
 on conflict(codigo) do update set nombre=excluded.nombre,precio_mensual=excluded.precio_mensual,dias_vigencia=excluded.dias_vigencia;
 
 create table if not exists public.tamaku_suscripciones (

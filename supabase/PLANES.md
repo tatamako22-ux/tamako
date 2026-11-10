@@ -1,11 +1,13 @@
+Actualizacion 10 de noviembre de 2026: ejecutar `precios_planes_20261110.sql` al final de las migraciones existentes para aplicar precios y cupos. Conserva pagos, fechas y funcionalidades.
+
 Planes comerciales — octubre de 2026
 ===================================
 
 | Nombre público | Código conservado | COP / mes | Usuarios activos, incluido propietario |
 | --- | --- | ---: | ---: |
-| Plata | BASICO | 69.900 | 1 |
-| Zafiro | PRO | 119.900 | 3 |
-| Diamante | PREMIUM | 199.000 | 10 |
+| Plata | BASICO | 34.999 | 1 |
+| Zafiro | PRO | 69.999 | 4 |
+| Diamante | PREMIUM | 159.999 | 10 |
 
 Activación
 ----------

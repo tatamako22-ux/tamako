@@ -83,3 +83,18 @@ test('el servicio de informes consulta la suscripción antes de leer datos', asy
   await assert.rejects(entorno.FacturacionService.getDatosReporte('tienda', '2026-10-01', '2026-10-27'), /Sin conexión/);
   assert.equal(lecturas, 0);
 });
+
+ test('precios y cupos comerciales coinciden en catalogo, portada, planes y registro', () => {
+  for (const [codigo, precio, usuarios] of [['BASICO',34999,1],['PRO',69999,4],['PREMIUM',159999,10]]) {
+    assert.equal(PLANES[codigo].precio, precio);
+    assert.equal(PLANES[codigo].usuarios, usuarios);
+    const importe='$'+String(precio).replace(/(\d)(?=(\d{3})+$)/g,'$1.');
+    for(const archivo of ['index.html','pages/servicios.html','pages/registro.html']) {
+      assert.ok(fs.readFileSync(archivo,'utf8').includes(importe), archivo+' debe mostrar '+importe);
+    }
+  }
+  const tarjetas=fs.readFileSync('pages/servicios.html','utf8');
+  assert.ok(tarjetas.includes('1 a 4 usuarios'));
+  assert.ok(!tarjetas.includes('<td>Incluido</td>'));
+  assert.equal((tarjetas.match(/aria-label="Incluido">&#10003;/g)||[]).length,8);
+ });

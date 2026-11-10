@@ -15,19 +15,19 @@ update public.tamaku_planes set
 where codigo='PRUEBA';
 
 update public.tamaku_planes set
-  nombre='Plata', precio_mensual=69900, dias_vigencia=30,
+  nombre='Plata', precio_mensual=34999, dias_vigencia=30,
   funcionalidades='{"dashboard":true,"agenda":true,"clientes":true,"profesionales":true,"facturacion":true,"caja":true,"reportes":false,"usuarios":true,"tienda":false,"ajustes":true,"marketing":false,"crm_avanzado":false,"multisede":false,"servicio_cliente":true}'::jsonb,
   limite_profesionales=null, limite_usuarios=1
 where codigo='BASICO';
 
 update public.tamaku_planes set
-  nombre='Zafiro', precio_mensual=119900, dias_vigencia=30,
+  nombre='Zafiro', precio_mensual=69999, dias_vigencia=30,
   funcionalidades='{"dashboard":true,"agenda":true,"clientes":true,"profesionales":true,"facturacion":true,"caja":true,"reportes":true,"usuarios":true,"tienda":false,"ajustes":true,"marketing":true,"crm_avanzado":false,"multisede":false,"servicio_cliente":true}'::jsonb,
-  limite_profesionales=null, limite_usuarios=3
+  limite_profesionales=null, limite_usuarios=4
 where codigo='PRO';
 
 update public.tamaku_planes set
-  nombre='Diamante', precio_mensual=199000, dias_vigencia=30,
+  nombre='Diamante', precio_mensual=159999, dias_vigencia=30,
   funcionalidades='{"dashboard":true,"agenda":true,"clientes":true,"profesionales":true,"facturacion":true,"caja":true,"reportes":true,"usuarios":true,"tienda":true,"ajustes":true,"marketing":true,"crm_avanzado":true,"multisede":true,"servicio_cliente":true}'::jsonb,
   limite_profesionales=null, limite_usuarios=10
 where codigo='PREMIUM';

@@ -76,9 +76,43 @@ body > .main-content > * {
 
 .clients-toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 15px;
   margin-bottom: 22px;
+}
+
+#btnExportarClientes {
+  width: auto;
+  min-height: 48px;
+  padding: 0 18px;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+#btnExportarClientes:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+#btnExportarClientes:focus-visible {
+  outline: 2px solid var(--clients-gold-light);
+  outline-offset: 3px;
+}
+
+#estadoExportacionClientes {
+  order: 4;
+  flex-basis: 100%;
+  color: var(--clients-gold-light);
+  font-size: 0.75rem;
+}
+
+#estadoExportacionClientes:empty { display: none; }
+
+@media (max-width: 900px) {
+  #btnExportarClientes { margin-top: 12px; }
+  #estadoExportacionClientes { display: block; margin-top: 8px; }
+  #estadoExportacionClientes:empty { display: none; }
 }
 
 .client-search-wrap {

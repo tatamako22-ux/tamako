@@ -636,7 +636,7 @@
             }
         }
     </style>
-<link rel="stylesheet" href="../assets/css/clientes.css?v=6">
+<link rel="stylesheet" href="../assets/css/clientes.css?v=7">
 <link rel="stylesheet" href="../assets/css/notifications.css?v=2">
 <link rel="stylesheet" href="../assets/css/mobile-compat.css?v=1">
 <script src="../assets/js/core/notifications.js?v=2"></script>
@@ -668,6 +668,10 @@
                 <input type="text" id="buscador" class="search-bar" placeholder="Buscar por nombre o teléfono...">
                 <kbd>CTRL K</kbd>
             </div>
+            <button id="btnExportarClientes" class="btn-new-client" type="button" disabled title="Descarga todos los clientes de esta tienda, sin aplicar los filtros del listado">
+                <i class="fa-solid fa-file-excel" aria-hidden="true"></i> Descargar Excel
+            </button>
+            <span id="estadoExportacionClientes" role="status" aria-live="polite"></span>
             <div class="directory-status"><span></span> Directorio actualizado</div>
         </div>
         <!-- BARRA DE ACCIÓN MASIVA (Aparece cuando seleccionas 1 o más clientes) -->
@@ -829,6 +833,33 @@
         const { renderPager } = await import('../assets/js/core/pager.js');
         const tiendaInfo = await requireTiendaInfo();
         if (!tiendaInfo) throw new Error("No existe una tienda válida para esta sesión");
+
+        const exportButton = document.getElementById('btnExportarClientes');
+        const exportStatus = document.getElementById('estadoExportacionClientes');
+        exportButton.disabled = false;
+        exportButton.addEventListener('click', async () => {
+            if (exportButton.disabled) return;
+            exportButton.disabled = true;
+            exportButton.setAttribute('aria-busy', 'true');
+            exportStatus.textContent = 'Preparando todos los clientes...';
+            try {
+                const { obtenerClientesExportacion, crearExcelClientes, descargarExcelClientes } = await import('../assets/js/clientes-export.js');
+                const clientes = await obtenerClientesExportacion(supabase, tiendaInfo.id, optionalSummary);
+                if (!clientes.length) {
+                    exportStatus.textContent = 'No hay clientes para descargar.';
+                    return;
+                }
+                descargarExcelClientes(crearExcelClientes(clientes, tiendaInfo.nombre), tiendaInfo.nombre);
+                exportStatus.textContent = `Excel generado con ${clientes.length} clientes.`;
+            } catch (error) {
+                console.error('Error exportando clientes:', error);
+                exportStatus.textContent = 'No se pudo generar el Excel. Intenta de nuevo.';
+                mostrarToast('No se pudo descargar la lista completa de clientes.', true);
+            } finally {
+                exportButton.disabled = false;
+                exportButton.removeAttribute('aria-busy');
+            }
+        });
 
         // --- FUNCIONES GLOBALES ---
         window.abrirModal = () => {

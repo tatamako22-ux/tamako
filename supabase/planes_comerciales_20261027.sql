@@ -12,8 +12,8 @@ update public.tamaku_planes p set
     'crm_avanzado',v.codigo in ('PREMIUM','PRUEBA'),
     'multisede',v.codigo in ('PREMIUM','PRUEBA'),
     'tienda',v.codigo in ('PREMIUM','PRUEBA'),'servicio_cliente',true)
-from (values ('BASICO','Plata',69900,1),('PRO','Zafiro',119900,3),
-  ('PREMIUM','Diamante',199000,10),('PRUEBA','Prueba Diamante 7 días',0,10))
+from (values ('BASICO','Plata',34999,1),('PRO','Zafiro',69999,4),
+  ('PREMIUM','Diamante',159999,10),('PRUEBA','Prueba Diamante 7 días',0,10))
   as v(codigo,nombre,precio,usuarios)
 where p.codigo=v.codigo;
 
